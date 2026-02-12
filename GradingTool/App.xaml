@@ -1,0 +1,21 @@
+﻿<Application x:Class="GradingTool.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:GradingTool"
+             xmlns:converters="clr-namespace:GradingTool.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/ButtonStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Converters -->
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+            <converters:NullToBoolConverter x:Key="NullToBoolConverter"/>
+            <converters:GenerationModeConverter x:Key="GenerationModeConverter"/>
+            <converters:BoolToOppositeBoolConverter x:Key="BoolToOppositeBoolConverter"/>
+            <converters:StatusColorConverter x:Key="StatusColorConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

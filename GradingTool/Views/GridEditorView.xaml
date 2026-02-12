@@ -1,0 +1,397 @@
+<UserControl x:Class="GradingTool.Views.GridEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- En-tête avec chemin et bouton retour -->
+        <Border Grid.Row="0" 
+                Background="#F8F9FA" 
+                BorderBrush="#E0E0E0" 
+                BorderThickness="0,0,0,1"
+                Padding="16,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Chemin: Session/Cours/Travail/Groupe -->
+                <TextBlock Grid.Column="0"
+                           Text="{Binding NavigationPath}"
+                           VerticalAlignment="Center"
+                           FontSize="18"
+                           Foreground="#555555"/>
+
+                <!-- Boutons -->
+                <StackPanel Grid.Column="1" 
+                           Orientation="Horizontal" 
+                           HorizontalAlignment="Right">
+                    <Button Content="Produire sommaire"
+                            Command="{Binding ExportSummaryCommand}"
+                            Height="35"
+                            Padding="20,0"
+                            Margin="0,0,10,0"
+                            Style="{StaticResource RoundedButton}"
+                            Background="#17A2B8"/>
+                    <Button Content="Exporter PDF"
+                            Command="{Binding ExportPdfCommand}"
+                            Height="35"
+                            Padding="20,0"
+                            Margin="0,0,10,0"
+                            Style="{StaticResource RoundedButton}"
+                            Background="#DC3545"/>
+                    <Button Content="Enregistrer"
+                            Command="{Binding SaveCommand}"
+                            Height="35"
+                            Padding="20,0"
+                            Margin="0,0,10,0"
+                            Style="{StaticResource RoundedButton}"
+                            Background="#28A745"/>
+                    <Button Content="Retour"
+                            Command="{Binding GoBackCommand}"
+                            Height="35"
+                            Padding="20,0"
+                            Style="{StaticResource RoundedButton}"
+                            Background="#6C757D"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Contenu principal -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Panneau gauche - Liste des fichiers JSON -->
+            <Border Grid.Column="0" 
+                    Background="#F8F9FA" 
+                    BorderBrush="#E0E0E0" 
+                    BorderThickness="0,0,1,0">
+                <DockPanel>
+                    <!-- Titre de la section -->
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="Grilles du groupe"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               TextWrapping="Wrap"
+                               Foreground="#333333"
+                               Padding="16"
+                               Background="White"
+                               TextAlignment="Center"/>
+
+                    <!-- Liste des fichiers -->
+                    <ListBox ItemsSource="{Binding GridFiles}"
+                             SelectedItem="{Binding SelectedGridFile}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Margin="8">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="10,8" 
+                                        Background="White" 
+                                        Margin="0,4"
+                                        CornerRadius="4"
+                                        BorderBrush="#E0E0E0"
+                                        BorderThickness="1">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   TextWrapping="Wrap"
+                                                   LineHeight="20">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsTeam}" Value="True">
+                                                            <Setter Property="FontWeight" Value="Bold"/>
+                                                            <Setter Property="Foreground" Value="#0D6EFD"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsTeam}" Value="False">
+                                                            <Setter Property="Foreground" Value="#333333"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding MembersDisplay}"
+                                                   FontSize="13"
+                                                   Foreground="#333333"
+                                                   TextWrapping="Wrap"
+                                                   LineHeight="20">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsTeam}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </Border>
+
+            <!-- Panneau droit - Informations du fichier sélectionné -->
+            <Grid Grid.Column="1" Background="White">
+                <DockPanel>
+                    <!-- En-tête de l'éditeur avec 3 colonnes -->
+                    <Border DockPanel.Dock="Top"
+                            Background="#F8F9FA"
+                            BorderBrush="#E0E0E0"
+                            BorderThickness="0,0,0,1"
+                            Padding="20,16">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Colonne 1: Noms des étudiants -->
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Étudiants" 
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="#555555"
+                                           Margin="0,0,0,6"/>
+                                <TextBlock Text="{Binding SelectedGridFile.MembersWithDaDisplay}"
+                                           FontSize="14"
+                                           Foreground="#666666"
+                                           TextWrapping="Wrap"
+                                           LineHeight="18"/>
+                            </StackPanel>
+
+                            <!-- Colonne 2: Total des pénalités -->
+                            <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                <TextBlock Text="Pénalités appliquées" 
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="#555555"
+                                           Margin="0,0,0,6"/>
+                                <Border Background="#FFF3CD" 
+                                        CornerRadius="4"
+                                        Padding="12">
+                                    <TextBlock Text="{Binding TotalPenalties, StringFormat={}{0:F1} pts}"
+                                               FontSize="14"
+                                               FontWeight="Bold"
+                                               Foreground="#856404"
+                                               HorizontalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Colonne 3: Total des points -->
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Total des points" 
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="#555555"
+                                           Margin="0,0,0,6"/>
+                                <Border Background="#E8F4F8" 
+                                        CornerRadius="4"
+                                        Padding="12">
+                                    <TextBlock Text="{Binding TotalPoints, StringFormat={}{0:F1} pts}"
+                                               FontSize="14"
+                                               FontWeight="Bold"
+                                               Foreground="#0D6EFD"
+                                               HorizontalAlignment="Center"/>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Espace pour le contenu de l'éditeur -->
+                    <ScrollViewer Padding="20">
+                        <StackPanel>
+                            <!-- Titre Critères -->
+                            <TextBlock Text="Critères"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#333333"
+                                       Margin="0,0,0,16"/>
+                            
+                            <ItemsControl ItemsSource="{Binding CurrentGrid.Criteria}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#E0E0E0" 
+                                                BorderThickness="0,0,0,1" 
+                                                Padding="0,16"
+                                                Margin="0,0,0,8">
+                                            <StackPanel>
+                                                <!-- Label du critère -->
+                                                <TextBlock Text="{Binding Label}"
+                                                           FontSize="14"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#333333"
+                                                           Margin="0,0,0,12"/>
+                                                
+                                                <!-- Contrôles d'édition -->
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="20"/>
+                                                        <ColumnDefinition Width="2*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    
+                                                    <!-- Label et Dropdown pour le résultat -->
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock FontSize="12"
+                                                                   Foreground="#666666"
+                                                                   Margin="0,0,0,4">
+                                                            <TextBlock.Text>
+                                                                <MultiBinding StringFormat="Résultat - {0:F1} pts">
+                                                                    <Binding Path="Points"/>
+                                                                </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                        <ComboBox x:Name="resultComboBox"
+                                                                  ItemsSource="{Binding Scale}"
+                                                                  SelectedValue="{Binding Result}"
+                                                                  SelectedValuePath="Qualitative"
+                                                                  Height="32"
+                                                                  Padding="8,4"
+                                                                  PreviewMouseWheel="ComboBox_PreviewMouseWheel">
+                                                            <ComboBox.Style>
+                                                                <Style TargetType="ComboBox">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Result}" Value="">
+                                                                            <Setter Property="SelectedIndex" Value="0"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </ComboBox.Style>
+                                                            <ComboBox.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <TextBlock>
+                                                                        <TextBlock.Text>
+                                                                            <MultiBinding StringFormat="{}{0} - {1} ({2} %)">
+                                                                                <Binding Path="Qualitative"/>
+                                                                                <Binding Path="Label"/>
+                                                                                <Binding Path="Points"/>
+                                                                            </MultiBinding>
+                                                                        </TextBlock.Text>
+                                                                    </TextBlock>
+                                                                </DataTemplate>
+                                                            </ComboBox.ItemTemplate>
+                                                        </ComboBox>
+                                                    </StackPanel>
+                                                    
+                                                    <!-- Espace -->
+                                                    <TextBlock Grid.Column="1"/>
+                                                    
+                                                    <!-- Label et Champ Rétroaction -->
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Text="Rétroaction"
+                                                                   FontSize="12"
+                                                                   Foreground="#666666"
+                                                                   Margin="0,0,0,4"/>
+                                                        <TextBox Text="{Binding Feedback}"
+                                                                 MinHeight="32"
+                                                                 Padding="8,4"
+                                                                 VerticalContentAlignment="Top"
+                                                                 AcceptsReturn="True"
+                                                                 TextWrapping="Wrap"
+                                                                 VerticalScrollBarVisibility="Auto"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- Titre Pénalités -->
+                            <TextBlock Text="Pénalités"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="#333333"
+                                       Margin="0,32,0,16"/>
+                            
+                            <ItemsControl ItemsSource="{Binding CurrentGrid.Penalties}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="#E0E0E0" 
+                                                BorderThickness="0,0,0,1" 
+                                                Padding="0,16"
+                                                Margin="0,0,0,8">
+                                            <StackPanel>
+                                                <!-- Label de la pénalité -->
+                                                <TextBlock FontSize="14"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#333333"
+                                                           Margin="0,0,0,12">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="{}{0} ({1:F1} pts)">
+                                                            <Binding Path="Label"/>
+                                                            <Binding Path="ComputedPenalty"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                                
+                                                <!-- Contrôles d'édition -->
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="20"/>
+                                                        <ColumnDefinition Width="2*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    
+                                                    <!-- Champ Count -->
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="Nombre"
+                                                                   FontSize="12"
+                                                                   Foreground="#666666"
+                                                                   Margin="0,0,0,4"/>
+                                                        <TextBox Text="{Binding Count, UpdateSourceTrigger=PropertyChanged}"
+                                                                 Height="32"
+                                                                 Padding="8,4"/>
+                                                    </StackPanel>
+                                                    
+                                                    <!-- Espace -->
+                                                    <TextBlock Grid.Column="1"/>
+                                                    
+                                                    <!-- Champ Reason -->
+                                                    <StackPanel Grid.Column="2">
+                                                        <TextBlock Text="Raison"
+                                                                   FontSize="12"
+                                                                   Foreground="#666666"
+                                                                   Margin="0,0,0,4"/>
+                                                        <TextBox Text="{Binding Reason, UpdateSourceTrigger=PropertyChanged}"
+                                                                 MinHeight="32"
+                                                                 Padding="8,4"
+                                                                 VerticalContentAlignment="Top"
+                                                                 AcceptsReturn="True"
+                                                                 TextWrapping="Wrap"
+                                                                 VerticalScrollBarVisibility="Auto"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

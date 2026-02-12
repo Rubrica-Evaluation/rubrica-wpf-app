@@ -1,0 +1,36 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (WPF)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/wpf-app/GradingTool/bin/Debug/net8.0-windows/GradingTool.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/wpf-app/GradingTool",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        },
+        {
+            "name": "Launch with dotnet run",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/wpf-app/GradingTool/bin/Debug/net8.0-windows/GradingTool.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/wpf-app/GradingTool",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart",
+            "launchSettingsProfile": "GradingTool"
+        }
+    ]
+}

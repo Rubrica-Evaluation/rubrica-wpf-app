@@ -1,0 +1,45 @@
+﻿<Window x:Class="GradingTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GradingTool"
+        xmlns:vm="clr-namespace:GradingTool.ViewModels"
+        xmlns:views="clr-namespace:GradingTool.Views"
+        mc:Ignorable="d"
+        Title="Grading Tool" 
+        Height="800" 
+        Width="1280"
+        WindowStartupLocation="CenterScreen"
+        Background="White">
+
+    <Window.Resources>
+        <!-- DataTemplate pour WorkspaceViewModel -->
+        <DataTemplate DataType="{x:Type vm:WorkspaceViewModel}">
+            <views:WorkspaceView/>
+        </DataTemplate>
+        
+        <!-- DataTemplate pour GridEditorViewModel -->
+        <DataTemplate DataType="{x:Type vm:GridEditorViewModel}">
+            <views:GridEditorView/>
+        </DataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- En-tête -->
+        <Border Grid.Row="0" Background="#F5F5F5" Padding="20,16">
+            <TextBlock Text="Outil d'évaluation"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="#333333"/>
+        </Border>
+        
+        <!-- Contenu - Affiche CurrentView -->
+        <ContentControl Grid.Row="1" Content="{Binding NavigationService.CurrentView}"/>
+    </Grid>
+</Window>

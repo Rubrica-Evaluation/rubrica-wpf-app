@@ -1,0 +1,517 @@
+<UserControl x:Class="GradingTool.Views.WorkspaceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="1200"
+             Background="White">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Panneau gauche - Navigation -->
+        <Border Grid.Column="0" 
+                BorderBrush="#E0E0E0" 
+                BorderThickness="0,0,1,0"
+                Background="White"
+                Padding="20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <Grid Grid.Row="0" Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0"
+                               Text="Dossier racine"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="#333333"
+                               VerticalAlignment="Center"/>
+                    
+                    <Button Grid.Column="1"
+                            Content="{Binding SelectFolderButtonText}"
+                            Style="{StaticResource RoundedButton}"
+                            Command="{Binding SelectSessionsRootCommand}"
+                            FontSize="11"
+                            Padding="10,4"/>
+                </Grid>
+                
+                <!-- Affichage du chemin configuré -->
+                <TextBlock Grid.Row="1"
+                           Text="{Binding SessionsRootPath, FallbackValue='Non configuré'}"
+                           FontSize="11"
+                           Foreground="#666666"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,20"
+                           Visibility="{Binding IsSessionsRootConfigured, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                
+                <!-- Message si non configuré -->
+                <TextBlock Grid.Row="1"
+                           Text="Aucun dossier racine configuré"
+                           FontSize="11"
+                           Foreground="#999999"
+                           FontStyle="Italic"
+                           Margin="0,0,0,20"
+                           Visibility="{Binding IsSessionsRootConfigured, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+
+                <!-- Section Sessions -->
+                <Grid Grid.Row="3" 
+                      Margin="0,0,0,10"
+                      Visibility="{Binding IsSessionsRootConfigured, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0"
+                               Text="Sessions"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="#333333"
+                               VerticalAlignment="Center"/>
+                    
+                    <Button Grid.Column="1"
+                            Content="+"
+                            Command="{Binding CreateNewSessionCommand}"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Padding="8,4"
+                            MinWidth="32"
+                            Margin="0,0,4,0"
+                            Style="{StaticResource RoundedButton}"/>
+                    
+                    <Button Grid.Column="2"
+                            Content="✏"
+                            Command="{Binding EditSessionCommand}"
+                            FontSize="14"
+                            Padding="8,4"
+                            MinWidth="32"
+                            Margin="0,0,4,0"
+                            Background="#FFA500"
+                            Style="{StaticResource RoundedButton}"/>
+                    
+                    <Button Grid.Column="3"
+                            Content="−"
+                            Command="{Binding DeleteSessionCommand}"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Padding="8,4"
+                            MinWidth="32"
+                            Background="#DC3545"
+                            Style="{StaticResource RoundedButton}"/>
+                </Grid>
+                
+                <ComboBox Grid.Row="5"
+                          ItemsSource="{Binding Sessions}"
+                          SelectedItem="{Binding SelectedSession}"
+                          FontSize="13"
+                          Padding="8,6"
+                          Margin="0,0,0,10"
+                          Visibility="{Binding IsSessionsRootConfigured, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                
+                <!-- Section Cours -->
+                <Grid Grid.Row="6" 
+                      Margin="0,20,0,12"
+                      Visibility="{Binding IsSessionSelected, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0"
+                               Text="Cours"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="#333333"
+                               VerticalAlignment="Center"/>
+                    
+                    <Button Grid.Column="1"
+                            Content="+"
+                            Command="{Binding CreateNewCourseCommand}"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Padding="8,4"
+                            MinWidth="32"
+                            Margin="0,0,4,0"
+                            Style="{StaticResource RoundedButton}"/>
+                    
+                    <Button Grid.Column="2"
+                            Content="✏"
+                            Command="{Binding EditCourseCommand}"
+                            FontSize="14"
+                            Padding="8,4"
+                            MinWidth="32"
+                            Margin="0,0,4,0"
+                            Background="#FFA500"
+                            Style="{StaticResource RoundedButton}"/>
+                    
+                    <Button Grid.Column="3"
+                            Content="−"
+                            Command="{Binding DeleteCourseCommand}"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Padding="8,4"
+                            MinWidth="32"
+                            Background="#DC3545"
+                            Style="{StaticResource RoundedButton}"/>
+                </Grid>
+                
+                <ListBox Grid.Row="7"
+                         ItemsSource="{Binding Courses}"
+                         SelectedItem="{Binding SelectedCourse}"
+                         FontSize="13"
+                         Padding="8"
+                         BorderBrush="#E0E0E0"
+                         BorderThickness="1"
+                         MaxHeight="200"
+                         MinHeight="50"
+                         Visibility="{Binding IsSessionSelected, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="8,6"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+
+                <!-- Section Évaluations -->
+                <Grid Grid.Row="8" 
+                      Margin="0,20,0,12"
+                      Visibility="{Binding IsCourseSelected, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0"
+                               Text="Évaluations"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               Foreground="#333333"
+                               VerticalAlignment="Center"/>
+                    
+                    <Button Grid.Column="1"
+                            Content="+"
+                            Command="{Binding CreateNewWorkCommand}"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Padding="8,4"
+                            MinWidth="32"
+                            Margin="0,0,4,0"
+                            Style="{StaticResource RoundedButton}"/>
+                    
+                    <Button Grid.Column="2"
+                            Content="✏"
+                            Command="{Binding EditWorkCommand}"
+                            FontSize="14"
+                            Padding="8,4"
+                            MinWidth="32"
+                            Margin="0,0,4,0"
+                            Background="#FFA500"
+                            Style="{StaticResource RoundedButton}"/>
+                    
+                    <Button Grid.Column="3"
+                            Content="−"
+                            Command="{Binding DeleteWorkCommand}"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Padding="8,4"
+                            MinWidth="32"
+                            Background="#DC3545"
+                            Style="{StaticResource RoundedButton}"/>
+                </Grid>
+                
+                <ListBox Grid.Row="10"
+                         ItemsSource="{Binding Works}"
+                         SelectedItem="{Binding SelectedWork}"
+                         FontSize="13"
+                         Padding="8"
+                         BorderBrush="#E0E0E0"
+                         BorderThickness="1"
+                         Visibility="{Binding IsCourseSelected, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="8,6"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </Grid>
+        </Border>
+        
+        <!-- Panneau droit - Contenu principal -->
+        <Grid Grid.Column="1" Margin="20">
+            <!-- Message si aucune évaluation sélectionnée -->
+            <StackPanel VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Margin="40">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedWork}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                
+                <TextBlock Text="Espace de travail"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="#333333"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,20"/>
+                
+                <TextBlock Text="Sélectionnez une évaluation pour voir les détails."
+                           FontSize="16"
+                           Foreground="#666666"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center"
+                           MaxWidth="500"/>
+            </StackPanel>
+
+            <!-- Détails de l'évaluation -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ScrollViewer.Style>
+                    <Style TargetType="ScrollViewer">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedWork, Converter={StaticResource NullToBoolConverter}}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ScrollViewer.Style>
+                
+                <StackPanel>
+                    <TextBlock Text="Détails de l'évaluation"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               Foreground="#333333"
+                               Margin="0,0,0,20"/>
+                    
+                    <TextBlock FontSize="16"
+                               Foreground="#666666"
+                               Margin="0,0,0,20">
+                        <Run Text="Évaluation:"/>
+                        <Run Text="{Binding SelectedWork, FallbackValue='N/A'}" FontWeight="SemiBold" Foreground="#333333"/>
+                    </TextBlock>
+
+                    <!-- Section Rubrique -->
+                    <TextBlock Text="Rubrique (rubric.json)"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="#333333"
+                               Margin="0,0,0,16"/>
+
+                    <Border Background="#F5F5F5"
+                            BorderBrush="#E0E0E0"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="16"
+                            Margin="0,0,0,12">
+                        <StackPanel>
+                            <!-- Statut de la rubrique -->
+                            <TextBlock FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,12">
+                                <Run Text="{Binding RubricStatusText}"/>
+                                <Run.Foreground>
+                                    <SolidColorBrush Color="{Binding RubricStatusColor}"/>
+                                </Run.Foreground>
+                            </TextBlock>
+
+                            <!-- Boutons -->
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Charger une rubrique"
+                                        Command="{Binding LoadRubricCommand}"
+                                        Style="{StaticResource RoundedButton}"
+                                        FontSize="13"
+                                        Padding="16,8"
+                                        Margin="0,0,12,0"/>
+                                
+                                <Button Content="Télécharger template"
+                                        Command="{Binding DownloadRubricTemplateCommand}"
+                                        Style="{StaticResource RoundedButton}"
+                                        FontSize="13"
+                                        Padding="16,8"
+                                        Margin="0,0,12,0"
+                                        Background="#6C757D"/>
+                                
+                                <Button Content="📁 Ouvrir dans l'explorateur"
+                                        Command="{Binding OpenRubricInExplorerCommand}"
+                                        Style="{StaticResource RoundedButton}"
+                                        FontSize="13"
+                                        Padding="16,8"
+                                        Background="#17A2B8"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Section Étudiants -->
+                    <TextBlock Text="Étudiants"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="#333333"
+                               Margin="0,24,0,16"/>
+
+                    <Border Background="#F5F5F5"
+                            BorderBrush="#E0E0E0"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="16"
+                            Margin="0,0,0,12">
+                        <StackPanel>
+                            <!-- Statut du roster -->
+                            <TextBlock FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,12">
+                                <Run Text="{Binding RosterStatusText}"/>
+                                <Run.Foreground>
+                                    <SolidColorBrush Color="{Binding RosterStatusColor}"/>
+                                </Run.Foreground>
+                            </TextBlock>
+
+                            <!-- Liste des groupes détectés -->
+                            <ListBox ItemsSource="{Binding Groups}"
+                                     SelectedItem="{Binding SelectedGroup}"
+                                     Margin="0,0,0,12"
+                                     Visibility="{Binding RosterExists, Converter={StaticResource BoolToVisibilityConverter}}"
+                                     BorderThickness="1"
+                                     BorderBrush="#28A745"
+                                     Background="White">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,0,0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <Border Grid.Column="0"
+                                                    Background="#E8F5E8"
+                                                    BorderBrush="#28A745"
+                                                    BorderThickness="1"
+                                                    CornerRadius="4"
+                                                    Padding="8"
+                                                    Margin="0,0,8,0">
+                                                <TextBlock Text="{Binding DisplayName}"
+                                                           FontSize="12"
+                                                           Foreground="#155724"/>
+                                            </Border>
+                                            
+                                            <Button Grid.Column="1"
+                                                    Content="X"
+                                                    Command="{Binding DataContext.DeleteRosterFileCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                    CommandParameter="{Binding}"
+                                                    FontSize="12"
+                                                    FontWeight="Bold"
+                                                    Padding="6,2"
+                                                    MinWidth="24"
+                                                    Background="#DC3545"
+                                                    Style="{StaticResource RoundedButton}"
+                                                    ToolTip="Supprimer cette liste d'étudiants"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <!-- Options de génération pour équipes -->
+                            <Border Background="#FFF8E1"
+                                    BorderBrush="#FFC107"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="12"
+                                    Margin="0,0,0,12"
+                                    Visibility="{Binding HasTeams, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <StackPanel>
+                                    <TextBlock Text="Mode de génération des grilles"
+                                               FontWeight="SemiBold"
+                                               FontSize="13"
+                                               Margin="0,0,0,8"/>
+                                    
+                                    <RadioButton Content="Une grille par étudiant"
+                                                 IsChecked="{Binding GenerationMode, Converter={StaticResource GenerationModeConverter}, ConverterParameter=individual}"
+                                                 GroupName="GenerationMode"
+                                                 FontSize="13"
+                                                 Margin="0,0,0,4"/>
+                                    
+                                    <RadioButton Content="Une grille par équipe"
+                                                 IsChecked="{Binding GenerationMode, Converter={StaticResource GenerationModeConverter}, ConverterParameter=team}"
+                                                 GroupName="GenerationMode"
+                                                 FontSize="13"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Boutons -->
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Charger des groupes"
+                                        Command="{Binding LoadRosterCommand}"
+                                        Style="{StaticResource RoundedButton}"
+                                        FontSize="13"
+                                        Padding="16,8"
+                                        Margin="0,0,12,0"/>
+                                
+                                <Button Content="Télécharger template"
+                                        Command="{Binding DownloadRosterTemplateCommand}"
+                                        Style="{StaticResource RoundedButton}"
+                                        FontSize="13"
+                                        Padding="16,8"
+                                        Margin="0,0,12,0"
+                                        Background="#6C757D"/>
+                                
+                                <Button Content="Générer tout le groupe"
+                                        Command="{Binding GenerateGroupGridsCommand}"
+                                        Style="{StaticResource RoundedButton}"
+                                        FontSize="13"
+                                        Padding="16,8"
+                                        Margin="0,0,12,0"
+                                        Background="#007BFF"
+                                        IsEnabled="{Binding CanGenerateGroupGrids}"/>
+                                
+                                <Button Content="Ouvrir dossier de grading"
+                                        Command="{Binding OpenGradingFolderCommand}"
+                                        Style="{StaticResource RoundedButton}"
+                                        FontSize="13"
+                                        Padding="16,8"
+                                        Margin="0,0,12,0"
+                                        Background="#17A2B8"
+                                        IsEnabled="{Binding SelectedGroup, Converter={StaticResource NullToBoolConverter}}"/>
+                                
+                                <Button Content="Ouvrir l'éditeur"
+                                        Command="{Binding NavigateToGridEditorCommand}"
+                                        Style="{StaticResource RoundedButton}"
+                                        FontSize="13"
+                                        Padding="16,8"
+                                        Background="#28A745"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</UserControl>
