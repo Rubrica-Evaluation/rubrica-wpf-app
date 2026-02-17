@@ -100,6 +100,27 @@ public class PdfService : IPdfService
                 y += cellHeight;
             }
 
+            // Draw penalty rows
+            if (grid.Penalties.Any())
+            {
+                foreach (var penalty in grid.Penalties)
+                {
+                    string resultText = penalty.Count.ToString();
+                    string pointsText = penalty.ComputedPenalty.ToString("F2");
+
+                    // Handle wrapped text for penalty labels
+                    var wrappedLabel = WrapText(gfx, penalty.Label, tableFont, col1Width - 8);
+                    double cellHeight = Math.Max(wrappedLabel.Count * 14 + 4, rowHeight);
+
+                    // Draw row
+                    DrawMultilineTableCell(gfx, tableX, y, col1Width, cellHeight, wrappedLabel, tableFont, false);
+                    DrawTableCell(gfx, tableX + col1Width, y, col2Width, cellHeight, "—", tableFont, false);
+                    DrawTableCell(gfx, tableX + col1Width + col2Width, y, col3Width, cellHeight, resultText, tableFont, false);
+                    DrawTableCell(gfx, tableX + col1Width + col2Width + col3Width, y, col4Width, cellHeight, pointsText, tableFont, false);
+                    y += cellHeight;
+                }
+            }
+
             // Draw total row
             string totalText = grid.Computed?.Total?.ToString("F2") ?? "0.00";
             DrawTableCell(gfx, tableX, y, col1Width, rowHeight, "TOTAL", tableHeaderFont, true);
@@ -134,6 +155,46 @@ public class PdfService : IPdfService
                     page = document.AddPage();
                     gfx = XGraphics.FromPdfPage(page);
                     y = 40;
+                }
+            }
+
+            // "Raisons des pénalités" section
+            if (grid.Penalties.Any(p => !string.IsNullOrWhiteSpace(p.Reason)))
+            {
+                // Check if we need a new page
+                if (y > page.Height - 100)
+                {
+                    page = document.AddPage();
+                    gfx = XGraphics.FromPdfPage(page);
+                    y = 40;
+                }
+
+                y += 15;
+                gfx.DrawString("Raisons des pénalités", sectionFont, XBrushes.Black, new XRect(leftMargin, y, contentWidth, 18), XStringFormats.TopLeft);
+                y += 25;
+
+                foreach (var penalty in grid.Penalties.Where(p => !string.IsNullOrWhiteSpace(p.Reason)))
+                {
+                    string labelText = $"{penalty.Label} — Nombre: {penalty.Count}";
+                    string reasonText = penalty.Reason;
+                    
+                    // Draw penalty label in bold
+                    gfx.DrawString(labelText, boldRegularFont, XBrushes.Black, new XRect(leftMargin, y, contentWidth, 20), XStringFormats.TopLeft);
+                    y += 18;
+                    
+                    y += 4;
+                    
+                    // Draw reason
+                    gfx.DrawString(reasonText, tableFont, XBrushes.Black, new XRect(leftMargin, y, contentWidth, 20), XStringFormats.TopLeft);
+                    y += 20;
+
+                    // Check if we need a new page
+                    if (y > page.Height - 40)
+                    {
+                        page = document.AddPage();
+                        gfx = XGraphics.FromPdfPage(page);
+                        y = 40;
+                    }
                 }
             }
 
