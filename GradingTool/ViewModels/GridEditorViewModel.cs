@@ -132,6 +132,11 @@ public partial class GridEditorViewModel : ObservableObject
     {
         CurrentGrid = await _gridService.LoadGridAsync(filePath);
         
+        // Charger les commentaires réutilisables depuis le répertoire grading
+        var groupPath = Path.GetDirectoryName(filePath)!;
+        var gradingPath = Path.GetDirectoryName(groupPath)!;  // Remonter au répertoire grading
+        await _commentService.LoadCommentsAsync(gradingPath);
+        
         // Attacher les event handlers pour recalculer le total quand les points changent
         if (CurrentGrid != null)
         {
@@ -176,6 +181,7 @@ public partial class GridEditorViewModel : ObservableObject
             // Le basePath doit être le répertoire du travail (ex: TP1), pas le répertoire grading
             var basePath = Path.GetDirectoryName(Path.GetDirectoryName(SelectedGridFile.FilePath))!;
             await _gridService.SaveGridAsync(CurrentGrid, basePath);
+            await _commentService.SaveCommentsAsync(basePath);
         }
     }
 
@@ -251,7 +257,7 @@ public partial class GridEditorViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void ConfirmFeedback(CriterionModel? criterion)
+    public async Task ConfirmFeedback(CriterionModel? criterion)
     {
         if (criterion == null || string.IsNullOrWhiteSpace(criterion.FeedbackInput))
             return;
@@ -259,6 +265,10 @@ public partial class GridEditorViewModel : ObservableObject
         if (criterion.EditingFeedbackIndex < 0)
         {
             criterion.Feedback.Add(criterion.FeedbackInput);
+            
+            // Sauvegarder le nouveau commentaire dans la banque réutilisable
+            _commentService.AddCommentForCriterion(criterion.Label, criterion.FeedbackInput);
+            // Note: La sauvegarde se fera lors de SaveAsync
         }
         else if (criterion.EditingFeedbackIndex < criterion.Feedback.Count)
         {
@@ -266,6 +276,7 @@ public partial class GridEditorViewModel : ObservableObject
         }
 
         CancelFeedback(criterion);
+        await Task.CompletedTask;
     }
 
     [RelayCommand]
@@ -315,14 +326,18 @@ public partial class GridEditorViewModel : ObservableObject
             
             if (success)
             {
+                // Sauvegarder les commentaires réutilisables dans le répertoire grading
+                var groupPath = Path.GetDirectoryName(SelectedGridFile.FilePath)!;
+                var gradingPath = Path.GetDirectoryName(groupPath)!;  // Remonter au répertoire grading
+                await _commentService.SaveCommentsAsync(gradingPath);
+                
                 _dialogService.ShowToast("Sauvegarde réussie");
                 
                 // Stocker le chemin du fichier actuel avant de recharger
                 var currentFilePath = SelectedGridFile.FilePath;
                 
                 // Recharger la liste des fichiers pour mettre à jour les informations
-                var gradingPath = Path.GetDirectoryName(currentFilePath)!;
-                var gridFileList = _gridService.LoadGridFiles(gradingPath);
+                var gridFileList = _gridService.LoadGridFiles(groupPath);
                 GridFiles.Clear();
                 foreach (var gridFile in gridFileList)
                 {

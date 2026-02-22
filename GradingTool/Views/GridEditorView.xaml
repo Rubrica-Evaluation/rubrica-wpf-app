@@ -332,30 +332,27 @@
                                                             
                                                             <!-- Boutons -->
                                                             <StackPanel Grid.Column="0" Orientation="Horizontal">
-                                                                <Button Content="➕ Ajouter"
+                                                                <Button Content="➕"
                                                                         Height="28"
-                                                                        Padding="12,0"
-                                                                        Margin="0,0,4,0"
+                                                                        Padding="6,0"
+                                                                        Margin="0,0,2,0"
                                                                         Background="#28A745"
-                                                                        Foreground="White"
-                                                                        FontSize="11"
+                                                                        Style="{StaticResource RoundedButton}"
                                                                         Command="{Binding DataContext.AddFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding}"/>
-                                                                <Button Content="✏️ Modifier"
+                                                                <Button Content="✏️"
                                                                         Height="28"
-                                                                        Padding="12,0"
-                                                                        Margin="0,0,4,0"
+                                                                        Padding="6,0"
+                                                                        Margin="0,0,2,0"
                                                                         Background="#0D6EFD"
-                                                                        Foreground="White"
-                                                                        FontSize="11"
+                                                                        Style="{StaticResource RoundedButton}"
                                                                         Command="{Binding DataContext.EditFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding}"/>
-                                                                <Button Content="🗑️ Supprimer"
+                                                                <Button Content="🗑️"
                                                                         Height="28"
-                                                                        Padding="12,0"
+                                                                        Padding="6,0"
                                                                         Background="#DC3545"
-                                                                        Foreground="White"
-                                                                        FontSize="11"
+                                                                        Style="{StaticResource RoundedButton}"
                                                                         Command="{Binding DataContext.DeleteFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding}"/>
                                                             </StackPanel>
@@ -366,11 +363,10 @@
                                                                       ItemsSource="{Binding SuggestedComments}"
                                                                       SelectedIndex="0"
                                                                       SelectionChanged="SuggestedCommentsComboBox_SelectionChanged"
-                                                                      Margin="20,0,0,0"
+                                                                      Margin="8,0,0,0"
                                                                       Height="28"
                                                                       Padding="8,4"
-                                                                      HorizontalAlignment="Right"
-                                                                      Width="250"
+                                                                      HorizontalAlignment="Stretch"
                                                                       IsEditable="False"/>
                                                         </Grid>
                                                         
@@ -394,16 +390,14 @@
                                                                     Padding="10,0"
                                                                     Margin="0,0,4,0"
                                                                     Background="#28A745"
-                                                                    Foreground="White"
-                                                                    FontSize="10"
+                                                                    Style="{StaticResource RoundedButton}"
                                                                     Command="{Binding DataContext.ConfirmFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                     CommandParameter="{Binding}"/>
                                                             <Button Content="✕ Annuler"
                                                                     Height="24"
                                                                     Padding="10,0"
                                                                     Background="#6C757D"
-                                                                    Foreground="White"
-                                                                    FontSize="10"
+                                                                    Style="{StaticResource RoundedButton}"
                                                                     Command="{Binding DataContext.CancelFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                     CommandParameter="{Binding}"/>
                                                         </StackPanel>

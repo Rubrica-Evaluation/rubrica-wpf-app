@@ -15,4 +15,16 @@ public interface ICommentService
     /// <param name="criterionLabel">Le label du critère</param>
     /// <param name="comment">Le commentaire à ajouter</param>
     void AddCommentForCriterion(string criterionLabel, string comment);
+
+    /// <summary>
+    /// Sauvegarde les commentaires dans un fichier JSON
+    /// </summary>
+    /// <param name="gradingPath">Le chemin du répertoire grading</param>
+    Task SaveCommentsAsync(string gradingPath);
+
+    /// <summary>
+    /// Charge les commentaires depuis un fichier JSON
+    /// </summary>
+    /// <param name="gradingPath">Le chemin du répertoire grading</param>
+    Task LoadCommentsAsync(string gradingPath);
 }

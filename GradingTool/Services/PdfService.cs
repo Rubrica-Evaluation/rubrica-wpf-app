@@ -137,9 +137,6 @@ public class PdfService : IPdfService
             foreach (var criterion in grid.Criteria)
             {
                 string labelText = $"{criterion.Label} — Résultat: {criterion.Result ?? "—"}";
-                string feedbackText = criterion.Feedback != null && criterion.Feedback.Count > 0
-                    ? string.Join(Environment.NewLine, criterion.Feedback)
-                    : "—";
                 
                 // Draw criterion label in bold
                 gfx.DrawString(labelText, boldRegularFont, XBrushes.Black, new XRect(leftMargin, y, contentWidth, 20), XStringFormats.TopLeft);
@@ -147,9 +144,35 @@ public class PdfService : IPdfService
                 
                 y += 4;
                 
-                // Draw feedback
-                gfx.DrawString(feedbackText, tableFont, XBrushes.Black, new XRect(leftMargin, y, contentWidth, 20), XStringFormats.TopLeft);
-                y += 20;
+                // Draw feedback - each comment on its own line with proper spacing
+                if (criterion.Feedback != null && criterion.Feedback.Count > 0)
+                {
+                    foreach (var feedback in criterion.Feedback)
+                    {
+                        // Wrap text for long feedback items
+                        var wrappedFeedback = WrapText(gfx, feedback, tableFont, contentWidth - 20);
+                        
+                        // Draw bullet point
+                        gfx.DrawString("•", tableFont, XBrushes.Black, new XRect(leftMargin, y, 10, 14), XStringFormats.TopLeft);
+                        
+                        // Draw feedback lines with indentation
+                        double feedbackX = leftMargin + 15;
+                        foreach (var line in wrappedFeedback)
+                        {
+                            gfx.DrawString(line, tableFont, XBrushes.Black, new XRect(feedbackX, y, contentWidth - 20, 14), XStringFormats.TopLeft);
+                            y += 14;
+                        }
+                        
+                        y += 2; // Extra spacing between items
+                    }
+                }
+                else
+                {
+                    gfx.DrawString("—", tableFont, XBrushes.Black, new XRect(leftMargin, y, contentWidth, 16), XStringFormats.TopLeft);
+                    y += 18;
+                }
+                
+                y += 4;
 
                 // Check if we need a new page
                 if (y > page.Height - 40)
@@ -178,7 +201,6 @@ public class PdfService : IPdfService
                 foreach (var penalty in grid.Penalties.Where(p => !string.IsNullOrWhiteSpace(p.Reason)))
                 {
                     string labelText = $"{penalty.Label} — Nombre: {penalty.Count}";
-                    string reasonText = penalty.Reason;
                     
                     // Draw penalty label in bold
                     gfx.DrawString(labelText, boldRegularFont, XBrushes.Black, new XRect(leftMargin, y, contentWidth, 20), XStringFormats.TopLeft);
@@ -186,9 +208,21 @@ public class PdfService : IPdfService
                     
                     y += 4;
                     
-                    // Draw reason
-                    gfx.DrawString(reasonText, tableFont, XBrushes.Black, new XRect(leftMargin, y, contentWidth, 20), XStringFormats.TopLeft);
-                    y += 20;
+                    // Draw reason with proper text wrapping
+                    var wrappedReason = WrapText(gfx, penalty.Reason, tableFont, contentWidth - 15);
+                    
+                    // Draw bullet point
+                    gfx.DrawString("•", tableFont, XBrushes.Black, new XRect(leftMargin, y, 10, 14), XStringFormats.TopLeft);
+                    
+                    // Draw reason lines with indentation
+                    double reasonX = leftMargin + 15;
+                    foreach (var line in wrappedReason)
+                    {
+                        gfx.DrawString(line, tableFont, XBrushes.Black, new XRect(reasonX, y, contentWidth - 20, 14), XStringFormats.TopLeft);
+                        y += 14;
+                    }
+                    
+                    y += 6; // Extra spacing between items
 
                     // Check if we need a new page
                     if (y > page.Height - 40)
@@ -249,27 +283,42 @@ public class PdfService : IPdfService
     private List<string> WrapText(XGraphics gfx, string text, XFont font, double maxWidth)
     {
         var lines = new List<string>();
-        var words = text.Split(' ');
-        var currentLine = "";
-        foreach (var word in words)
+        
+        // D'abord diviser par les retours de ligne explicites (\r\n ou \n)
+        var paragraphs = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+        
+        foreach (var paragraph in paragraphs)
         {
-            var testLine = string.IsNullOrEmpty(currentLine) ? word : currentLine + " " + word;
-            var size = gfx.MeasureString(testLine, font);
+            // Pour chaque paragraphe, appliquer le wrapping
+            var words = paragraph.Split(' ');
+            var currentLine = "";
+            
+            foreach (var word in words)
+            {
+                var testLine = string.IsNullOrEmpty(currentLine) ? word : currentLine + " " + word;
+                var size = gfx.MeasureString(testLine, font);
 
-            if (size.Width > maxWidth && !string.IsNullOrEmpty(currentLine))
+                if (size.Width > maxWidth && !string.IsNullOrEmpty(currentLine))
+                {
+                    lines.Add(currentLine);
+                    currentLine = word;
+                }
+                else
+                {
+                    currentLine = testLine;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(currentLine))
             {
                 lines.Add(currentLine);
-                currentLine = word;
             }
-            else
+            
+            // Si le paragraphe était vide (deux retours de ligne à la suite), ajouter une ligne vide
+            if (string.IsNullOrWhiteSpace(paragraph) && lines.Count > 0 && !string.IsNullOrEmpty(lines[lines.Count - 1]))
             {
-                currentLine = testLine;
+                lines.Add("");
             }
-        }
-
-        if (!string.IsNullOrEmpty(currentLine))
-        {
-            lines.Add(currentLine);
         }
 
         return lines;

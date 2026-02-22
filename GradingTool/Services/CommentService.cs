@@ -1,65 +1,19 @@
 namespace GradingTool.Services;
 
+using System.Text.Json;
+using System.Text.Encodings.Web;
+using System.IO;
+
 public class CommentService : ICommentService
 {
     private readonly Dictionary<string, List<string>> _commentsByCriteria;
+    private const string CommentsFileName = "reusable_comments.json";
 
     public CommentService()
     {
-        // Initialiser avec des commentaires mockés
-        _commentsByCriteria = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
-        {
-            {
-                "Structure des tables",
-                new List<string>
-                {
-                    "Code clair et facile à comprendre",
-                    "Code relativement clair",
-                    "Code peu clair, manque de structure",
-                    "Code difficile à comprendre, très désorganisé"
-                }
-            },
-            {
-                "Contraintes",
-                new List<string>
-                {
-                    "Solution complètement correcte",
-                    "Solution correcte avec quelques erreurs mineures",
-                    "Solution partiellement correcte",
-                    "Solution incorrecte ou incomplète"
-                }
-            },
-            {
-                "Relations (PK / FK)",
-                new List<string>
-                {
-                    "Toutes les exigences sont satisfaites",
-                    "La plupart des exigences sont satisfaites",
-                    "Plusieurs exigences sont manquantes",
-                    "Beaucoup d'exigences sont manquantes"
-                }
-            },
-            {
-                "Fichiers SQL remis",
-                new List<string>
-                {
-                    "Documentation complète et claire",
-                    "Documentation adéquate",
-                    "Documentation insuffisante",
-                    "Pas de documentation ou très minimal"
-                }
-            },
-            {
-                "Efficacité",
-                new List<string>
-                {
-                    "Solution très efficace et optimisée",
-                    "Solution efficace",
-                    "Solution fonctionnelle mais à améliorer",
-                    "Solution inefficace ou très lente"
-                }
-            }
-        };
+        // Initialiser avec un dictionnaire vide
+        // Les commentaires seront chargés depuis le fichier JSON lors du démarrage
+        _commentsByCriteria = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
     }
 
     public List<string> GetCommentsForCriterion(string criterionLabel)
@@ -94,6 +48,82 @@ public class CommentService : ICommentService
         if (!_commentsByCriteria[criterionLabel].Contains(comment))
         {
             _commentsByCriteria[criterionLabel].Add(comment);
+        }
+    }
+
+    public async Task SaveCommentsAsync(string gradingPath)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(gradingPath) || !Directory.Exists(gradingPath))
+            {
+                return;
+            }
+
+            string filePath = Path.Combine(gradingPath, CommentsFileName);
+            
+            // Sérialiser le dictionnaire des commentaires avec accents préservés
+            var options = new JsonSerializerOptions 
+            { 
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+            string jsonContent = JsonSerializer.Serialize(_commentsByCriteria, options);
+            
+            // Écrire dans le fichier
+            await File.WriteAllTextAsync(filePath, jsonContent);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Erreur lors de la sauvegarde des commentaires: {ex.Message}");
+        }
+    }
+
+    public async Task LoadCommentsAsync(string gradingPath)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(gradingPath) || !Directory.Exists(gradingPath))
+            {
+                return;
+            }
+
+            string filePath = Path.Combine(gradingPath, CommentsFileName);
+            
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+
+            // Lire le fichier JSON
+            string jsonContent = await File.ReadAllTextAsync(filePath);
+            
+            // Désérialiser et fusionner avec les commentaires existants
+            var loadedComments = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(jsonContent);
+            
+            if (loadedComments != null)
+            {
+                foreach (var kvp in loadedComments)
+                {
+                    if (!_commentsByCriteria.ContainsKey(kvp.Key))
+                    {
+                        _commentsByCriteria[kvp.Key] = new List<string>();
+                    }
+                    
+                    // Ajouter les commentaires chargés s'ils n'existent pas déjà
+                    foreach (var comment in kvp.Value)
+                    {
+                        if (!_commentsByCriteria[kvp.Key].Contains(comment))
+                        {
+                            _commentsByCriteria[kvp.Key].Add(comment);
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Erreur lors du chargement des commentaires: {ex.Message}");
         }
     }
 }

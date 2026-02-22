@@ -6,6 +6,20 @@ using System.Text.Json.Serialization;
 
 namespace GradingTool.Models
 {
+    public class ObservableCollectionConverter : System.Text.Json.Serialization.JsonConverter<ObservableCollection<string>>
+    {
+        public override ObservableCollection<string> Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+        {
+            var list = System.Text.Json.JsonSerializer.Deserialize<List<string>>(ref reader, options) ?? new List<string>();
+            return new ObservableCollection<string>(list);
+        }
+
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, ObservableCollection<string> value, System.Text.Json.JsonSerializerOptions options)
+        {
+            System.Text.Json.JsonSerializer.Serialize(writer, value.ToList(), options);
+        }
+    }
+
     public class RubricModel
     {
         [JsonPropertyName("meta")]
@@ -103,6 +117,7 @@ namespace GradingTool.Models
         private string _result = string.Empty;
 
         [JsonPropertyName("feedback")]
+        [System.Text.Json.Serialization.JsonConverter(typeof(ObservableCollectionConverter))]
         public ObservableCollection<string> Feedback { get; set; } = new();
 
         [ObservableProperty]
@@ -112,16 +127,28 @@ namespace GradingTool.Models
         [JsonIgnore]
         public ObservableCollection<string> SuggestedComments { get; } = new();
 
-        [ObservableProperty]
         [JsonIgnore]
+        public bool IsEditingFeedback
+        {
+            get => _isEditingFeedback;
+            set => SetProperty(ref _isEditingFeedback, value);
+        }
         private bool _isEditingFeedback;
 
-        [ObservableProperty]
         [JsonIgnore]
+        public int EditingFeedbackIndex
+        {
+            get => _editingFeedbackIndex;
+            set => SetProperty(ref _editingFeedbackIndex, value);
+        }
         private int _editingFeedbackIndex = -1;
 
-        [ObservableProperty]
         [JsonIgnore]
+        public string FeedbackInput
+        {
+            get => _feedbackInput;
+            set => SetProperty(ref _feedbackInput, value);
+        }
         private string _feedbackInput = string.Empty;
 
         partial void OnResultChanged(string value)
