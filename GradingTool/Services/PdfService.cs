@@ -137,7 +137,9 @@ public class PdfService : IPdfService
             foreach (var criterion in grid.Criteria)
             {
                 string labelText = $"{criterion.Label} — Résultat: {criterion.Result ?? "—"}";
-                string feedbackText = criterion.Feedback ?? "—";
+                string feedbackText = criterion.Feedback != null && criterion.Feedback.Count > 0
+                    ? string.Join(Environment.NewLine, criterion.Feedback)
+                    : "—";
                 
                 // Draw criterion label in bold
                 gfx.DrawString(labelText, boldRegularFont, XBrushes.Black, new XRect(leftMargin, y, contentWidth, 20), XStringFormats.TopLeft);

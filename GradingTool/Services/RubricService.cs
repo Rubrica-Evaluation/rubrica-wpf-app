@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Collections.ObjectModel;
 
 namespace GradingTool.Services;
 
@@ -235,7 +236,7 @@ public class RubricService : IRubricService
                     },
                     Weight = 60,
                     Result = "",
-                    Feedback = "",
+                    Feedback = new ObservableCollection<string>(),
                     Points = null
                 },
                 new CriterionModel
@@ -251,7 +252,7 @@ public class RubricService : IRubricService
                     },
                     Weight = 40,
                     Result = "",
-                    Feedback = "",
+                    Feedback = new ObservableCollection<string>(),
                     Points = null
                 }
             },

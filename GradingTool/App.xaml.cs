@@ -44,6 +44,7 @@ public partial class App : Application
         services.AddSingleton<IGridService, GridService>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IPdfService, PdfService>();
+        services.AddSingleton<ICommentService, CommentService>();
 
         // ViewModel Factory pour le NavigationService
         services.AddSingleton<Func<Type, object>>(serviceProvider =>

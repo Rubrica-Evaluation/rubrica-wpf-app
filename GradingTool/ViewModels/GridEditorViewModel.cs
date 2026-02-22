@@ -17,6 +17,7 @@ public partial class GridEditorViewModel : ObservableObject
     private readonly IGridService _gridService;
     private readonly IDialogService _dialogService;
     private readonly IPdfService _pdfService;
+    private readonly ICommentService _commentService;
 
     [ObservableProperty]
     private string _groupName = string.Empty;
@@ -45,14 +46,33 @@ public partial class GridEditorViewModel : ObservableObject
     [ObservableProperty]
     private double? _totalPenalties;
 
+    [ObservableProperty]
+    private CriterionModel? _selectedCriterion;
+
+    [ObservableProperty]
+    private string? _selectedFeedbackItem;
+
+    public void SelectSuggestedComment(string? comment, CriterionModel? criterion)
+    {
+        if (comment == null || criterion == null)
+            return;
+
+        // Ajouter le commentaire s'il n'existe pas déjà
+        if (!criterion.Feedback.Contains(comment))
+        {
+            criterion.Feedback.Add(comment);
+        }
+    }
+
     public string NavigationPath => $"{SessionName} / {CourseName} / {WorkName} / {GroupName}";
     
-    public GridEditorViewModel(INavigationService navigationService, IGridService gridService, IDialogService dialogService, IPdfService pdfService)
+    public GridEditorViewModel(INavigationService navigationService, IGridService gridService, IDialogService dialogService, IPdfService pdfService, ICommentService commentService)
     {
         _navigationService = navigationService;
         _gridService = gridService;
         _dialogService = dialogService;
         _pdfService = pdfService;
+        _commentService = commentService;
     }
 
     public void Initialize(GroupModel group, string gradingPath, string session, string course, string work)
@@ -118,6 +138,8 @@ public partial class GridEditorViewModel : ObservableObject
             foreach (var criterion in CurrentGrid.Criteria)
             {
                 criterion.PropertyChanged += OnCriterionPropertyChanged;
+                // Charger les suggestions pour ce critère
+                await UpdateSuggestionsForCriterion(criterion);
             }
             foreach (var penalty in CurrentGrid.Penalties)
             {
@@ -185,6 +207,86 @@ public partial class GridEditorViewModel : ObservableObject
         TotalPoints = criteriaTotal + penaltiesTotal;
         TotalPenalties = penaltiesTotal;
         CurrentGrid.Computed.Total = TotalPoints;
+    }
+
+    private async Task UpdateSuggestionsForCriterion(CriterionModel criterion)
+    {
+        criterion.SuggestedComments.Clear();
+        
+        // Ajouter le placeholder en premier
+        criterion.SuggestedComments.Add("-- Commentaires existants --");
+        
+        // Charger les suggestions basées sur le label du critère
+        var suggestions = _commentService.GetCommentsForCriterion(criterion.Label);
+        
+        foreach (var comment in suggestions)
+        {
+            criterion.SuggestedComments.Add(comment);
+        }
+        
+        await Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    public void AddFeedback(CriterionModel? criterion)
+    {
+        if (criterion == null) return;
+
+        SelectedCriterion = criterion;
+        criterion.IsEditingFeedback = true;
+        criterion.EditingFeedbackIndex = -1;
+        criterion.FeedbackInput = string.Empty;
+    }
+
+    [RelayCommand]
+    public void EditFeedback(CriterionModel? criterion)
+    {
+        if (criterion == null || SelectedFeedbackItem == null || criterion.Feedback.Count == 0)
+            return;
+
+        SelectedCriterion = criterion;
+        criterion.EditingFeedbackIndex = criterion.Feedback.IndexOf(SelectedFeedbackItem);
+        criterion.FeedbackInput = SelectedFeedbackItem;
+        criterion.IsEditingFeedback = true;
+    }
+
+    [RelayCommand]
+    public void ConfirmFeedback(CriterionModel? criterion)
+    {
+        if (criterion == null || string.IsNullOrWhiteSpace(criterion.FeedbackInput))
+            return;
+
+        if (criterion.EditingFeedbackIndex < 0)
+        {
+            criterion.Feedback.Add(criterion.FeedbackInput);
+        }
+        else if (criterion.EditingFeedbackIndex < criterion.Feedback.Count)
+        {
+            criterion.Feedback[criterion.EditingFeedbackIndex] = criterion.FeedbackInput;
+        }
+
+        CancelFeedback(criterion);
+    }
+
+    [RelayCommand]
+    public void DeleteFeedback(CriterionModel? criterion)
+    {
+        if (criterion == null || SelectedFeedbackItem == null)
+            return;
+
+        criterion.Feedback.Remove(SelectedFeedbackItem);
+    }
+
+    [RelayCommand]
+    public void CancelFeedback(CriterionModel? criterion)
+    {
+        if (criterion == null) return;
+
+        criterion.IsEditingFeedback = false;
+        criterion.FeedbackInput = string.Empty;
+        criterion.EditingFeedbackIndex = -1;
+        SelectedCriterion = null;
+        SelectedFeedbackItem = null;
     }
 
     [RelayCommand]

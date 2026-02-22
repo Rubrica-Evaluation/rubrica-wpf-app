@@ -303,13 +303,110 @@
                                                                    FontSize="12"
                                                                    Foreground="#666666"
                                                                    Margin="0,0,0,4"/>
-                                                        <TextBox Text="{Binding Feedback}"
-                                                                 MinHeight="32"
+                                                        
+                                                        <!-- Liste des feedbacks -->
+                                                        <ListBox ItemsSource="{Binding Feedback}"
+                                                                 x:Name="FeedbackList"
+                                                                 SelectedItem="{Binding DataContext.SelectedFeedbackItem, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
+                                                                 MinHeight="60"
+                                                                 MaxHeight="120"
+                                                                 Margin="0,0,0,8"
+                                                                 Background="White"
+                                                                 BorderBrush="#E0E0E0"
+                                                                 BorderThickness="1">
+                                                            <ListBox.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <Border Padding="8" Background="#F8F9FA" Margin="0,2">
+                                                                        <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+                                                                    </Border>
+                                                                </DataTemplate>
+                                                            </ListBox.ItemTemplate>
+                                                        </ListBox>
+                                                        
+                                                        <!-- StackPanel pour les boutons d'action -->
+                                                        <Grid Margin="0,0,0,8">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            
+                                                            <!-- Boutons -->
+                                                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                                                <Button Content="➕ Ajouter"
+                                                                        Height="28"
+                                                                        Padding="12,0"
+                                                                        Margin="0,0,4,0"
+                                                                        Background="#28A745"
+                                                                        Foreground="White"
+                                                                        FontSize="11"
+                                                                        Command="{Binding DataContext.AddFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                        CommandParameter="{Binding}"/>
+                                                                <Button Content="✏️ Modifier"
+                                                                        Height="28"
+                                                                        Padding="12,0"
+                                                                        Margin="0,0,4,0"
+                                                                        Background="#0D6EFD"
+                                                                        Foreground="White"
+                                                                        FontSize="11"
+                                                                        Command="{Binding DataContext.EditFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                        CommandParameter="{Binding}"/>
+                                                                <Button Content="🗑️ Supprimer"
+                                                                        Height="28"
+                                                                        Padding="12,0"
+                                                                        Background="#DC3545"
+                                                                        Foreground="White"
+                                                                        FontSize="11"
+                                                                        Command="{Binding DataContext.DeleteFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                        CommandParameter="{Binding}"/>
+                                                            </StackPanel>
+                                                            
+                                                            <!-- ComboBox pour les commentaires existants -->
+                                                            <ComboBox Grid.Column="1"
+                                                                      x:Name="SuggestedCommentsComboBox"
+                                                                      ItemsSource="{Binding SuggestedComments}"
+                                                                      SelectedIndex="0"
+                                                                      SelectionChanged="SuggestedCommentsComboBox_SelectionChanged"
+                                                                      Margin="20,0,0,0"
+                                                                      Height="28"
+                                                                      Padding="8,4"
+                                                                      HorizontalAlignment="Right"
+                                                                      Width="250"
+                                                                      IsEditable="False"/>
+                                                        </Grid>
+                                                        
+                                                        <!-- Champ texte caché pour ajouter/modifier un feedback -->
+                                                        <TextBox Text="{Binding FeedbackInput, UpdateSourceTrigger=PropertyChanged}"
+                                                                 MinHeight="40"
                                                                  Padding="8,4"
                                                                  VerticalContentAlignment="Top"
                                                                  AcceptsReturn="True"
                                                                  TextWrapping="Wrap"
-                                                                 VerticalScrollBarVisibility="Auto"/>
+                                                                 VerticalScrollBarVisibility="Auto"
+                                                                 BorderBrush="#E0E0E0"
+                                                                 BorderThickness="1"
+                                                                 Visibility="{Binding IsEditingFeedback, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                                 Margin="0,0,0,4"/>
+                                                        
+                                                        <!-- Boutons pour confirmer/annuler la saisie -->
+                                                        <StackPanel Orientation="Horizontal" Visibility="{Binding IsEditingFeedback, Converter={StaticResource BoolToVisibilityConverter}}" Margin="0,0,0,8">
+                                                            <Button Content="✓ Confirmer"
+                                                                    Height="24"
+                                                                    Padding="10,0"
+                                                                    Margin="0,0,4,0"
+                                                                    Background="#28A745"
+                                                                    Foreground="White"
+                                                                    FontSize="10"
+                                                                    Command="{Binding DataContext.ConfirmFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    CommandParameter="{Binding}"/>
+                                                            <Button Content="✕ Annuler"
+                                                                    Height="24"
+                                                                    Padding="10,0"
+                                                                    Background="#6C757D"
+                                                                    Foreground="White"
+                                                                    FontSize="10"
+                                                                    Command="{Binding DataContext.CancelFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    CommandParameter="{Binding}"/>
+                                                        </StackPanel>
                                                     </StackPanel>
                                                 </Grid>
                                             </StackPanel>

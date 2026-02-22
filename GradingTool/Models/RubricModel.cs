@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.Json.Serialization;
 
@@ -102,11 +103,26 @@ namespace GradingTool.Models
         private string _result = string.Empty;
 
         [JsonPropertyName("feedback")]
-        public string Feedback { get; set; } = string.Empty;
+        public ObservableCollection<string> Feedback { get; set; } = new();
 
         [ObservableProperty]
         [JsonPropertyName("points")]
         private double? _points;
+
+        [JsonIgnore]
+        public ObservableCollection<string> SuggestedComments { get; } = new();
+
+        [ObservableProperty]
+        [JsonIgnore]
+        private bool _isEditingFeedback;
+
+        [ObservableProperty]
+        [JsonIgnore]
+        private int _editingFeedbackIndex = -1;
+
+        [ObservableProperty]
+        [JsonIgnore]
+        private string _feedbackInput = string.Empty;
 
         partial void OnResultChanged(string value)
         {

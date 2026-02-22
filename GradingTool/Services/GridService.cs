@@ -2,6 +2,7 @@ using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Collections.ObjectModel;
 using GradingTool.Models;
 
 namespace GradingTool.Services;
@@ -47,7 +48,7 @@ public class GridService : IGridService
                 Scale = c.Scale,
                 Weight = c.Weight,
                 Result = c.Result,
-                Feedback = c.Feedback,
+                Feedback = new ObservableCollection<string>(c.Feedback),
                 Points = c.Points
             }).ToList(),
             Computed = new ComputedModel
@@ -181,7 +182,7 @@ public class GridService : IGridService
                 Scale = c.Scale,
                 Weight = c.Weight,
                 Result = c.Result,
-                Feedback = c.Feedback,
+                Feedback = new ObservableCollection<string>(c.Feedback),
                 Points = c.Points
             }).ToList(),
             Computed = new ComputedModel
