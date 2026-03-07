@@ -19,6 +19,8 @@ public partial class GridEditorViewModel : ObservableObject
     private readonly IPdfService _pdfService;
     private readonly ICommentService _commentService;
 
+    private string _gradingRootPath = string.Empty;
+
     [ObservableProperty]
     private string _groupName = string.Empty;
 
@@ -50,19 +52,7 @@ public partial class GridEditorViewModel : ObservableObject
     private CriterionModel? _selectedCriterion;
 
     [ObservableProperty]
-    private string? _selectedFeedbackItem;
-
-    public void SelectSuggestedComment(string? comment, CriterionModel? criterion)
-    {
-        if (comment == null || criterion == null)
-            return;
-
-        // Ajouter le commentaire s'il n'existe pas déjà
-        if (!criterion.Feedback.Contains(comment))
-        {
-            criterion.Feedback.Add(comment);
-        }
-    }
+    private CommentEntry? _selectedFeedbackItem;
 
     public string NavigationPath => $"{SessionName} / {CourseName} / {WorkName} / {GroupName}";
     
@@ -111,6 +101,7 @@ public partial class GridEditorViewModel : ObservableObject
             foreach (var criterion in CurrentGrid.Criteria)
             {
                 criterion.PropertyChanged -= OnCriterionPropertyChanged;
+                criterion.Feedback.CollectionChanged -= (s, e) => RefreshResultRecommendation(criterion);
             }
             foreach (var penalty in CurrentGrid.Penalties)
             {
@@ -135,6 +126,7 @@ public partial class GridEditorViewModel : ObservableObject
         // Charger les commentaires réutilisables depuis le répertoire grading
         var groupPath = Path.GetDirectoryName(filePath)!;
         var gradingPath = Path.GetDirectoryName(groupPath)!;  // Remonter au répertoire grading
+        _gradingRootPath = gradingPath;
         await _commentService.LoadCommentsAsync(gradingPath);
         
         // Attacher les event handlers pour recalculer le total quand les points changent
@@ -143,8 +135,12 @@ public partial class GridEditorViewModel : ObservableObject
             foreach (var criterion in CurrentGrid.Criteria)
             {
                 criterion.PropertyChanged += OnCriterionPropertyChanged;
-                // Charger les suggestions pour ce critère
-                await UpdateSuggestionsForCriterion(criterion);
+                // Abonner aux changements de feedback pour la recommandation
+                var capturedCriterion = criterion;
+                capturedCriterion.Feedback.CollectionChanged += (s, e) =>
+                    RefreshResultRecommendation(capturedCriterion);
+                // Calculer la recommandation initiale
+                RefreshResultRecommendation(criterion);
             }
             foreach (var penalty in CurrentGrid.Penalties)
             {
@@ -215,22 +211,32 @@ public partial class GridEditorViewModel : ObservableObject
         CurrentGrid.Computed.Total = TotalPoints;
     }
 
-    private async Task UpdateSuggestionsForCriterion(CriterionModel criterion)
+    private void RefreshResultRecommendation(CriterionModel criterion)
     {
-        criterion.SuggestedComments.Clear();
-        
-        // Ajouter le placeholder en premier
-        criterion.SuggestedComments.Add("-- Commentaires existants --");
-        
-        // Charger les suggestions basées sur le label du critère
-        var suggestions = _commentService.GetCommentsForCriterion(criterion.Label);
-        
-        foreach (var comment in suggestions)
+        criterion.RecommendedResult = _gridService.GetResultRecommendation(
+            criterion.Feedback, criterion.Scale);
+    }
+
+    [RelayCommand]
+    public void OpenCommentPicker(CriterionModel? criterion)
+    {
+        if (criterion == null) return;
+
+        var comments = _commentService.GetCommentsForCriterion(criterion.Label);
+        var selected = Views.CommentPickerDialog.Show(criterion.Label, comments, _commentService);
+
+        if (selected != null && !criterion.Feedback.Any(f => string.Equals(f.Text, selected, StringComparison.OrdinalIgnoreCase)))
         {
-            criterion.SuggestedComments.Add(comment);
+            var bankEntry = comments.FirstOrDefault(c => string.Equals(c.Text, selected, StringComparison.OrdinalIgnoreCase));
+            criterion.Feedback.Add(bankEntry ?? new CommentEntry { Text = selected, Severity = CommentSeverity.Aucun });
         }
-        
-        await Task.CompletedTask;
+    }
+
+    [RelayCommand]
+    public void ApplyRecommendation(CriterionModel? criterion)
+    {
+        if (criterion == null || string.IsNullOrEmpty(criterion.RecommendedResult)) return;
+        criterion.Result = criterion.RecommendedResult;
     }
 
     [RelayCommand]
@@ -238,10 +244,13 @@ public partial class GridEditorViewModel : ObservableObject
     {
         if (criterion == null) return;
 
-        SelectedCriterion = criterion;
-        criterion.IsEditingFeedback = true;
-        criterion.EditingFeedbackIndex = -1;
-        criterion.FeedbackInput = string.Empty;
+        var (text, addToBank, severity) = Views.InputDialog.ShowWithBankOption("Nouveau commentaire :", "Ajouter un commentaire", multiline: true);
+        if (string.IsNullOrWhiteSpace(text)) return;
+
+        var entry = new CommentEntry { Text = text, Severity = severity };
+        criterion.Feedback.Add(entry);
+        if (addToBank)
+            _commentService.AddCommentForCriterion(criterion.Label, entry);
     }
 
     [RelayCommand]
@@ -250,33 +259,14 @@ public partial class GridEditorViewModel : ObservableObject
         if (criterion == null || SelectedFeedbackItem == null || criterion.Feedback.Count == 0)
             return;
 
-        SelectedCriterion = criterion;
-        criterion.EditingFeedbackIndex = criterion.Feedback.IndexOf(SelectedFeedbackItem);
-        criterion.FeedbackInput = SelectedFeedbackItem;
-        criterion.IsEditingFeedback = true;
-    }
+        int idx = criterion.Feedback.IndexOf(SelectedFeedbackItem);
+        var text = Views.InputDialog.Show("Modifier le commentaire :", "Modifier", SelectedFeedbackItem.Text, multiline: true);
+        if (text == null) return;
 
-    [RelayCommand]
-    public async Task ConfirmFeedback(CriterionModel? criterion)
-    {
-        if (criterion == null || string.IsNullOrWhiteSpace(criterion.FeedbackInput))
-            return;
+        if (idx >= 0 && idx < criterion.Feedback.Count)
+            criterion.Feedback[idx] = new CommentEntry { Text = text, Severity = SelectedFeedbackItem.Severity };
 
-        if (criterion.EditingFeedbackIndex < 0)
-        {
-            criterion.Feedback.Add(criterion.FeedbackInput);
-            
-            // Sauvegarder le nouveau commentaire dans la banque réutilisable
-            _commentService.AddCommentForCriterion(criterion.Label, criterion.FeedbackInput);
-            // Note: La sauvegarde se fera lors de SaveAsync
-        }
-        else if (criterion.EditingFeedbackIndex < criterion.Feedback.Count)
-        {
-            criterion.Feedback[criterion.EditingFeedbackIndex] = criterion.FeedbackInput;
-        }
-
-        CancelFeedback(criterion);
-        await Task.CompletedTask;
+        SelectedFeedbackItem = null;
     }
 
     [RelayCommand]
@@ -286,17 +276,6 @@ public partial class GridEditorViewModel : ObservableObject
             return;
 
         criterion.Feedback.Remove(SelectedFeedbackItem);
-    }
-
-    [RelayCommand]
-    public void CancelFeedback(CriterionModel? criterion)
-    {
-        if (criterion == null) return;
-
-        criterion.IsEditingFeedback = false;
-        criterion.FeedbackInput = string.Empty;
-        criterion.EditingFeedbackIndex = -1;
-        SelectedCriterion = null;
         SelectedFeedbackItem = null;
     }
 

@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:helpers="clr-namespace:GradingTool.Helpers"
+             xmlns:models="clr-namespace:GradingTool.Models"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Background="White">
@@ -103,12 +105,23 @@
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <Border Padding="10,8" 
-                                        Background="White" 
+                                <Border Padding="10,8"
                                         Margin="0,4"
-                                        CornerRadius="4"
-                                        BorderBrush="#E0E0E0"
-                                        BorderThickness="1">
+                                        CornerRadius="4">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="White"/>
+                                            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                                    <Setter Property="Background" Value="#BBDEFB"/>
+                                                    <Setter Property="BorderBrush" Value="#1976D2"/>
+                                                    <Setter Property="BorderThickness" Value="2"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                     <StackPanel>
                                         <TextBlock Text="{Binding DisplayName}"
                                                    TextWrapping="Wrap"
@@ -268,7 +281,7 @@
                                                                   SelectedValuePath="Qualitative"
                                                                   Height="32"
                                                                   Padding="8,4"
-                                                                  PreviewMouseWheel="ComboBox_PreviewMouseWheel">
+                                                                  helpers:ScrollHelper.BubbleToParent="True">
                                                             <ComboBox.Style>
                                                                 <Style TargetType="ComboBox">
                                                                     <Style.Triggers>
@@ -292,6 +305,47 @@
                                                                 </DataTemplate>
                                                             </ComboBox.ItemTemplate>
                                                         </ComboBox>
+
+                                                        <!-- Recommendation basée sur les commentaires -->
+                                                        <Button Margin="0,4,0,0"
+                                                                Padding="0"
+                                                                BorderThickness="0"
+                                                                Background="Transparent"
+                                                                Cursor="Hand"
+                                                                ToolTip="Cliquer pour appliquer cette suggestion"
+                                                                Visibility="{Binding HasRecommendation, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                                Command="{Binding DataContext.ApplyRecommendationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding}">
+                                                            <Border Background="#EBF5FB"
+                                                                    BorderBrush="#AED6F1"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="3"
+                                                                    Padding="6,4">
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsMouseOver}" Value="True">
+                                                                                <Setter Property="Background" Value="#D6EAF8"/>
+                                                                                <Setter Property="BorderBrush" Value="#3498DB"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Border.Style>
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <TextBlock Text="💡"
+                                                                               FontSize="11"
+                                                                               VerticalAlignment="Center"
+                                                                               Margin="0,0,4,0"/>
+                                                                    <TextBlock FontSize="11"
+                                                                               Foreground="#1A5276"
+                                                                               VerticalAlignment="Center">
+                                                                        <TextBlock.Text>
+                                                                            <Binding Path="RecommendedResult" StringFormat="Suggestion : {0}"/>
+                                                                        </TextBlock.Text>
+                                                                    </TextBlock>
+                                                                </StackPanel>
+                                                            </Border>
+                                                        </Button>
                                                     </StackPanel>
                                                     
                                                     <!-- Espace -->
@@ -307,6 +361,7 @@
                                                         <!-- Liste des feedbacks -->
                                                         <ListBox ItemsSource="{Binding Feedback}"
                                                                  x:Name="FeedbackList"
+                                                                 helpers:ScrollHelper.BubbleToParent="True"
                                                                  SelectedItem="{Binding DataContext.SelectedFeedbackItem, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
                                                                  MinHeight="60"
                                                                  MaxHeight="120"
@@ -316,8 +371,39 @@
                                                                  BorderThickness="1">
                                                             <ListBox.ItemTemplate>
                                                                 <DataTemplate>
-                                                                    <Border Padding="8" Background="#F8F9FA" Margin="0,2">
-                                                                        <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+                                                                    <Border Padding="8" Margin="0,2">
+                                                                        <Border.Style>
+                                                                            <Style TargetType="Border">
+                                                                                <Setter Property="Background" Value="#F8F9FA"/>
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                                                                        <Setter Property="Background" Value="#BBDEFB"/>
+                                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                        </Border.Style>
+                                                                        <StackPanel Orientation="Horizontal">
+                                                                            <Border CornerRadius="3"
+                                                                                    Padding="4,1"
+                                                                                    Margin="0,0,6,0"
+                                                                                    VerticalAlignment="Center"
+                                                                                    Background="{Binding Severity, Converter={StaticResource SeverityColorConverter}}">
+                                                                                <Border.Style>
+                                                                                    <Style TargetType="Border">
+                                                                                        <Style.Triggers>
+                                                                                            <DataTrigger Binding="{Binding Severity}" Value="{x:Static models:CommentSeverity.Aucun}">
+                                                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                            </DataTrigger>
+                                                                                        </Style.Triggers>
+                                                                                    </Style>
+                                                                                </Border.Style>
+                                                                                <TextBlock Text="{Binding Severity}"
+                                                                                           FontSize="10"
+                                                                                           Foreground="White"
+                                                                                           FontWeight="SemiBold"/>
+                                                                            </Border>
+                                                                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap"/>
+                                                                        </StackPanel>
                                                                     </Border>
                                                                 </DataTemplate>
                                                             </ListBox.ItemTemplate>
@@ -357,50 +443,20 @@
                                                                         CommandParameter="{Binding}"/>
                                                             </StackPanel>
                                                             
-                                                            <!-- ComboBox pour les commentaires existants -->
-                                                            <ComboBox Grid.Column="1"
-                                                                      x:Name="SuggestedCommentsComboBox"
-                                                                      ItemsSource="{Binding SuggestedComments}"
-                                                                      SelectedIndex="0"
-                                                                      SelectionChanged="SuggestedCommentsComboBox_SelectionChanged"
-                                                                      Margin="8,0,0,0"
-                                                                      Height="28"
-                                                                      Padding="8,4"
-                                                                      HorizontalAlignment="Stretch"
-                                                                      IsEditable="False"/>
-                                                        </Grid>
-                                                        
-                                                        <!-- Champ texte caché pour ajouter/modifier un feedback -->
-                                                        <TextBox Text="{Binding FeedbackInput, UpdateSourceTrigger=PropertyChanged}"
-                                                                 MinHeight="40"
-                                                                 Padding="8,4"
-                                                                 VerticalContentAlignment="Top"
-                                                                 AcceptsReturn="True"
-                                                                 TextWrapping="Wrap"
-                                                                 VerticalScrollBarVisibility="Auto"
-                                                                 BorderBrush="#E0E0E0"
-                                                                 BorderThickness="1"
-                                                                 Visibility="{Binding IsEditingFeedback, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                                 Margin="0,0,0,4"/>
-                                                        
-                                                        <!-- Boutons pour confirmer/annuler la saisie -->
-                                                        <StackPanel Orientation="Horizontal" Visibility="{Binding IsEditingFeedback, Converter={StaticResource BoolToVisibilityConverter}}" Margin="0,0,0,8">
-                                                            <Button Content="✓ Confirmer"
-                                                                    Height="24"
+                                                            <!-- Bouton banque de commentaires -->
+                                                            <Button Grid.Column="1"
+                                                                    Content="💬 Banque"
+                                                                    Height="28"
                                                                     Padding="10,0"
-                                                                    Margin="0,0,4,0"
-                                                                    Background="#28A745"
-                                                                    Style="{StaticResource RoundedButton}"
-                                                                    Command="{Binding DataContext.ConfirmFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                                    CommandParameter="{Binding}"/>
-                                                            <Button Content="✕ Annuler"
-                                                                    Height="24"
-                                                                    Padding="10,0"
+                                                                    Margin="8,0,0,0"
+                                                                    FontSize="12"
                                                                     Background="#6C757D"
                                                                     Style="{StaticResource RoundedButton}"
-                                                                    Command="{Binding DataContext.CancelFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                    ToolTip="Choisir un commentaire depuis la banque"
+                                                                    Command="{Binding DataContext.OpenCommentPickerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                     CommandParameter="{Binding}"/>
-                                                        </StackPanel>
+                                                        </Grid>
+                                                        
                                                     </StackPanel>
                                                 </Grid>
                                             </StackPanel>

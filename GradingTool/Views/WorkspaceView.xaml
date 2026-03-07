@@ -189,9 +189,7 @@
                          MinHeight="50"
                          Visibility="{Binding IsSessionSelected, Converter={StaticResource BoolToVisibilityConverter}}">
                     <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Padding" Value="8,6"/>
-                        </Style>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource SelectableListBoxItemStyle}"/>
                     </ListBox.ItemContainerStyle>
                 </ListBox>
 
@@ -253,9 +251,7 @@
                          BorderThickness="1"
                          Visibility="{Binding IsCourseSelected, Converter={StaticResource BoolToVisibilityConverter}}">
                     <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Padding" Value="8,6"/>
-                        </Style>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource SelectableListBoxItemStyle}"/>
                     </ListBox.ItemContainerStyle>
                 </ListBox>
             </Grid>

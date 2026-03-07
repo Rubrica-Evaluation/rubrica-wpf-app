@@ -1,0 +1,286 @@
+<Window x:Class="GradingTool.Views.CommentPickerDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="clr-namespace:GradingTool.Models"
+        Title="Banque de commentaires"
+        Width="520"
+        Height="580"
+        MinWidth="400"
+        MinHeight="320"
+        WindowStartupLocation="CenterOwner"
+        Background="#F5F5F5">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- En-tête : critère -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,14">
+            <TextBlock Text="Critère"
+                       FontSize="11"
+                       Foreground="#888888"
+                       Margin="0,0,0,2"/>
+            <TextBlock Text="{Binding CriterionLabel}"
+                       FontSize="15"
+                       FontWeight="SemiBold"
+                       Foreground="#333333"
+                       TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <!-- Barre de recherche -->
+        <Grid Grid.Row="1" Margin="0,0,0,10">
+            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Padding="8,6"
+                     FontSize="13"
+                     BorderBrush="#CCCCCC"
+                     BorderThickness="1"/>
+            <TextBlock Text="🔍  Filtrer les commentaires..."
+                       Foreground="#AAAAAA"
+                       FontSize="13"
+                       IsHitTestVisible="False"
+                       Margin="10,0,0,0"
+                       VerticalAlignment="Center">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SearchText}" Value="">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
+
+        <!-- Liste des commentaires -->
+        <Border Grid.Row="2"
+                BorderBrush="#DDDDDD"
+                BorderThickness="1"
+                CornerRadius="4"
+                Background="White"
+                Margin="0,0,0,14">
+            <Grid>
+                <!-- Message vide -->
+                <TextBlock Text="Aucun commentaire dans la banque pour ce critère."
+                           Foreground="#AAAAAA"
+                           FontSize="13"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap"
+                           Margin="16">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding FilteredComments.Count}" Value="0">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <ListBox ItemsSource="{Binding FilteredComments}"
+                         SelectedItem="{Binding SelectedEntry}"
+                         SelectionMode="Single"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         x:Name="CommentListBox"
+                         MouseDoubleClick="CommentListBox_MouseDoubleClick">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="4,2"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="ItemBorder"
+                                                Background="White"
+                                                BorderBrush="#E0E0E0"
+                                                BorderThickness="1"
+                                                CornerRadius="4"
+                                                Padding="10,8">
+                                            <ContentPresenter/>
+                                            <VisualStateManager.VisualStateGroups>
+                                                <VisualStateGroup x:Name="SelectionStates">
+                                                    <VisualState x:Name="Selected">
+                                                        <Storyboard>
+                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ItemBorder" Storyboard.TargetProperty="Background">
+                                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                                    <DiscreteObjectKeyFrame.Value>
+                                                                        <SolidColorBrush Color="#BBDEFB"/>
+                                                                    </DiscreteObjectKeyFrame.Value>
+                                                                </DiscreteObjectKeyFrame>
+                                                            </ObjectAnimationUsingKeyFrames>
+                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ItemBorder" Storyboard.TargetProperty="BorderBrush">
+                                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                                    <DiscreteObjectKeyFrame.Value>
+                                                                        <SolidColorBrush Color="#1976D2"/>
+                                                                    </DiscreteObjectKeyFrame.Value>
+                                                                </DiscreteObjectKeyFrame>
+                                                            </ObjectAnimationUsingKeyFrames>
+                                                        </Storyboard>
+                                                    </VisualState>
+                                                    <VisualState x:Name="Unselected"/>
+                                                    <VisualState x:Name="SelectedUnfocused">
+                                                        <Storyboard>
+                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ItemBorder" Storyboard.TargetProperty="Background">
+                                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                                    <DiscreteObjectKeyFrame.Value>
+                                                                        <SolidColorBrush Color="#BBDEFB"/>
+                                                                    </DiscreteObjectKeyFrame.Value>
+                                                                </DiscreteObjectKeyFrame>
+                                                            </ObjectAnimationUsingKeyFrames>
+                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ItemBorder" Storyboard.TargetProperty="BorderBrush">
+                                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                                    <DiscreteObjectKeyFrame.Value>
+                                                                        <SolidColorBrush Color="#1976D2"/>
+                                                                    </DiscreteObjectKeyFrame.Value>
+                                                                </DiscreteObjectKeyFrame>
+                                                            </ObjectAnimationUsingKeyFrames>
+                                                        </Storyboard>
+                                                    </VisualState>
+                                                </VisualStateGroup>
+                                                <VisualStateGroup x:Name="CommonStates">
+                                                    <VisualState x:Name="Normal"/>
+                                                    <VisualState x:Name="MouseOver">
+                                                        <Storyboard>
+                                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ItemBorder" Storyboard.TargetProperty="Background">
+                                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                                    <DiscreteObjectKeyFrame.Value>
+                                                                        <SolidColorBrush Color="#F5F9FF"/>
+                                                                    </DiscreteObjectKeyFrame.Value>
+                                                                </DiscreteObjectKeyFrame>
+                                                            </ObjectAnimationUsingKeyFrames>
+                                                        </Storyboard>
+                                                    </VisualState>
+                                                </VisualStateGroup>
+                                            </VisualStateManager.VisualStateGroups>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Border CornerRadius="3"
+                                        Padding="5,2"
+                                        Margin="0,0,8,0"
+                                        VerticalAlignment="Center"
+                                        Background="{Binding Severity, Converter={StaticResource SeverityColorConverter}}">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Severity}" Value="{x:Static models:CommentSeverity.Aucun}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding Severity}"
+                                               FontSize="10"
+                                               Foreground="White"
+                                               FontWeight="SemiBold"/>
+                                </Border>
+                                <TextBlock Text="{Binding Text}"
+                                           TextWrapping="Wrap"
+                                           FontSize="13"
+                                           Foreground="#333333"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+
+        <!-- Sévérité + Boutons -->
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Sévérité (visible si sélection) -->
+            <StackPanel Grid.Row="0"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Margin="0,0,0,10"
+                        Visibility="{Binding HasSelection, Converter={StaticResource BoolToVisibilityConverter}}">
+                <TextBlock Text="Sévérité :"
+                           VerticalAlignment="Center"
+                           Margin="0,0,8,0"
+                           FontSize="13"
+                           Foreground="#444444"/>
+                <ComboBox ItemsSource="{Binding SeverityValues}"
+                          SelectedItem="{Binding SelectedSeverity}"
+                          Width="140"
+                          Height="32"
+                          FontSize="12"
+                          Padding="8,4"/>
+            </StackPanel>
+
+            <!-- Boutons -->
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Modifier / Supprimer (gauche) -->
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal">
+                    <Button Content="✏️  Modifier"
+                            Command="{Binding EditCommand}"
+                            Height="34"
+                            MinWidth="100"
+                            Padding="12,0"
+                            Margin="0,0,6,0"
+                            FontSize="13"
+                            Style="{StaticResource RoundedButton}"
+                            Background="#FFC107"/>
+                    <Button Content="🗑️  Supprimer"
+                            Command="{Binding DeleteCommand}"
+                            Height="34"
+                            MinWidth="110"
+                            Padding="12,0"
+                            FontSize="13"
+                            Style="{StaticResource RoundedButton}"
+                            Background="#DC3545"/>
+                </StackPanel>
+
+                <!-- Annuler / Sélectionner (droite) -->
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal">
+                    <Button Content="Annuler"
+                            Command="{Binding CancelCommand}"
+                            Height="34"
+                            MinWidth="100"
+                            Padding="16,0"
+                            Margin="0,0,8,0"
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Style="{StaticResource RoundedButton}"
+                            Background="#6C757D"/>
+                    <Button Content="Sélectionner"
+                            Command="{Binding ConfirmCommand}"
+                            Height="34"
+                            MinWidth="120"
+                            Padding="16,0"
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Style="{StaticResource RoundedButton}"
+                            Background="#0D6EFD"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

@@ -150,7 +150,7 @@ public class PdfService : IPdfService
                     foreach (var feedback in criterion.Feedback)
                     {
                         // Wrap text for long feedback items
-                        var wrappedFeedback = WrapText(gfx, feedback, tableFont, contentWidth - 20);
+                        var wrappedFeedback = WrapText(gfx, feedback.Text, tableFont, contentWidth - 20);
                         
                         // Draw bullet point
                         gfx.DrawString("•", tableFont, XBrushes.Black, new XRect(leftMargin, y, 10, 14), XStringFormats.TopLeft);

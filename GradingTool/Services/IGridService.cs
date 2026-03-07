@@ -71,4 +71,14 @@ public interface IGridService
     /// <param name="filePath">Le chemin du fichier JSON de la grille</param>
     /// <returns>La grille chargée</returns>
     Task<GridModel?> LoadGridAsync(string filePath);
+
+    /// <summary>
+    /// Recommande un résultat pour un critère en combinant les sévérités des commentaires sélectionnés.
+    /// </summary>
+    /// <param name="feedback">Les commentaires actifs sur le critère (avec leur sévérité).</param>
+    /// <param name="scale">L'échelle du critère.</param>
+    /// <returns>Le qualificatif recommandé, ou null si aucun feedback.</returns>
+    string? GetResultRecommendation(
+        IEnumerable<CommentEntry> feedback,
+        IEnumerable<ScaleItemModel> scale);
 }

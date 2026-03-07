@@ -236,7 +236,7 @@ public class RubricService : IRubricService
                     },
                     Weight = 60,
                     Result = "",
-                    Feedback = new ObservableCollection<string>(),
+                    Feedback = new ObservableCollection<CommentEntry>(),
                     Points = null
                 },
                 new CriterionModel
@@ -252,7 +252,7 @@ public class RubricService : IRubricService
                     },
                     Weight = 40,
                     Result = "",
-                    Feedback = new ObservableCollection<string>(),
+                    Feedback = new ObservableCollection<CommentEntry>(),
                     Points = null
                 }
             },

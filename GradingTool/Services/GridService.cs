@@ -48,7 +48,7 @@ public class GridService : IGridService
                 Scale = c.Scale,
                 Weight = c.Weight,
                 Result = c.Result,
-                Feedback = new ObservableCollection<string>(c.Feedback),
+                Feedback = new ObservableCollection<CommentEntry>(c.Feedback),
                 Points = c.Points
             }).ToList(),
             Computed = new ComputedModel
@@ -182,7 +182,7 @@ public class GridService : IGridService
                 Scale = c.Scale,
                 Weight = c.Weight,
                 Result = c.Result,
-                Feedback = new ObservableCollection<string>(c.Feedback),
+                Feedback = new ObservableCollection<CommentEntry>(c.Feedback),
                 Points = c.Points
             }).ToList(),
             Computed = new ComputedModel
@@ -360,6 +360,39 @@ public class GridService : IGridService
             Console.WriteLine($"Erreur lors du chargement de la grille {filePath}: {ex.Message}");
             return null;
         }
+    }
+
+    public string? GetResultRecommendation(
+        IEnumerable<CommentEntry> feedback,
+        IEnumerable<ScaleItemModel> scale)
+    {
+        var feedbackList = feedback.Where(f => !string.IsNullOrWhiteSpace(f.Text)).ToList();
+        var scaleList = scale.OrderByDescending(s => s.Points).ToList();
+
+        if (feedbackList.Count == 0 || scaleList.Count < 2)
+            return null;
+
+        int nMineur = 0, nMajeur = 0, nCritique = 0;
+        foreach (var entry in feedbackList)
+        {
+            switch (entry.Severity)
+            {
+                case CommentSeverity.Mineur:   nMineur++;   break;
+                case CommentSeverity.Majeur:   nMajeur++;   break;
+                case CommentSeverity.Critique: nCritique++; break;
+            }
+        }
+
+        int maxDrop = scaleList.Count - 2;
+        int drop;
+        if (nCritique >= 1)          drop = maxDrop;
+        else if (nMajeur >= 2)       drop = 3;
+        else if (nMajeur >= 1 || nMineur > 2) drop = 2;
+        else if (nMineur >= 1)       drop = 1;
+        else                         drop = 0;
+
+        drop = Math.Min(drop, maxDrop);
+        return scaleList[drop].Qualitative;
     }
 }
 

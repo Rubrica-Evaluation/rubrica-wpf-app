@@ -16,6 +16,13 @@
             <converters:GenerationModeConverter x:Key="GenerationModeConverter"/>
             <converters:BoolToOppositeBoolConverter x:Key="BoolToOppositeBoolConverter"/>
             <converters:StatusColorConverter x:Key="StatusColorConverter"/>
+            <converters:SeverityColorConverter x:Key="SeverityColorConverter"/>
+
+            <!-- Selection colors: same dark blue focused and unfocused -->
+            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#1565C0"/>
+            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="White"/>
+            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#1976D2"/>
+            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -6,17 +6,43 @@ using System.Text.Json.Serialization;
 
 namespace GradingTool.Models
 {
-    public class ObservableCollectionConverter : System.Text.Json.Serialization.JsonConverter<ObservableCollection<string>>
+    /// <summary>
+    /// Convertit ObservableCollection&lt;CommentEntry&gt; en JSON.
+    /// Supporte la migration de l'ancien format (tableau de chaînes) vers le nouveau (tableau d'objets).
+    /// </summary>
+    public class FeedbackCollectionConverter : System.Text.Json.Serialization.JsonConverter<ObservableCollection<CommentEntry>>
     {
-        public override ObservableCollection<string> Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+        private static readonly JsonSerializerOptions _innerOptions = new()
         {
-            var list = System.Text.Json.JsonSerializer.Deserialize<List<string>>(ref reader, options) ?? new List<string>();
-            return new ObservableCollection<string>(list);
+            Converters = { new JsonStringEnumConverter() }
+        };
+
+        public override ObservableCollection<CommentEntry> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            using var doc = JsonDocument.ParseValue(ref reader);
+            var result = new List<CommentEntry>();
+
+            foreach (var element in doc.RootElement.EnumerateArray())
+            {
+                if (element.ValueKind == JsonValueKind.String)
+                {
+                    // Ancien format : chaîne simple
+                    result.Add(new CommentEntry { Text = element.GetString() ?? string.Empty, Severity = CommentSeverity.Aucun });
+                }
+                else if (element.ValueKind == JsonValueKind.Object)
+                {
+                    // Nouveau format : { text, severity }
+                    var entry = element.Deserialize<CommentEntry>(_innerOptions) ?? new CommentEntry();
+                    result.Add(entry);
+                }
+            }
+
+            return new ObservableCollection<CommentEntry>(result);
         }
 
-        public override void Write(System.Text.Json.Utf8JsonWriter writer, ObservableCollection<string> value, System.Text.Json.JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, ObservableCollection<CommentEntry> value, JsonSerializerOptions options)
         {
-            System.Text.Json.JsonSerializer.Serialize(writer, value.ToList(), options);
+            JsonSerializer.Serialize(writer, value.ToList(), _innerOptions);
         }
     }
 
@@ -117,15 +143,24 @@ namespace GradingTool.Models
         private string _result = string.Empty;
 
         [JsonPropertyName("feedback")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(ObservableCollectionConverter))]
-        public ObservableCollection<string> Feedback { get; set; } = new();
+        [System.Text.Json.Serialization.JsonConverter(typeof(FeedbackCollectionConverter))]
+        public ObservableCollection<CommentEntry> Feedback { get; set; } = new();
 
         [ObservableProperty]
         [JsonPropertyName("points")]
         private double? _points;
 
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasRecommendation))]
+        [property: JsonIgnore]
+        private string? _recommendedResult;
+
+        [ObservableProperty]
+        [property: JsonIgnore]
+        private int _recommendedResultMatchCount;
+
         [JsonIgnore]
-        public ObservableCollection<string> SuggestedComments { get; } = new();
+        public bool HasRecommendation => !string.IsNullOrEmpty(RecommendedResult);
 
         [JsonIgnore]
         public bool IsEditingFeedback
