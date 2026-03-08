@@ -38,11 +38,14 @@ public class CommentService : ICommentService
         if (string.IsNullOrWhiteSpace(criterionLabel) || string.IsNullOrWhiteSpace(entry.Text))
             return;
 
-        if (!_commentsByCriteria.ContainsKey(criterionLabel))
-            _commentsByCriteria[criterionLabel] = new List<CommentEntry>();
+        if (!_commentsByCriteria.TryGetValue(criterionLabel, out var list))
+        {
+            list = new List<CommentEntry>();
+            _commentsByCriteria[criterionLabel] = list;
+        }
 
-        var list = _commentsByCriteria[criterionLabel];
-        if (!list.Any(e => string.Equals(e.Text, entry.Text, StringComparison.OrdinalIgnoreCase)))
+        var alreadyExists = list.Any(e => string.Equals(e.Text, entry.Text, StringComparison.OrdinalIgnoreCase));
+        if (!alreadyExists)
             list.Add(entry);
     }
 
@@ -84,41 +87,49 @@ public class CommentService : ICommentService
             if (!File.Exists(filePath)) return;
 
             string jsonContent = await File.ReadAllTextAsync(filePath);
-
-            // Essayer le nouveau format (List<CommentEntry>)
-            Dictionary<string, List<CommentEntry>>? loaded = null;
-            try { loaded = JsonSerializer.Deserialize<Dictionary<string, List<CommentEntry>>>(jsonContent, _jsonOptions); }
-            catch (JsonException) { }
-
-            // Retomber sur l'ancien format (List<string>) et migrer
-            if (loaded == null)
-            {
-                var oldFormat = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(jsonContent);
-                if (oldFormat != null)
-                    loaded = oldFormat.ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value.Select(t => new CommentEntry { Text = t, Severity = CommentSeverity.Aucun }).ToList(),
-                        StringComparer.OrdinalIgnoreCase);
-            }
-
+            var loaded = TryDeserializeNewFormat(jsonContent) ?? MigrateFromLegacyFormat(jsonContent);
             if (loaded == null) return;
 
-            foreach (var kvp in loaded)
-            {
-                if (!_commentsByCriteria.ContainsKey(kvp.Key))
-                    _commentsByCriteria[kvp.Key] = new List<CommentEntry>();
-
-                foreach (var entry in kvp.Value)
-                {
-                    if (!_commentsByCriteria[kvp.Key].Any(e =>
-                            string.Equals(e.Text, entry.Text, StringComparison.OrdinalIgnoreCase)))
-                        _commentsByCriteria[kvp.Key].Add(entry);
-                }
-            }
+            MergeIntoCache(loaded);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Erreur lors du chargement des commentaires: {ex.Message}");
+        }
+    }
+
+    private static Dictionary<string, List<CommentEntry>>? TryDeserializeNewFormat(string jsonContent)
+    {
+        try { return JsonSerializer.Deserialize<Dictionary<string, List<CommentEntry>>>(jsonContent, _jsonOptions); }
+        catch (JsonException) { return null; }
+    }
+
+    private static Dictionary<string, List<CommentEntry>>? MigrateFromLegacyFormat(string jsonContent)
+    {
+        var oldFormat = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(jsonContent);
+        if (oldFormat == null) return null;
+
+        return oldFormat.ToDictionary(
+            kvp => kvp.Key,
+            kvp => kvp.Value.Select(t => new CommentEntry { Text = t, Severity = CommentSeverity.Aucun }).ToList(),
+            StringComparer.OrdinalIgnoreCase);
+    }
+
+    private void MergeIntoCache(Dictionary<string, List<CommentEntry>> loaded)
+    {
+        foreach (var (criterionLabel, entries) in loaded)
+        {
+            if (!_commentsByCriteria.TryGetValue(criterionLabel, out var list))
+            {
+                list = new List<CommentEntry>();
+                _commentsByCriteria[criterionLabel] = list;
+            }
+
+            foreach (var entry in entries)
+            {
+                if (!list.Any(e => string.Equals(e.Text, entry.Text, StringComparison.OrdinalIgnoreCase)))
+                    list.Add(entry);
+            }
         }
     }
 }

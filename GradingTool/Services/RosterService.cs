@@ -81,7 +81,7 @@ public class RosterService : IRosterService
             return string.Empty;
         
         // Chercher le pattern "gr" suivi de chiffres
-        var match = System.Text.RegularExpressions.Regex.Match(groupCode, @"gr(\d+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        var match = Regex.Match(groupCode, @"gr(\d+)", RegexOptions.IgnoreCase);
         if (match.Success)
         {
             return match.Groups[1].Value;
