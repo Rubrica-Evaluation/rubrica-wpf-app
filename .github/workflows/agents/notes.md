@@ -5,3 +5,8 @@
 - Mettre les noms d'étudiants dans leur propre pastille comme pénalité et note
 - Mettre les sélections plus visibles dans le UI
 - Numberbox avec boutons +/-
+
+
+- Ajouter un lien vers les grilles qui utilisent un commentaire (une sorte de picker avec un preview?)
+
+- Corriger la modification de commentaire: ajouter un combobox dans le dialog, le retirer du picker de la banque. Et permettre de modifier la gravité pour un commentaire d'étudiant. Plus une case à cocher "Modifier le commentaire équivalent dans la banque".

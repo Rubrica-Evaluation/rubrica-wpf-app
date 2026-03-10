@@ -19,7 +19,7 @@ public class PdfService : IPdfService
     private const double RowHeight = 18;
     private const double ColCritereWidth = 230;
     private const double ColPoidsWidth = 70;
-    private const double ColResultatWidth = 70;
+    private const double ColResultatWidth = 100;
     private const double ColPointsWidth = 80;
     private const double Col2X = LeftMargin + ColCritereWidth;
     private const double Col3X = Col2X + ColPoidsWidth;
@@ -118,12 +118,13 @@ public class PdfService : IPdfService
     {
         foreach (var criterion in grid.Criteria)
         {
-            var wrappedLabel = WrapText(ctx.Gfx, criterion.Label, ctx.Fonts.Table, ColCritereWidth - 8);
-            double cellHeight = Math.Max(wrappedLabel.Count * 14 + 4, RowHeight);
+            var wrappedLabel  = WrapText(ctx.Gfx, criterion.Label,        ctx.Fonts.Table, ColCritereWidth  - 8);
+            var wrappedResult = WrapText(ctx.Gfx, criterion.Result ?? "—", ctx.Fonts.Table, ColResultatWidth - 8);
+            double cellHeight = Math.Max(Math.Max(wrappedLabel.Count, wrappedResult.Count) * 14 + 4, RowHeight);
 
-            DrawMultilineTableCell(ctx.Gfx, LeftMargin, ctx.Y, ColCritereWidth,  cellHeight, wrappedLabel, ctx.Fonts.Table, false);
-            DrawTableCell(ctx.Gfx, Col2X, ctx.Y, ColPoidsWidth,    cellHeight, criterion.Weight.ToString(),           ctx.Fonts.Table, false);
-            DrawTableCell(ctx.Gfx, Col3X, ctx.Y, ColResultatWidth, cellHeight, criterion.Result ?? "—",               ctx.Fonts.Table, false);
+            DrawMultilineTableCell(ctx.Gfx, LeftMargin, ctx.Y, ColCritereWidth,  cellHeight, wrappedLabel,  ctx.Fonts.Table, false);
+            DrawTableCell(ctx.Gfx, Col2X, ctx.Y, ColPoidsWidth,    cellHeight, criterion.Weight.ToString(),              ctx.Fonts.Table, false);
+            DrawMultilineTableCell(ctx.Gfx, Col3X,      ctx.Y, ColResultatWidth, cellHeight, wrappedResult, ctx.Fonts.Table, false);
             DrawTableCell(ctx.Gfx, Col4X, ctx.Y, ColPointsWidth,   cellHeight, criterion.Points?.ToString("F2") ?? "0.00", ctx.Fonts.Table, false);
             ctx.Y += cellHeight;
         }
