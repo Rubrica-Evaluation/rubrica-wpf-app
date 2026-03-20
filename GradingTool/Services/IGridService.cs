@@ -81,4 +81,9 @@ public interface IGridService
     string? GetResultRecommendation(
         IEnumerable<CommentEntry> feedback,
         IEnumerable<ScaleItemModel> scale);
+
+    /// <summary>
+    /// Cherche toutes les grilles du dossier grading qui contiennent un commentaire identique (texte + sévérité).
+    /// </summary>
+    List<string> FindCommentUsages(string gradingPath, CommentEntry comment);
 }

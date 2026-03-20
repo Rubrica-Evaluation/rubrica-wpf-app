@@ -17,6 +17,7 @@
             <converters:BoolToOppositeBoolConverter x:Key="BoolToOppositeBoolConverter"/>
             <converters:StatusColorConverter x:Key="StatusColorConverter"/>
             <converters:SeverityColorConverter x:Key="SeverityColorConverter"/>
+            <converters:CommentUsageTooltipConverter x:Key="CommentUsageTooltipConverter"/>
 
             <!-- Selection colors: same dark blue focused and unfocused -->
             <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#1565C0"/>

@@ -22,7 +22,6 @@ public partial class CommentPickerViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasSelection))]
-    [NotifyPropertyChangedFor(nameof(SelectedSeverity))]
     [NotifyCanExecuteChangedFor(nameof(ConfirmCommand))]
     [NotifyCanExecuteChangedFor(nameof(EditCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteCommand))]
@@ -35,26 +34,8 @@ public partial class CommentPickerViewModel : ObservableObject
             ? _allComments
             : _allComments.Where(c => c.Text.Contains(SearchText, System.StringComparison.OrdinalIgnoreCase));
 
-    public IEnumerable<CommentSeverity> SeverityValues { get; } = Enum.GetValues<CommentSeverity>();
-
-    public CommentSeverity SelectedSeverity
-    {
-        get => SelectedEntry?.Severity ?? CommentSeverity.Aucun;
-        set
-        {
-            if (SelectedEntry == null || SelectedEntry.Severity == value) return;
-            var oldText = SelectedEntry.Text;
-            var newEntry = new CommentEntry { Text = SelectedEntry.Text, Severity = value };
-            _commentService.UpdateCommentForCriterion(_criterionLabel, oldText, newEntry);
-            int idx = _allComments.IndexOf(SelectedEntry);
-            if (idx >= 0) _allComments[idx] = newEntry;
-            SelectedEntry = newEntry;
-            OnPropertyChanged(nameof(FilteredComments));
-        }
-    }
-
     public event Action<bool>? CloseRequested;
-    public event Action<string>? EditRequested;
+    public event Action<string, CommentSeverity>? EditRequested;
 
     public CommentPickerViewModel(string criterionLabel, List<CommentEntry> comments, ICommentService commentService)
     {
@@ -73,13 +54,13 @@ public partial class CommentPickerViewModel : ObservableObject
     private void Cancel() => CloseRequested?.Invoke(false);
 
     [RelayCommand(CanExecute = nameof(HasEntrySelected))]
-    private void Edit() => EditRequested?.Invoke(SelectedEntry!.Text);
+    private void Edit() => EditRequested?.Invoke(SelectedEntry!.Text, SelectedEntry!.Severity);
 
-    public void ApplyEdit(string updatedText)
+    public void ApplyEdit(string updatedText, CommentSeverity severity)
     {
         if (string.IsNullOrWhiteSpace(updatedText) || SelectedEntry == null) return;
         var oldText = SelectedEntry.Text;
-        var newEntry = new CommentEntry { Text = updatedText.Trim(), Severity = SelectedEntry.Severity };
+        var newEntry = new CommentEntry { Text = updatedText.Trim(), Severity = severity };
         _commentService.UpdateCommentForCriterion(_criterionLabel, oldText, newEntry);
         int idx = _allComments.IndexOf(SelectedEntry);
         if (idx >= 0) _allComments[idx] = newEntry;

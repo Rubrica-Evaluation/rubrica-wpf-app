@@ -217,6 +217,14 @@ public partial class GridEditorViewModel : ObservableObject
             criterion.Feedback, criterion.Scale);
     }
 
+    public string GetCommentUsagesTooltip(CommentEntry entry)
+    {
+        if (string.IsNullOrEmpty(_gradingRootPath)) return string.Empty;
+        var usages = _gridService.FindCommentUsages(_gradingRootPath, entry);
+        if (usages.Count == 0) return "Aucune grille ne contient ce commentaire.";
+        return "Utilisé dans :\n" + string.Join("\n", usages.Select(u => $"• {u}"));
+    }
+
     [RelayCommand]
     public void OpenCommentPicker(CriterionModel? criterion)
     {
@@ -260,11 +268,16 @@ public partial class GridEditorViewModel : ObservableObject
             return;
 
         int idx = criterion.Feedback.IndexOf(SelectedFeedbackItem);
-        var text = Views.InputDialog.Show("Modifier le commentaire :", "Modifier", SelectedFeedbackItem.Text, multiline: true);
+        var originalEntry = SelectedFeedbackItem;
+        var (text, severity, updateBank) = Views.InputDialog.ShowWithSeverity("Modifier le commentaire :", "Modifier", originalEntry.Text, originalEntry.Severity);
         if (text == null) return;
 
+        var updatedEntry = new CommentEntry { Text = text, Severity = severity };
         if (idx >= 0 && idx < criterion.Feedback.Count)
-            criterion.Feedback[idx] = new CommentEntry { Text = text, Severity = SelectedFeedbackItem.Severity };
+            criterion.Feedback[idx] = updatedEntry;
+
+        if (updateBank)
+            _commentService.UpdateCommentForCriterion(criterion.Label, originalEntry.Text, updatedEntry);
 
         SelectedFeedbackItem = null;
     }

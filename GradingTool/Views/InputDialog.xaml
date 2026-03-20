@@ -15,6 +15,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -46,7 +47,7 @@
                   Margin="0,0,0,12"
                   Visibility="{Binding AddToBankVisible}"/>
 
-        <!-- Sévérité (visible uniquement lors d'un ajout à la banque) -->
+        <!-- Sévérité (visible uniquement lors d'un ajout à la banque ou d'une modification) -->
         <StackPanel Grid.Row="3"
                     Orientation="Horizontal"
                     Margin="0,0,0,12"
@@ -64,7 +65,15 @@
                       Padding="8,2"/>
         </StackPanel>
 
-        <StackPanel Grid.Row="5"
+        <CheckBox Grid.Row="4"
+                  Content="Modifier le commentaire équivalent dans la banque"
+                  IsChecked="{Binding UpdateBankInPlace}"
+                  FontSize="12"
+                  Foreground="#555555"
+                  Margin="0,0,0,12"
+                  Visibility="{Binding UpdateBankVisible}"/>
+
+        <StackPanel Grid.Row="6"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right">
             <Button Content="Annuler"

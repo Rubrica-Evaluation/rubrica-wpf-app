@@ -365,6 +365,47 @@ public class GridService : IGridService
         drop = Math.Min(drop, maxDrop);
         return scaleList[drop].Qualitative;
     }
+
+    public List<string> FindCommentUsages(string gradingPath, CommentEntry comment)
+    {
+        var usages = new List<string>();
+        if (!Directory.Exists(gradingPath)) return usages;
+
+        foreach (var groupDir in Directory.GetDirectories(gradingPath))
+        {
+            foreach (var filePath in Directory.GetFiles(groupDir, "*.json"))
+            {
+                try
+                {
+                    var jsonContent = File.ReadAllText(filePath, Encoding.UTF8);
+                    var grid = JsonSerializer.Deserialize<GridModel>(jsonContent, _jsonOptions);
+                    if (grid == null) continue;
+
+                    bool hasMatch = grid.Criteria.Any(c =>
+                        c.Feedback.Any(f =>
+                            string.Equals(f.Text, comment.Text, StringComparison.Ordinal) &&
+                            f.Severity == comment.Severity));
+
+                    if (hasMatch)
+                        usages.Add(BuildUsageLabel(grid));
+                }
+                catch { /* fichier illisible, on ignore */ }
+            }
+        }
+        return usages;
+    }
+
+    private static string BuildUsageLabel(GridModel grid)
+    {
+        if (grid.Meta.Members is { Count: > 0 })
+        {
+            var names = string.Join(" / ", grid.Meta.Members.Select(m => m.DisplayName));
+            return $"{grid.Meta.Student.Group} — {names}";
+        }
+        var student = grid.Meta.Student;
+        var displayName = $"{student.FirstName} {student.LastName}".Trim();
+        return $"{student.Group} — {displayName}";
+    }
 }
 
 // Classe pour afficher les informations du fichier

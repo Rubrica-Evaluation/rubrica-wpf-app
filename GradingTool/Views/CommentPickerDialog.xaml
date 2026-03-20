@@ -201,34 +201,14 @@
             </Grid>
         </Border>
 
-        <!-- Sévérité + Boutons -->
+        <!-- Boutons -->
         <Grid Grid.Row="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Sévérité (visible si sélection) -->
-            <StackPanel Grid.Row="0"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center"
-                        Margin="0,0,0,10"
-                        Visibility="{Binding HasSelection, Converter={StaticResource BoolToVisibilityConverter}}">
-                <TextBlock Text="Sévérité :"
-                           VerticalAlignment="Center"
-                           Margin="0,0,8,0"
-                           FontSize="13"
-                           Foreground="#444444"/>
-                <ComboBox ItemsSource="{Binding SeverityValues}"
-                          SelectedItem="{Binding SelectedSeverity}"
-                          Width="140"
-                          Height="32"
-                          FontSize="12"
-                          Padding="8,4"/>
-            </StackPanel>
-
             <!-- Boutons -->
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>

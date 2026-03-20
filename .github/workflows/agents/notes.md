@@ -7,6 +7,7 @@
 - Numberbox avec boutons +/-
 
 
-- Ajouter un lien vers les grilles qui utilisent un commentaire (une sorte de picker avec un preview?)
-
-- Corriger la modification de commentaire: ajouter un combobox dans le dialog, le retirer du picker de la banque. Et permettre de modifier la gravité pour un commentaire d'étudiant. Plus une case à cocher "Modifier le commentaire équivalent dans la banque".
+- Avant l'exportation en du sommaire ou en pdf, quelques vérifications devraient être faites :
+    - Aucun résultat n'est null
+    - Aucun critère avec feedback vide n'a autre chose que excellent (1er choix)
+    - Donner un message en indiquant les grilles à vérifier, mais permettre de continuer

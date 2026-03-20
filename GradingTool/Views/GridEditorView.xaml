@@ -371,7 +371,20 @@
                                                                  BorderThickness="1">
                                                             <ListBox.ItemTemplate>
                                                                 <DataTemplate>
-                                                                    <Border Padding="8" Margin="0,2">
+                                                                    <Border Padding="8" Margin="0,2"
+                                                                            Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                                                        <Border.ToolTip>
+                                                                            <ToolTip MaxWidth="360">
+                                                                                <TextBlock TextWrapping="Wrap">
+                                                                                    <TextBlock.Text>
+                                                                                        <MultiBinding Converter="{StaticResource CommentUsageTooltipConverter}">
+                                                                                            <Binding Path="PlacementTarget.DataContext" RelativeSource="{RelativeSource AncestorType=ToolTip}"/>
+                                                                                            <Binding Path="PlacementTarget.Tag" RelativeSource="{RelativeSource AncestorType=ToolTip}"/>
+                                                                                        </MultiBinding>
+                                                                                    </TextBlock.Text>
+                                                                                </TextBlock>
+                                                                            </ToolTip>
+                                                                        </Border.ToolTip>
                                                                         <Border.Style>
                                                                             <Style TargetType="Border">
                                                                                 <Setter Property="Background" Value="#F8F9FA"/>

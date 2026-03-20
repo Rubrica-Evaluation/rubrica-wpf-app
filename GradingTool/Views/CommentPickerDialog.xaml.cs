@@ -20,11 +20,11 @@ public partial class CommentPickerDialog : Window
             DialogResult = result;
             Close();
         };
-        Vm.EditRequested += originalText =>
+        Vm.EditRequested += (originalText, originalSeverity) =>
         {
-            var result = InputDialog.Show("Modifier le commentaire :", "Modifier", originalText, multiline: true);
-            if (result != null)
-                Vm.ApplyEdit(result);
+            var result = InputDialog.ShowWithSeverity("Modifier le commentaire :", "Modifier", originalText, originalSeverity, showUpdateBank: false);
+            if (result.Text != null)
+                Vm.ApplyEdit(result.Text, result.Severity);
         };
     }
 
