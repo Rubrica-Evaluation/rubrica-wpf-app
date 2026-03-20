@@ -10,6 +10,7 @@ public class CommentService : ICommentService
 {
     private readonly Dictionary<string, List<CommentEntry>> _commentsByCriteria;
     private const string CommentsFileName = "reusable_comments.json";
+    private string? _currentGradingPath;
 
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -68,6 +69,9 @@ public class CommentService : ICommentService
         try
         {
             if (string.IsNullOrWhiteSpace(gradingPath) || !Directory.Exists(gradingPath)) return;
+            // Ne pas écraser le fichier si le chargement a échoué pour ce chemin
+            if (_currentGradingPath != gradingPath) return;
+
             string filePath = Path.Combine(gradingPath, CommentsFileName);
             string jsonContent = JsonSerializer.Serialize(_commentsByCriteria, _jsonOptions);
             await Helpers.FileHelper.WriteAllTextAtomicAsync(filePath, jsonContent);
@@ -82,20 +86,30 @@ public class CommentService : ICommentService
     {
         try
         {
-            _commentsByCriteria.Clear();
-
             if (string.IsNullOrWhiteSpace(gradingPath) || !Directory.Exists(gradingPath)) return;
             string filePath = Path.Combine(gradingPath, CommentsFileName);
-            if (!File.Exists(filePath)) return;
+
+            if (!File.Exists(filePath))
+            {
+                // Fichier absent : nouveau TP, on repart à zéro
+                _commentsByCriteria.Clear();
+                _currentGradingPath = gradingPath;
+                return;
+            }
 
             string jsonContent = await File.ReadAllTextAsync(filePath);
             var loaded = JsonSerializer.Deserialize<Dictionary<string, List<CommentEntry>>>(jsonContent, _jsonOptions);
             if (loaded == null) return;
 
+            // Vider le cache seulement après un chargement réussi
+            _commentsByCriteria.Clear();
+            _currentGradingPath = gradingPath;
             MergeIntoCache(loaded);
         }
         catch (Exception ex)
         {
+            // En cas d'échec (fichier verrouillé par OneDrive, etc.),
+            // on conserve les commentaires existants plutôt que de les perdre
             System.Diagnostics.Debug.WriteLine($"Erreur lors du chargement des commentaires: {ex.Message}");
         }
     }
