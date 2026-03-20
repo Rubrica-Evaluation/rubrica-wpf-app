@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Collections.ObjectModel;
 using GradingTool.Models;
+using GradingTool.Helpers;
 
 namespace GradingTool.Services;
 
@@ -53,7 +54,7 @@ public class GridService : IGridService
             var filePath = Path.Combine(gradingPath, fileName);
 
             var json = JsonSerializer.Serialize(grid, _jsonOptions);
-            await File.WriteAllTextAsync(filePath, json, Encoding.UTF8);
+            await FileHelper.WriteAllTextAtomicAsync(filePath, json);
 
             return true;
         }
@@ -198,7 +199,7 @@ public class GridService : IGridService
             var filePath = Path.Combine(gradingPath, fileName);
 
             var json = JsonSerializer.Serialize(grid, _jsonOptions);
-            await File.WriteAllTextAsync(filePath, json, Encoding.UTF8);
+            await FileHelper.WriteAllTextAtomicAsync(filePath, json);
 
             return true;
         }

@@ -8,7 +8,6 @@ namespace GradingTool.Models
 {
     /// <summary>
     /// Convertit ObservableCollection&lt;CommentEntry&gt; en JSON.
-    /// Supporte la migration de l'ancien format (tableau de chaînes) vers le nouveau (tableau d'objets).
     /// </summary>
     public class FeedbackCollectionConverter : System.Text.Json.Serialization.JsonConverter<ObservableCollection<CommentEntry>>
     {
@@ -19,25 +18,8 @@ namespace GradingTool.Models
 
         public override ObservableCollection<CommentEntry> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            using var doc = JsonDocument.ParseValue(ref reader);
-            var result = new List<CommentEntry>();
-
-            foreach (var element in doc.RootElement.EnumerateArray())
-            {
-                if (element.ValueKind == JsonValueKind.String)
-                {
-                    // Ancien format : chaîne simple
-                    result.Add(new CommentEntry { Text = element.GetString() ?? string.Empty, Severity = CommentSeverity.Aucun });
-                }
-                else if (element.ValueKind == JsonValueKind.Object)
-                {
-                    // Nouveau format : { text, severity }
-                    var entry = element.Deserialize<CommentEntry>(_innerOptions) ?? new CommentEntry();
-                    result.Add(entry);
-                }
-            }
-
-            return new ObservableCollection<CommentEntry>(result);
+            var list = JsonSerializer.Deserialize<List<CommentEntry>>(ref reader, _innerOptions) ?? new();
+            return new ObservableCollection<CommentEntry>(list);
         }
 
         public override void Write(Utf8JsonWriter writer, ObservableCollection<CommentEntry> value, JsonSerializerOptions options)

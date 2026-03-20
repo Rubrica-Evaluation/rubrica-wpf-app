@@ -70,7 +70,7 @@ public class CommentService : ICommentService
             if (string.IsNullOrWhiteSpace(gradingPath) || !Directory.Exists(gradingPath)) return;
             string filePath = Path.Combine(gradingPath, CommentsFileName);
             string jsonContent = JsonSerializer.Serialize(_commentsByCriteria, _jsonOptions);
-            await File.WriteAllTextAsync(filePath, jsonContent);
+            await Helpers.FileHelper.WriteAllTextAtomicAsync(filePath, jsonContent);
         }
         catch (Exception ex)
         {
@@ -82,12 +82,14 @@ public class CommentService : ICommentService
     {
         try
         {
+            _commentsByCriteria.Clear();
+
             if (string.IsNullOrWhiteSpace(gradingPath) || !Directory.Exists(gradingPath)) return;
             string filePath = Path.Combine(gradingPath, CommentsFileName);
             if (!File.Exists(filePath)) return;
 
             string jsonContent = await File.ReadAllTextAsync(filePath);
-            var loaded = TryDeserializeNewFormat(jsonContent) ?? MigrateFromLegacyFormat(jsonContent);
+            var loaded = JsonSerializer.Deserialize<Dictionary<string, List<CommentEntry>>>(jsonContent, _jsonOptions);
             if (loaded == null) return;
 
             MergeIntoCache(loaded);
@@ -96,23 +98,6 @@ public class CommentService : ICommentService
         {
             System.Diagnostics.Debug.WriteLine($"Erreur lors du chargement des commentaires: {ex.Message}");
         }
-    }
-
-    private static Dictionary<string, List<CommentEntry>>? TryDeserializeNewFormat(string jsonContent)
-    {
-        try { return JsonSerializer.Deserialize<Dictionary<string, List<CommentEntry>>>(jsonContent, _jsonOptions); }
-        catch (JsonException) { return null; }
-    }
-
-    private static Dictionary<string, List<CommentEntry>>? MigrateFromLegacyFormat(string jsonContent)
-    {
-        var oldFormat = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(jsonContent);
-        if (oldFormat == null) return null;
-
-        return oldFormat.ToDictionary(
-            kvp => kvp.Key,
-            kvp => kvp.Value.Select(t => new CommentEntry { Text = t, Severity = CommentSeverity.Aucun }).ToList(),
-            StringComparer.OrdinalIgnoreCase);
     }
 
     private void MergeIntoCache(Dictionary<string, List<CommentEntry>> loaded)
