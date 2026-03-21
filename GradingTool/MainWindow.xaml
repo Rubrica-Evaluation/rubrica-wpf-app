@@ -23,6 +23,11 @@
         <DataTemplate DataType="{x:Type vm:GridEditorViewModel}">
             <views:GridEditorView/>
         </DataTemplate>
+
+        <!-- DataTemplate pour RubricDesignerViewModel -->
+        <DataTemplate DataType="{x:Type vm:RubricDesignerViewModel}">
+            <views:RubricDesignerView/>
+        </DataTemplate>
     </Window.Resources>
     
     <Grid>

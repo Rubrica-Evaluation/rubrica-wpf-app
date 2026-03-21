@@ -342,27 +342,14 @@
 
                             <!-- Boutons -->
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="Charger une rubrique"
-                                        Command="{Binding LoadRubricCommand}"
-                                        Style="{StaticResource RoundedButton}"
-                                        FontSize="13"
-                                        Padding="16,8"
-                                        Margin="0,0,12,0"/>
-                                
-                                <Button Content="Télécharger template"
-                                        Command="{Binding DownloadRubricTemplateCommand}"
-                                        Style="{StaticResource RoundedButton}"
-                                        FontSize="13"
-                                        Padding="16,8"
-                                        Margin="0,0,12,0"
-                                        Background="#6C757D"/>
-                                
-                                <Button Content="📁 Ouvrir dans l'explorateur"
-                                        Command="{Binding OpenRubricInExplorerCommand}"
-                                        Style="{StaticResource RoundedButton}"
-                                        FontSize="13"
-                                        Padding="16,8"
-                                        Background="#17A2B8"/>
+                                <Button Content="Concepteur de grille"
+                                    Command="{Binding OpenRubricDesignerCommand}"
+                                    Style="{StaticResource RoundedButton}"
+                                    FontSize="13"
+                                    Padding="16,8"
+                                    Margin="0,0,0,0"
+                                    Background="#0D6EFD"
+                                    ToolTip="Créer ou modifier la rubrique du travail (critères, niveaux qualitatifs, pénalités)"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>

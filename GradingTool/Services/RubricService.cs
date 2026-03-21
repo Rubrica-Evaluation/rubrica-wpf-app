@@ -10,6 +10,12 @@ namespace GradingTool.Services;
 public class RubricService : IRubricService
 {
     private readonly ISessionsRootService _sessionsRootService;
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
 
     public RubricService(ISessionsRootService sessionsRootService)
     {
@@ -35,10 +41,15 @@ public class RubricService : IRubricService
     public RubricModel? LoadRubric(string sessionName, string courseName, string workName, out string errorMessage)
     {
         errorMessage = string.Empty;
-        
         var rubricPath = GetRubricPath(sessionName, courseName, workName);
-        
-        if (!File.Exists(rubricPath))
+        return LoadRubricFromFile(rubricPath, out errorMessage);
+    }
+
+    public RubricModel? LoadRubricFromFile(string filePath, out string errorMessage)
+    {
+        errorMessage = string.Empty;
+
+        if (!File.Exists(filePath))
         {
             errorMessage = "Le fichier rubric.json n'existe pas.";
             return null;
@@ -46,12 +57,12 @@ public class RubricService : IRubricService
 
         try
         {
-            var jsonContent = File.ReadAllText(rubricPath, Encoding.UTF8);
+            var jsonContent = File.ReadAllText(filePath, Encoding.UTF8);
             var rubric = JsonSerializer.Deserialize<RubricModel>(jsonContent);
 
             if (rubric == null)
             {
-                errorMessage = "Impossible de désérialiser le fichier rubric.json.";
+                errorMessage = "Impossible de désérialiser le fichier JSON.";
                 return null;
             }
 
@@ -64,13 +75,66 @@ public class RubricService : IRubricService
         }
         catch (JsonException)
         {
-            errorMessage = "Le fichier n'est pas au bon format. Assurez-vous qu'il s'agit d'un fichier JSON valide.";
+            errorMessage = "Le fichier n'est pas au bon format JSON valide.";
             return null;
         }
         catch (Exception)
         {
-            errorMessage = "Impossible de lire le fichier rubrique. Vérifiez que le fichier n'est pas corrompu.";
+            errorMessage = "Impossible de lire le fichier. Vérifiez qu'il n'est pas corrompu.";
             return null;
+        }
+    }
+
+    public RubricModel CreateEmptyRubric(string workName)
+    {
+        return new RubricModel
+        {
+            Meta = new RubricMeta
+            {
+                Tp = workName,
+                Student = new StudentModel
+                {
+                    Da = string.Empty,
+                    FirstName = string.Empty,
+                    LastName = string.Empty,
+                    Group = string.Empty,
+                    GroupCode = string.Empty,
+                    Team = 0
+                }
+            },
+            Penalties = new List<PenaltyItemModel>(),
+            Criteria = new List<CriterionModel>(),
+            Computed = new ComputedModel
+            {
+                Total = null
+            }
+        };
+    }
+
+    public bool SaveRubric(string sessionName, string courseName, string workName, RubricModel rubric)
+    {
+        if (!ValidateRubricFormat(rubric, out _))
+        {
+            return false;
+        }
+
+        try
+        {
+            var rubricPath = GetRubricPath(sessionName, courseName, workName);
+            var rubricDirectory = Path.GetDirectoryName(rubricPath);
+
+            if (!string.IsNullOrEmpty(rubricDirectory) && !Directory.Exists(rubricDirectory))
+            {
+                Directory.CreateDirectory(rubricDirectory);
+            }
+
+            var jsonContent = JsonSerializer.Serialize(rubric, JsonOptions);
+            File.WriteAllText(rubricPath, jsonContent, Encoding.UTF8);
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 
@@ -262,13 +326,7 @@ public class RubricService : IRubricService
             }
         };
 
-        var options = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-        };
-
-        var jsonContent = JsonSerializer.Serialize(template, options);
+        var jsonContent = JsonSerializer.Serialize(template, JsonOptions);
         File.WriteAllText(destinationFilePath, jsonContent, Encoding.UTF8);
     }
 }

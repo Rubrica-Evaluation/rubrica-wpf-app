@@ -60,6 +60,7 @@ public partial class App : Application
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<WorkspaceViewModel>();
         services.AddSingleton<GridEditorViewModel>();
+        services.AddSingleton<RubricDesignerViewModel>();
 
         // Views
         services.AddSingleton<MainWindow>();
