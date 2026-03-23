@@ -2,6 +2,7 @@
 using System.Data;
 using System.Text;
 using System.Windows;
+using GradingTool.Helpers;
 using GradingTool.Services;
 using GradingTool.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,28 @@ public partial class App : Application
 
         var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.Show();
+
+        var sessionsRootService = _serviceProvider.GetRequiredService<ISessionsRootService>();
+        var rootPath = sessionsRootService.GetSessionsRootPath();
+
+        if (OneDriveHelper.ShouldWarnUser(rootPath))
+        {
+            var result = MessageBox.Show(
+                "Le dossier de données se trouve dans OneDrive, mais OneDrive n'est pas démarré.\n\n"
+                + "Cela pourrait entraîner une perte de données ou des conflits de synchronisation.\n\n"
+                + "Conseil : fermez l'application, démarrez OneDrive, puis relancez.\n\n"
+                + "Voulez-vous continuer malgré le risque ?",
+                "Avertissement — OneDrive inactif",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning,
+                MessageBoxResult.No);
+
+            if (result == MessageBoxResult.No)
+            {
+                Shutdown();
+                return;
+            }
+        }
     }
 
     private void ConfigureServices(ServiceCollection services)

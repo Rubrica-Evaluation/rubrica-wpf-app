@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GradingTool.Helpers;
 using GradingTool.Services;
 using GradingTool.Models;
 using System.Collections.ObjectModel;
@@ -444,6 +445,8 @@ public partial class WorkspaceViewModel : ObservableObject
             SessionsRootPath = _sessionsRootService.GetSessionsRootPath();
             IsSessionsRootConfigured = true;
 
+            WarnIfOneDriveInactive(SessionsRootPath);
+
             LoadSessions();
 
             _dialogService.ShowToast("Dossier racine configuré avec succès");
@@ -455,6 +458,19 @@ public partial class WorkspaceViewModel : ObservableObject
                 "Erreur",
                 System.Windows.MessageBoxImage.Error);
         }
+    }
+
+    private void WarnIfOneDriveInactive(string? path)
+    {
+        if (!OneDriveHelper.ShouldWarnUser(path))
+            return;
+
+        _dialogService.ShowMessage(
+            "Le dossier sélectionné se trouve dans OneDrive, mais OneDrive n'est pas démarré.\n\n"
+            + "Cela pourrait entraîner une perte de données ou des conflits de synchronisation.\n\n"
+            + "Conseil : démarrez OneDrive avant de continuer à travailler.",
+            "Avertissement — OneDrive inactif",
+            System.Windows.MessageBoxImage.Warning);
     }
 
     [RelayCommand]
