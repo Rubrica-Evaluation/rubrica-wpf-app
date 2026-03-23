@@ -1,3 +1,4 @@
+using GradingTool.Helpers;
 using GradingTool.Models;
 using System.IO;
 using System.Text;
@@ -111,9 +112,9 @@ public class RubricService : IRubricService
         };
     }
 
-    public bool SaveRubric(string sessionName, string courseName, string workName, RubricModel rubric)
+    public bool SaveRubric(string sessionName, string courseName, string workName, RubricModel rubric, out string errorMessage)
     {
-        if (!ValidateRubricFormat(rubric, out _))
+        if (!ValidateRubricFormat(rubric, out errorMessage))
         {
             return false;
         }
@@ -129,11 +130,13 @@ public class RubricService : IRubricService
             }
 
             var jsonContent = JsonSerializer.Serialize(rubric, JsonOptions);
-            File.WriteAllText(rubricPath, jsonContent, Encoding.UTF8);
+            FileHelper.WriteAllTextAtomicAsync(rubricPath, jsonContent, Encoding.UTF8).GetAwaiter().GetResult();
+            errorMessage = string.Empty;
             return true;
         }
-        catch
+        catch (Exception ex)
         {
+            errorMessage = ex.Message;
             return false;
         }
     }
@@ -155,7 +158,7 @@ public class RubricService : IRubricService
             return false;
         }
 
-        if (rubric.Penalties == null || rubric.Penalties.Count == 0)
+        if (rubric.Penalties == null)
         {
             errorMessage = "La rubrique ne contient pas la section des pénalités.";
             return false;

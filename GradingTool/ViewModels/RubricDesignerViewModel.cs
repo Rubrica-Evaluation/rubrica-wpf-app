@@ -495,10 +495,10 @@ public partial class RubricDesignerViewModel : ObservableObject
         }
 
         var rubric = BuildRubric();
-        if (!_rubricService.SaveRubric(SessionName, CourseName, WorkName, rubric))
+        if (!_rubricService.SaveRubric(SessionName, CourseName, WorkName, rubric, out var saveError))
         {
             _dialogService.ShowMessage(
-                "La rubrique n'a pas pu être enregistrée.",
+                $"La rubrique n'a pas pu être enregistrée.\n\n{saveError}",
                 "Erreur de sauvegarde",
                 System.Windows.MessageBoxImage.Error);
             return;
@@ -537,10 +537,10 @@ public partial class RubricDesignerViewModel : ObservableObject
         }
 
         var rubric = BuildRubric();
-        if (!_rubricService.SaveRubric(SessionName, CourseName, WorkName, rubric))
+        if (!_rubricService.SaveRubric(SessionName, CourseName, WorkName, rubric, out var saveError))
         {
             _dialogService.ShowMessage(
-                "La rubrique n'a pas pu être enregistrée.",
+                $"La rubrique n'a pas pu être enregistrée.\n\n{saveError}",
                 "Erreur de sauvegarde",
                 System.Windows.MessageBoxImage.Error);
             return false;

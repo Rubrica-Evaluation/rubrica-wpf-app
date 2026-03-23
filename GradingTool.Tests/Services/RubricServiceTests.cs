@@ -23,17 +23,30 @@ public class RubricServiceTests
     }
 
     [Fact]
-    public void ValidateRubricFormat_MissingPenalty_ReturnsFalse()
+    public void ValidateRubricFormat_NullPenalties_ReturnsFalse()
+    {
+        var sessionsRootService = Substitute.For<ISessionsRootService>();
+        var sut = new RubricService(sessionsRootService);
+        var rubric = BuildValidRubric();
+        rubric.Penalties = null!;
+
+        var isValid = sut.ValidateRubricFormat(rubric, out var errorMessage);
+
+        Assert.False(isValid);
+        Assert.Contains("pénalités", errorMessage, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void ValidateRubricFormat_EmptyPenalties_ReturnsTrue()
     {
         var sessionsRootService = Substitute.For<ISessionsRootService>();
         var sut = new RubricService(sessionsRootService);
         var rubric = BuildValidRubric();
         rubric.Penalties.Clear();
 
-        var isValid = sut.ValidateRubricFormat(rubric, out var errorMessage);
+        var isValid = sut.ValidateRubricFormat(rubric, out _);
 
-        Assert.False(isValid);
-        Assert.Contains("pénalités", errorMessage, StringComparison.OrdinalIgnoreCase);
+        Assert.True(isValid);
     }
 
     [Fact]
@@ -44,7 +57,7 @@ public class RubricServiceTests
         var sut = new RubricService(sessionsRootService);
         var rubric = sut.CreateEmptyRubric("TP1");
 
-        var saved = sut.SaveRubric("Hiver 2026", "BD1", "TP1", rubric);
+        var saved = sut.SaveRubric("Hiver 2026", "BD1", "TP1", rubric, out _);
 
         Assert.False(saved);
     }

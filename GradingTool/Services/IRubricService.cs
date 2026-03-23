@@ -28,7 +28,7 @@ public interface IRubricService
     /// <summary>
     /// Saves the rubric.json file for the specified evaluation
     /// </summary>
-    bool SaveRubric(string sessionName, string courseName, string workName, RubricModel rubric);
+    bool SaveRubric(string sessionName, string courseName, string workName, RubricModel rubric, out string errorMessage);
 
     /// <summary>
     /// Validates that the rubric matches the expected format
