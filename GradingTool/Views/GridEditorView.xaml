@@ -41,21 +41,25 @@
                             Command="{Binding ExportSummaryCommand}"
                             Padding="16,8"
                             Margin="0,0,8,0"
-                            Style="{StaticResource GhostButton}"/>
+                            Style="{StaticResource GhostButton}"
+                            ToolTip="Générer un fichier csv des résultats de tous les étudiants du groupe (pour importation Léa)"/>
                     <Button Content="Exporter PDF"
                             Command="{Binding ExportPdfCommand}"
                             Padding="16,8"
                             Margin="0,0,8,0"
-                            Style="{StaticResource DangerButton}"/>
+                            Style="{StaticResource DangerButton}"
+                            ToolTip="Exporter toutes les grilles du groupe en PDF (et travaux.zip)"/>
                     <Button Content="Enregistrer"
                             Command="{Binding SaveCommand}"
                             Padding="16,8"
                             Margin="0,0,8,0"
-                            Style="{StaticResource RoundedButton}"/>
+                            Style="{StaticResource RoundedButton}"
+                            ToolTip="Enregistrer les modifications de la grille courante"/>
                     <Button Content="Retour"
                             Command="{Binding GoBackCommand}"
                             Padding="16,8"
-                            Style="{StaticResource GhostButton}"/>
+                            Style="{StaticResource GhostButton}"
+                            ToolTip="Retourner à l'espace de travail"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -305,6 +309,7 @@
                                                                 Padding="0"
                                                                 BorderThickness="0"
                                                                 Background="Transparent"
+                                                                HorizontalAlignment="Left"
                                                                 Cursor="Hand"
                                                                 ToolTip="Cliquer pour appliquer cette suggestion"
                                                                 Visibility="{Binding HasRecommendation, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -353,19 +358,40 @@
                                                                    Margin="0,0,0,4"/>
                                                         
                                                         <!-- Liste des feedbacks -->
+                                                        <Border BorderBrush="#E0E0E0"
+                                                                BorderThickness="1"
+                                                                CornerRadius="8"
+                                                                ClipToBounds="True"
+                                                                Margin="0,0,0,8">
                                                         <ListBox ItemsSource="{Binding Feedback}"
                                                                  x:Name="FeedbackList"
                                                                  helpers:ScrollHelper.BubbleToParent="True"
                                                                  SelectedItem="{Binding DataContext.SelectedFeedbackItem, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
                                                                  MinHeight="60"
-                                                                 MaxHeight="120"
-                                                                 Margin="0,0,0,8"
+                                                                 MaxHeight="160"
                                                                  Background="White"
-                                                                 BorderBrush="#E0E0E0"
-                                                                 BorderThickness="1">
+                                                                 BorderThickness="0"
+                                                                 HorizontalContentAlignment="Stretch"
+                                                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                                            <ListBox.ItemContainerStyle>
+                                                                <Style TargetType="ListBoxItem">
+                                                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                                                    <Setter Property="Padding" Value="0"/>
+                                                                    <Setter Property="Margin" Value="0"/>
+                                                                    <Setter Property="Template">
+                                                                        <Setter.Value>
+                                                                            <ControlTemplate TargetType="ListBoxItem">
+                                                                                <ContentPresenter/>
+                                                                            </ControlTemplate>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </Style>
+                                                            </ListBox.ItemContainerStyle>
                                                             <ListBox.ItemTemplate>
                                                                 <DataTemplate>
-                                                                    <Border Padding="8" Margin="0,2"
+                                                                    <Border Padding="8,6"
+                                                                            Margin="4,2"
+                                                                            CornerRadius="6"
                                                                             Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}">
                                                                         <Border.ToolTip>
                                                                             <ToolTip MaxWidth="360">
@@ -384,16 +410,21 @@
                                                                                 <Setter Property="Background" Value="#F8F9FA"/>
                                                                                 <Style.Triggers>
                                                                                     <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
-                                                                                        <Setter Property="Background" Value="#BBDEFB"/>
+                                                                                        <Setter Property="Background" Value="#DDEEFB"/>
                                                                                     </DataTrigger>
                                                                                 </Style.Triggers>
                                                                             </Style>
                                                                         </Border.Style>
-                                                                        <StackPanel Orientation="Horizontal">
-                                                                            <Border CornerRadius="3"
+                                                                        <Grid>
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="Auto"/>
+                                                                                <ColumnDefinition Width="*"/>
+                                                                            </Grid.ColumnDefinitions>
+                                                                            <Border Grid.Column="0"
+                                                                                    CornerRadius="3"
                                                                                     Padding="4,1"
-                                                                                    Margin="0,0,6,0"
-                                                                                    VerticalAlignment="Center"
+                                                                                    Margin="0,2,6,0"
+                                                                                    VerticalAlignment="Top"
                                                                                     Background="{Binding Severity, Converter={StaticResource SeverityColorConverter}}">
                                                                                 <Border.Style>
                                                                                     <Style TargetType="Border">
@@ -409,12 +440,16 @@
                                                                                            Foreground="White"
                                                                                            FontWeight="SemiBold"/>
                                                                             </Border>
-                                                                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap"/>
-                                                                        </StackPanel>
+                                                                            <TextBlock Grid.Column="1"
+                                                                                       Text="{Binding Text}"
+                                                                                       TextWrapping="Wrap"
+                                                                                       FontSize="12"/>
+                                                                        </Grid>
                                                                     </Border>
                                                                 </DataTemplate>
                                                             </ListBox.ItemTemplate>
                                                         </ListBox>
+                                                        </Border>
                                                         
                                                         <!-- StackPanel pour les boutons d'action -->
                                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
