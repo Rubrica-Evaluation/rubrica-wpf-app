@@ -17,6 +17,9 @@ public partial class GridEditorViewModel : ObservableObject
     private readonly IGridService _gridService;
     private readonly IDialogService _dialogService;
     private readonly IPdfService _pdfService;
+    private readonly ICommentService _commentService;
+
+    private string _gradingRootPath = string.Empty;
 
     [ObservableProperty]
     private string _groupName = string.Empty;
@@ -45,14 +48,24 @@ public partial class GridEditorViewModel : ObservableObject
     [ObservableProperty]
     private double? _totalPenalties;
 
+    [ObservableProperty]
+    private CriterionModel? _selectedCriterion;
+
+    [ObservableProperty]
+    private CommentEntry? _selectedFeedbackItem;
+
+    [ObservableProperty]
+    private bool _justSaved;
+
     public string NavigationPath => $"{SessionName} / {CourseName} / {WorkName} / {GroupName}";
     
-    public GridEditorViewModel(INavigationService navigationService, IGridService gridService, IDialogService dialogService, IPdfService pdfService)
+    public GridEditorViewModel(INavigationService navigationService, IGridService gridService, IDialogService dialogService, IPdfService pdfService, ICommentService commentService)
     {
         _navigationService = navigationService;
         _gridService = gridService;
         _dialogService = dialogService;
         _pdfService = pdfService;
+        _commentService = commentService;
     }
 
     public void Initialize(GroupModel group, string gradingPath, string session, string course, string work)
@@ -91,6 +104,7 @@ public partial class GridEditorViewModel : ObservableObject
             foreach (var criterion in CurrentGrid.Criteria)
             {
                 criterion.PropertyChanged -= OnCriterionPropertyChanged;
+                criterion.Feedback.CollectionChanged -= (s, e) => RefreshResultRecommendation(criterion);
             }
             foreach (var penalty in CurrentGrid.Penalties)
             {
@@ -112,12 +126,24 @@ public partial class GridEditorViewModel : ObservableObject
     {
         CurrentGrid = await _gridService.LoadGridAsync(filePath);
         
+        // Charger les commentaires réutilisables depuis le répertoire grading
+        var groupPath = Path.GetDirectoryName(filePath)!;
+        var gradingPath = Path.GetDirectoryName(groupPath)!;  // Remonter au répertoire grading
+        _gradingRootPath = gradingPath;
+        await _commentService.LoadCommentsAsync(gradingPath);
+        
         // Attacher les event handlers pour recalculer le total quand les points changent
         if (CurrentGrid != null)
         {
             foreach (var criterion in CurrentGrid.Criteria)
             {
                 criterion.PropertyChanged += OnCriterionPropertyChanged;
+                // Abonner aux changements de feedback pour la recommandation
+                var capturedCriterion = criterion;
+                capturedCriterion.Feedback.CollectionChanged += (s, e) =>
+                    RefreshResultRecommendation(capturedCriterion);
+                // Calculer la recommandation initiale
+                RefreshResultRecommendation(criterion);
             }
             foreach (var penalty in CurrentGrid.Penalties)
             {
@@ -154,7 +180,16 @@ public partial class GridEditorViewModel : ObservableObject
             // Le basePath doit être le répertoire du travail (ex: TP1), pas le répertoire grading
             var basePath = Path.GetDirectoryName(Path.GetDirectoryName(SelectedGridFile.FilePath))!;
             await _gridService.SaveGridAsync(CurrentGrid, basePath);
+            await _commentService.SaveCommentsAsync(basePath);
+            _ = ShowSavedFeedbackAsync();
         }
+    }
+
+    private async Task ShowSavedFeedbackAsync()
+    {
+        JustSaved = true;
+        await Task.Delay(2000);
+        JustSaved = false;
     }
 
     private void RecalculateAll()
@@ -187,6 +222,87 @@ public partial class GridEditorViewModel : ObservableObject
         CurrentGrid.Computed.Total = TotalPoints;
     }
 
+    private void RefreshResultRecommendation(CriterionModel criterion)
+    {
+        criterion.RecommendedResult = _gridService.GetResultRecommendation(
+            criterion.Feedback, criterion.Scale);
+    }
+
+    public string GetCommentUsagesTooltip(CommentEntry entry)
+    {
+        if (string.IsNullOrEmpty(_gradingRootPath)) return string.Empty;
+        var usages = _gridService.FindCommentUsages(_gradingRootPath, entry);
+        if (usages.Count == 0) return "Aucune grille ne contient ce commentaire.";
+        return "Utilisé dans :\n" + string.Join("\n", usages.Select(u => $"• {u}"));
+    }
+
+    [RelayCommand]
+    public void OpenCommentPicker(CriterionModel? criterion)
+    {
+        if (criterion == null) return;
+
+        var comments = _commentService.GetCommentsForCriterion(criterion.Label);
+        var selected = Views.CommentPickerDialog.Show(criterion.Label, comments, _commentService);
+
+        if (selected != null && !criterion.Feedback.Any(f => string.Equals(f.Text, selected, StringComparison.OrdinalIgnoreCase)))
+        {
+            var bankEntry = comments.FirstOrDefault(c => string.Equals(c.Text, selected, StringComparison.OrdinalIgnoreCase));
+            criterion.Feedback.Add(bankEntry ?? new CommentEntry { Text = selected, Severity = CommentSeverity.Aucun });
+        }
+    }
+
+    [RelayCommand]
+    public void ApplyRecommendation(CriterionModel? criterion)
+    {
+        if (criterion == null || string.IsNullOrEmpty(criterion.RecommendedResult)) return;
+        criterion.Result = criterion.RecommendedResult;
+    }
+
+    [RelayCommand]
+    public void AddFeedback(CriterionModel? criterion)
+    {
+        if (criterion == null) return;
+
+        var (text, addToBank, severity) = Views.InputDialog.ShowWithBankOption("Nouveau commentaire :", "Ajouter un commentaire", multiline: true);
+        if (string.IsNullOrWhiteSpace(text)) return;
+
+        var entry = new CommentEntry { Text = text, Severity = severity };
+        criterion.Feedback.Add(entry);
+        if (addToBank)
+            _commentService.AddCommentForCriterion(criterion.Label, entry);
+    }
+
+    [RelayCommand]
+    public void EditFeedback(CriterionModel? criterion)
+    {
+        if (criterion == null || SelectedFeedbackItem == null || criterion.Feedback.Count == 0)
+            return;
+
+        int idx = criterion.Feedback.IndexOf(SelectedFeedbackItem);
+        var originalEntry = SelectedFeedbackItem;
+        var (text, severity, updateBank) = Views.InputDialog.ShowWithSeverity("Modifier le commentaire :", "Modifier", originalEntry.Text, originalEntry.Severity);
+        if (text == null) return;
+
+        var updatedEntry = new CommentEntry { Text = text, Severity = severity };
+        if (idx >= 0 && idx < criterion.Feedback.Count)
+            criterion.Feedback[idx] = updatedEntry;
+
+        if (updateBank)
+            _commentService.UpdateCommentForCriterion(criterion.Label, originalEntry.Text, updatedEntry);
+
+        SelectedFeedbackItem = null;
+    }
+
+    [RelayCommand]
+    public void DeleteFeedback(CriterionModel? criterion)
+    {
+        if (criterion == null || SelectedFeedbackItem == null)
+            return;
+
+        criterion.Feedback.Remove(SelectedFeedbackItem);
+        SelectedFeedbackItem = null;
+    }
+
     [RelayCommand]
     private async Task SaveAsync()
     {
@@ -213,14 +329,19 @@ public partial class GridEditorViewModel : ObservableObject
             
             if (success)
             {
+                // Sauvegarder les commentaires réutilisables dans le répertoire grading
+                var groupPath = Path.GetDirectoryName(SelectedGridFile.FilePath)!;
+                var gradingPath = Path.GetDirectoryName(groupPath)!;  // Remonter au répertoire grading
+                await _commentService.SaveCommentsAsync(gradingPath);
+                
                 _dialogService.ShowToast("Sauvegarde réussie");
+                _ = ShowSavedFeedbackAsync();
                 
                 // Stocker le chemin du fichier actuel avant de recharger
                 var currentFilePath = SelectedGridFile.FilePath;
                 
                 // Recharger la liste des fichiers pour mettre à jour les informations
-                var gradingPath = Path.GetDirectoryName(currentFilePath)!;
-                var gridFileList = _gridService.LoadGridFiles(gradingPath);
+                var gridFileList = _gridService.LoadGridFiles(groupPath);
                 GridFiles.Clear();
                 foreach (var gridFile in gridFileList)
                 {
@@ -350,6 +471,54 @@ public partial class GridEditorViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task ExportSinglePdf()
+    {
+        if (CurrentGrid == null || SelectedGridFile == null)
+        {
+            _dialogService.ShowToast("Aucune grille sélectionnée");
+            return;
+        }
+
+        try
+        {
+            string groupDir = Path.GetDirectoryName(SelectedGridFile.FilePath)!;
+            string workDir = Path.GetDirectoryName(Path.GetDirectoryName(groupDir))!;
+            string pdfDocsDir = Path.Combine(workDir, "pdf_docs", SelectedGridFile.Group);
+            Directory.CreateDirectory(pdfDocsDir);
+
+            string pdfFileName = Path.GetFileNameWithoutExtension(SelectedGridFile.FilePath) + ".pdf";
+            string pdfPath = Path.Combine(pdfDocsDir, pdfFileName);
+
+            if (File.Exists(pdfPath))
+            {
+                var choice = _dialogService.ShowOverwriteConfirmation(1, 1);
+                if (choice == OverwriteChoice.Cancel)
+                    return;
+                if (choice == OverwriteChoice.Skip)
+                {
+                    Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = pdfDocsDir, UseShellExecute = true });
+                    return;
+                }
+            }
+
+            var success = await _pdfService.ExportPdfAsync(CurrentGrid, pdfPath);
+            if (success)
+            {
+                _dialogService.ShowToast("PDF exporté avec succès");
+                Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = pdfDocsDir, UseShellExecute = true });
+            }
+            else
+            {
+                _dialogService.ShowToast("Erreur lors de l'exportation PDF");
+            }
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowToast($"Erreur: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
     private async Task ExportPdf()
     {
         if (SelectedGridFile == null)
@@ -372,7 +541,21 @@ public partial class GridEditorViewModel : ObservableObject
             string workDir = Path.GetDirectoryName(Path.GetDirectoryName(groupDir))!;
             string pdfDocsDir = Path.Combine(workDir, "pdf_docs", SelectedGridFile.Group);
 
-            var success = await _pdfService.ExportGroupPdfsAsync(groupDir, pdfDocsDir);
+            int totalCount = Directory.GetFiles(groupDir, "*.json").Length;
+            int existingCount = Directory.Exists(pdfDocsDir)
+                ? Directory.GetFiles(pdfDocsDir, "*.pdf").Length
+                : 0;
+
+            bool overwrite = false;
+            if (existingCount > 0)
+            {
+                var choice = _dialogService.ShowOverwriteConfirmation(existingCount, totalCount);
+                if (choice == OverwriteChoice.Cancel)
+                    return;
+                overwrite = choice == OverwriteChoice.Overwrite;
+            }
+
+            var success = await _pdfService.ExportGroupPdfsAsync(groupDir, pdfDocsDir, overwrite);
 
             if (success)
             {

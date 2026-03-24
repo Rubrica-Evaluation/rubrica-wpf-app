@@ -1,10 +1,33 @@
 using System.Text.Json;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Text.Json.Serialization;
 
 namespace GradingTool.Models
 {
+    /// <summary>
+    /// Convertit ObservableCollection&lt;CommentEntry&gt; en JSON.
+    /// </summary>
+    public class FeedbackCollectionConverter : System.Text.Json.Serialization.JsonConverter<ObservableCollection<CommentEntry>>
+    {
+        private static readonly JsonSerializerOptions _innerOptions = new()
+        {
+            Converters = { new JsonStringEnumConverter() }
+        };
+
+        public override ObservableCollection<CommentEntry> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            var list = JsonSerializer.Deserialize<List<CommentEntry>>(ref reader, _innerOptions) ?? new();
+            return new ObservableCollection<CommentEntry>(list);
+        }
+
+        public override void Write(Utf8JsonWriter writer, ObservableCollection<CommentEntry> value, JsonSerializerOptions options)
+        {
+            JsonSerializer.Serialize(writer, value.ToList(), _innerOptions);
+        }
+    }
+
     public class RubricModel
     {
         [JsonPropertyName("meta")]
@@ -102,11 +125,48 @@ namespace GradingTool.Models
         private string _result = string.Empty;
 
         [JsonPropertyName("feedback")]
-        public string Feedback { get; set; } = string.Empty;
+        [System.Text.Json.Serialization.JsonConverter(typeof(FeedbackCollectionConverter))]
+        public ObservableCollection<CommentEntry> Feedback { get; set; } = new();
 
         [ObservableProperty]
         [JsonPropertyName("points")]
         private double? _points;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasRecommendation))]
+        [property: JsonIgnore]
+        private string? _recommendedResult;
+
+        [ObservableProperty]
+        [property: JsonIgnore]
+        private int _recommendedResultMatchCount;
+
+        [JsonIgnore]
+        public bool HasRecommendation => !string.IsNullOrEmpty(RecommendedResult);
+
+        [JsonIgnore]
+        public bool IsEditingFeedback
+        {
+            get => _isEditingFeedback;
+            set => SetProperty(ref _isEditingFeedback, value);
+        }
+        private bool _isEditingFeedback;
+
+        [JsonIgnore]
+        public int EditingFeedbackIndex
+        {
+            get => _editingFeedbackIndex;
+            set => SetProperty(ref _editingFeedbackIndex, value);
+        }
+        private int _editingFeedbackIndex = -1;
+
+        [JsonIgnore]
+        public string FeedbackInput
+        {
+            get => _feedbackInput;
+            set => SetProperty(ref _feedbackInput, value);
+        }
+        private string _feedbackInput = string.Empty;
 
         partial void OnResultChanged(string value)
         {

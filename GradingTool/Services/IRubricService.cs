@@ -21,6 +21,16 @@ public interface IRubricService
     RubricModel? LoadRubric(string sessionName, string courseName, string workName, out string errorMessage);
 
     /// <summary>
+    /// Creates an empty rubric draft for the specified evaluation
+    /// </summary>
+    RubricModel CreateEmptyRubric(string workName);
+
+    /// <summary>
+    /// Saves the rubric.json file for the specified evaluation
+    /// </summary>
+    bool SaveRubric(string sessionName, string courseName, string workName, RubricModel rubric, out string errorMessage);
+
+    /// <summary>
     /// Validates that the rubric matches the expected format
     /// </summary>
     bool ValidateRubricFormat(RubricModel rubric, out string errorMessage);
@@ -29,6 +39,11 @@ public interface IRubricService
     /// Copies a selected file to the rubric folder as rubric.json
     /// </summary>
     void ImportRubric(string sessionName, string courseName, string workName, string sourceFilePath);
+
+    /// <summary>
+    /// Loads and validates a rubric from an arbitrary file path
+    /// </summary>
+    RubricModel? LoadRubricFromFile(string filePath, out string errorMessage);
 
     /// <summary>
     /// Creates and saves a template rubric.json file to the specified location

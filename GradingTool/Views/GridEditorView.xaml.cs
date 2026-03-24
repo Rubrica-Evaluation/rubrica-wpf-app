@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
+using GradingTool.Models;
+using GradingTool.ViewModels;
 
 namespace GradingTool.Views;
 
@@ -9,9 +11,6 @@ public partial class GridEditorView : UserControl
     {
         InitializeComponent();
     }
-
-    private void ComboBox_PreviewMouseWheel(object sender, System.Windows.Input.MouseWheelEventArgs e)
-    {
-        e.Handled = true;
-    }
 }
+
+

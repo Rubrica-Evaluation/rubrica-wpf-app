@@ -28,9 +28,23 @@ public partial class MainWindow : Window
 
     private async void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
+        if (DataContext is not MainViewModel mainViewModel)
+            return;
+
+        var currentView = mainViewModel.NavigationService.CurrentView;
+
+        // Vérifier les modifications non enregistrées dans le Concepteur de grille
+        if (currentView is RubricDesignerViewModel rubricDesigner)
+        {
+            if (!rubricDesigner.CanProceedWithUnsavedChanges())
+            {
+                e.Cancel = true;
+                return;
+            }
+        }
+
         // Sauvegarder automatiquement la grille actuelle si on est dans l'éditeur
-        if (DataContext is MainViewModel mainViewModel && 
-            mainViewModel.NavigationService.CurrentView is GridEditorViewModel gridEditorViewModel)
+        if (currentView is GridEditorViewModel gridEditorViewModel)
         {
             await gridEditorViewModel.SaveCurrentGridAsync();
         }

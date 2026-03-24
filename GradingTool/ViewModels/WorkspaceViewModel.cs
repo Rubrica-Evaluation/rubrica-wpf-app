@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GradingTool.Helpers;
 using GradingTool.Services;
 using GradingTool.Models;
 using System.Collections.ObjectModel;
@@ -54,13 +55,13 @@ public partial class WorkspaceViewModel : ObservableObject
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(EditWorkCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteWorkCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenRubricDesignerCommand))]
     private string? _selectedWork;
 
     [ObservableProperty]
     private Dictionary<string, string>? _workSubdirectories;
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(OpenRubricInExplorerCommand))]
     private bool _rubricExists;
 
     [ObservableProperty]
@@ -444,6 +445,8 @@ public partial class WorkspaceViewModel : ObservableObject
             SessionsRootPath = _sessionsRootService.GetSessionsRootPath();
             IsSessionsRootConfigured = true;
 
+            WarnIfOneDriveInactive(SessionsRootPath);
+
             LoadSessions();
 
             _dialogService.ShowToast("Dossier racine configuré avec succès");
@@ -455,6 +458,19 @@ public partial class WorkspaceViewModel : ObservableObject
                 "Erreur",
                 System.Windows.MessageBoxImage.Error);
         }
+    }
+
+    private void WarnIfOneDriveInactive(string? path)
+    {
+        if (!OneDriveHelper.ShouldWarnUser(path))
+            return;
+
+        _dialogService.ShowMessage(
+            "Le dossier sélectionné se trouve dans OneDrive, mais OneDrive n'est pas démarré.\n\n"
+            + "Cela pourrait entraîner une perte de données ou des conflits de synchronisation.\n\n"
+            + "Conseil : démarrez OneDrive avant de continuer à travailler.",
+            "Avertissement — OneDrive inactif",
+            System.Windows.MessageBoxImage.Warning);
     }
 
     [RelayCommand]
@@ -737,97 +753,22 @@ public partial class WorkspaceViewModel : ObservableObject
 
     private bool CanDeleteWork() => !string.IsNullOrEmpty(SelectedWork);
 
-    [RelayCommand]
-    private void LoadRubric()
+    private bool CanOpenRubricDesigner() =>
+        !string.IsNullOrEmpty(SelectedSession) &&
+        !string.IsNullOrEmpty(SelectedCourse) &&
+        !string.IsNullOrEmpty(SelectedWork);
+
+    [RelayCommand(CanExecute = nameof(CanOpenRubricDesigner))]
+    private void OpenRubricDesigner()
     {
         if (string.IsNullOrEmpty(SelectedSession) || string.IsNullOrEmpty(SelectedCourse) || string.IsNullOrEmpty(SelectedWork))
             return;
 
-        // Vérifier si une rubrique existe déjà
-        if (_rubricService.RubricExists(SelectedSession, SelectedCourse, SelectedWork))
+        _navigationService.NavigateTo<RubricDesignerViewModel>();
+
+        if (_navigationService.CurrentView is RubricDesignerViewModel designer)
         {
-            if (!_dialogService.ShowConfirmation(
-                "Une rubrique existe déjà pour cette évaluation.\n\nVoulez-vous la remplacer par une nouvelle rubrique?",
-                "Rubrique existante"))
-            {
-                return;
-            }
-        }
-
-        var selectedFile = _dialogService.SelectFile(
-            "Sélectionner un fichier de rubrique", 
-            "Fichiers JSON|*.json|Tous les fichiers|*.*");
-
-        if (string.IsNullOrEmpty(selectedFile))
-            return;
-
-        try
-        {
-            _rubricService.ImportRubric(SelectedSession, SelectedCourse, SelectedWork, selectedFile);
-            UpdateRubricStatus();
-            _dialogService.ShowToast("Rubrique chargée et enregistrée sous 'rubric.json'");
-        }
-        catch (Exception ex)
-        {
-            _dialogService.ShowMessage(
-                ex.Message,
-                "Impossible de charger la rubrique",
-                System.Windows.MessageBoxImage.Error);
-        }
-    }
-
-    [RelayCommand]
-    private void DownloadRubricTemplate()
-    {
-        var saveFile = _dialogService.SaveFile(
-            "Enregistrer le template de rubrique",
-            "rubric_template.json",
-            "Fichiers JSON|*.json");
-
-        if (string.IsNullOrEmpty(saveFile))
-            return;
-
-        try
-        {
-            _rubricService.SaveRubricTemplate(saveFile);
-            _dialogService.ShowToast($"Template enregistré: {Path.GetFileName(saveFile)}");
-        }
-        catch (Exception ex)
-        {
-            _dialogService.ShowMessage(
-                $"Erreur lors de la création du template:\n\n{ex.Message}",
-                "Erreur",
-                System.Windows.MessageBoxImage.Error);
-        }
-    }
-
-    [RelayCommand(CanExecute = nameof(RubricExists))]
-    private void OpenRubricInExplorer()
-    {
-        if (string.IsNullOrEmpty(SelectedSession) || string.IsNullOrEmpty(SelectedCourse) || string.IsNullOrEmpty(SelectedWork))
-            return;
-
-        var rubricPath = _rubricService.GetRubricPath(SelectedSession, SelectedCourse, SelectedWork);
-        
-        if (!File.Exists(rubricPath))
-        {
-            _dialogService.ShowMessage(
-                "Le fichier rubrique n'existe pas.",
-                "Fichier introuvable",
-                System.Windows.MessageBoxImage.Warning);
-            return;
-        }
-
-        try
-        {
-            Process.Start("explorer.exe", $"/select,\"{rubricPath}\"");
-        }
-        catch (Exception ex)
-        {
-            _dialogService.ShowMessage(
-                $"Impossible d'ouvrir l'explorateur:\n\n{ex.Message}",
-                "Erreur",
-                System.Windows.MessageBoxImage.Error);
+            designer.Initialize(SelectedSession, SelectedCourse, SelectedWork);
         }
     }
 

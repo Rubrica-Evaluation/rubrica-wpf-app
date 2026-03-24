@@ -12,234 +12,101 @@ public class ConfigurationService : IConfigurationService
         "Evaluation-App");
     
     private static readonly string ConfigFilePath = Path.Combine(
-        AppDataFolder, 
+        AppDataFolder,
         "app-config.json");
+
+    private static readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        WriteIndented = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
 
     public string? LoadSessionsRootPath()
     {
         try
         {
-            if (File.Exists(ConfigFilePath))
-            {
-                var json = File.ReadAllText(ConfigFilePath, Encoding.UTF8);
-                var config = JsonSerializer.Deserialize<AppConfig>(json);
-                
-                if (config?.SessionsRootPath != null && Directory.Exists(config.SessionsRootPath))
-                {
-                    return config.SessionsRootPath;
-                }
-            }
+            var path = LoadConfig()?.SessionsRootPath;
+            return path != null && Directory.Exists(path) ? path : null;
         }
-        catch
-        {
-            // Ignorer les erreurs de chargement
-        }
-
-        return null;
+        catch { return null; }
     }
 
     public string? LoadSelectedSession()
     {
-        try
-        {
-            if (File.Exists(ConfigFilePath))
-            {
-                var json = File.ReadAllText(ConfigFilePath, Encoding.UTF8);
-                var config = JsonSerializer.Deserialize<AppConfig>(json);
-                return config?.SelectedSession;
-            }
-        }
-        catch
-        {
-            // Ignorer les erreurs de chargement
-        }
-
-        return null;
+        try { return LoadConfig()?.SelectedSession; }
+        catch { return null; }
     }
 
     public void SaveSelectedSession(string? sessionName)
     {
         try
         {
-            // Charger la config existante ou créer une nouvelle
-            AppConfig config;
-            if (File.Exists(ConfigFilePath))
-            {
-                var json = File.ReadAllText(ConfigFilePath, Encoding.UTF8);
-                config = JsonSerializer.Deserialize<AppConfig>(json) ?? new AppConfig();
-            }
-            else
-            {
-                config = new AppConfig();
-            }
-
+            var config = LoadConfig() ?? new AppConfig();
             config.SelectedSession = sessionName;
-
-            // Créer le dossier Evaluation-App s'il n'existe pas
-            if (!Directory.Exists(AppDataFolder))
-            {
-                Directory.CreateDirectory(AppDataFolder);
-            }
-
-            var configJson = JsonSerializer.Serialize(config, new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            });
-            File.WriteAllText(ConfigFilePath, configJson, Encoding.UTF8);
+            SaveConfig(config);
         }
-        catch
-        {
-            // Ignorer les erreurs de sauvegarde
-        }
+        catch { }
     }
 
     public string? LoadSelectedCourse()
     {
-        try
-        {
-            if (File.Exists(ConfigFilePath))
-            {
-                var json = File.ReadAllText(ConfigFilePath, Encoding.UTF8);
-                var config = JsonSerializer.Deserialize<AppConfig>(json);
-                return config?.SelectedCourse;
-            }
-        }
-        catch
-        {
-            // Ignorer les erreurs de chargement
-        }
-
-        return null;
+        try { return LoadConfig()?.SelectedCourse; }
+        catch { return null; }
     }
 
     public void SaveSelectedCourse(string? courseName)
     {
         try
         {
-            // Charger la config existante ou créer une nouvelle
-            AppConfig config;
-            if (File.Exists(ConfigFilePath))
-            {
-                var json = File.ReadAllText(ConfigFilePath, Encoding.UTF8);
-                config = JsonSerializer.Deserialize<AppConfig>(json) ?? new AppConfig();
-            }
-            else
-            {
-                config = new AppConfig();
-            }
-
+            var config = LoadConfig() ?? new AppConfig();
             config.SelectedCourse = courseName;
-
-            // Créer le dossier Evaluation-App s'il n'existe pas
-            if (!Directory.Exists(AppDataFolder))
-            {
-                Directory.CreateDirectory(AppDataFolder);
-            }
-
-            var configJson = JsonSerializer.Serialize(config, new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            });
-            File.WriteAllText(ConfigFilePath, configJson, Encoding.UTF8);
+            SaveConfig(config);
         }
-        catch
-        {
-            // Ignorer les erreurs de sauvegarde
-        }
+        catch { }
     }
 
     public string? LoadSelectedWork()
     {
-        try
-        {
-            if (File.Exists(ConfigFilePath))
-            {
-                var json = File.ReadAllText(ConfigFilePath, Encoding.UTF8);
-                var config = JsonSerializer.Deserialize<AppConfig>(json);
-                return config?.SelectedWork;
-            }
-        }
-        catch
-        {
-            // Ignorer les erreurs de chargement
-        }
-
-        return null;
+        try { return LoadConfig()?.SelectedWork; }
+        catch { return null; }
     }
 
     public void SaveSelectedWork(string? workName)
     {
         try
         {
-            // Charger la config existante ou créer une nouvelle
-            AppConfig config;
-            if (File.Exists(ConfigFilePath))
-            {
-                var json = File.ReadAllText(ConfigFilePath, Encoding.UTF8);
-                config = JsonSerializer.Deserialize<AppConfig>(json) ?? new AppConfig();
-            }
-            else
-            {
-                config = new AppConfig();
-            }
-
+            var config = LoadConfig() ?? new AppConfig();
             config.SelectedWork = workName;
-
-            // Créer le dossier Evaluation-App s'il n'existe pas
-            if (!Directory.Exists(AppDataFolder))
-            {
-                Directory.CreateDirectory(AppDataFolder);
-            }
-
-            var configJson = JsonSerializer.Serialize(config, new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            });
-            File.WriteAllText(ConfigFilePath, configJson, Encoding.UTF8);
+            SaveConfig(config);
         }
-        catch
-        {
-            // Ignorer les erreurs de sauvegarde
-        }
+        catch { }
     }
 
     public void SaveSessionsRootPath(string path)
     {
         try
         {
-            // Charger la config existante ou créer une nouvelle
-            AppConfig config;
-            if (File.Exists(ConfigFilePath))
-            {
-                var json = File.ReadAllText(ConfigFilePath, Encoding.UTF8);
-                config = JsonSerializer.Deserialize<AppConfig>(json) ?? new AppConfig();
-            }
-            else
-            {
-                config = new AppConfig();
-            }
-
+            var config = LoadConfig() ?? new AppConfig();
             config.SessionsRootPath = path;
-
-            // Créer le dossier Evaluation-App s'il n'existe pas
-            if (!Directory.Exists(AppDataFolder))
-            {
-                Directory.CreateDirectory(AppDataFolder);
-            }
-            var configJson = JsonSerializer.Serialize(config, new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-            });
-            File.WriteAllText(ConfigFilePath, configJson, Encoding.UTF8);
+            SaveConfig(config);
         }
         catch (Exception ex)
         {
             throw new InvalidOperationException($"Erreur lors de la sauvegarde de la configuration: {ex.Message}", ex);
         }
+    }
+
+    private AppConfig? LoadConfig()
+    {
+        if (!File.Exists(ConfigFilePath)) return null;
+        var json = File.ReadAllText(ConfigFilePath, Encoding.UTF8);
+        return JsonSerializer.Deserialize<AppConfig>(json);
+    }
+
+    private void SaveConfig(AppConfig config)
+    {
+        Directory.CreateDirectory(AppDataFolder);
+        File.WriteAllText(ConfigFilePath, JsonSerializer.Serialize(config, _jsonOptions), Encoding.UTF8);
     }
 
     private class AppConfig

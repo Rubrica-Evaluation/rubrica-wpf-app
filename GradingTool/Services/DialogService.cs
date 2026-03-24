@@ -80,6 +80,23 @@ public class DialogService : IDialogService
         };
     }
 
+    public UnsavedChangesChoice ShowUnsavedChangesConfirmation(string context)
+    {
+        string message = $"Des modifications non enregistrées sont en cours dans {context}.\n\n"
+                       + "• [Oui] Enregistrer avant de quitter\n"
+                       + "• [Non] Quitter sans enregistrer\n"
+                       + "• [Annuler] Rester dans le concepteur";
+
+        var result = MessageBox.Show(message, "Modifications non enregistrées", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+
+        return result switch
+        {
+            MessageBoxResult.Yes => UnsavedChangesChoice.Save,
+            MessageBoxResult.No => UnsavedChangesChoice.Discard,
+            _ => UnsavedChangesChoice.Cancel
+        };
+    }
+
     public void ShowToast(string message, int durationMs = 3000)
     {
         var mainWindow = Application.Current.MainWindow;
