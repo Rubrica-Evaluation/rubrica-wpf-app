@@ -18,6 +18,7 @@
             <converters:StatusColorConverter x:Key="StatusColorConverter"/>
             <converters:SeverityColorConverter x:Key="SeverityColorConverter"/>
             <converters:CommentUsageTooltipConverter x:Key="CommentUsageTooltipConverter"/>
+            <converters:ScalePointsColorConverter x:Key="ScalePointsColorConverter"/>
 
             <!-- Selection colors: same dark blue focused and unfocused -->
             <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#1565C0"/>

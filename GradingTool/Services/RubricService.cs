@@ -130,7 +130,7 @@ public class RubricService : IRubricService
             }
 
             var jsonContent = JsonSerializer.Serialize(rubric, JsonOptions);
-            FileHelper.WriteAllTextAtomicAsync(rubricPath, jsonContent, Encoding.UTF8).GetAwaiter().GetResult();
+            FileHelper.WriteAllTextAtomic(rubricPath, jsonContent, Encoding.UTF8);
             errorMessage = string.Empty;
             return true;
         }

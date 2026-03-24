@@ -54,6 +54,9 @@ public partial class GridEditorViewModel : ObservableObject
     [ObservableProperty]
     private CommentEntry? _selectedFeedbackItem;
 
+    [ObservableProperty]
+    private bool _justSaved;
+
     public string NavigationPath => $"{SessionName} / {CourseName} / {WorkName} / {GroupName}";
     
     public GridEditorViewModel(INavigationService navigationService, IGridService gridService, IDialogService dialogService, IPdfService pdfService, ICommentService commentService)
@@ -178,7 +181,15 @@ public partial class GridEditorViewModel : ObservableObject
             var basePath = Path.GetDirectoryName(Path.GetDirectoryName(SelectedGridFile.FilePath))!;
             await _gridService.SaveGridAsync(CurrentGrid, basePath);
             await _commentService.SaveCommentsAsync(basePath);
+            _ = ShowSavedFeedbackAsync();
         }
+    }
+
+    private async Task ShowSavedFeedbackAsync()
+    {
+        JustSaved = true;
+        await Task.Delay(2000);
+        JustSaved = false;
     }
 
     private void RecalculateAll()
@@ -324,6 +335,7 @@ public partial class GridEditorViewModel : ObservableObject
                 await _commentService.SaveCommentsAsync(gradingPath);
                 
                 _dialogService.ShowToast("Sauvegarde réussie");
+                _ = ShowSavedFeedbackAsync();
                 
                 // Stocker le chemin du fichier actuel avant de recharger
                 var currentFilePath = SelectedGridFile.FilePath;
@@ -459,6 +471,54 @@ public partial class GridEditorViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task ExportSinglePdf()
+    {
+        if (CurrentGrid == null || SelectedGridFile == null)
+        {
+            _dialogService.ShowToast("Aucune grille sélectionnée");
+            return;
+        }
+
+        try
+        {
+            string groupDir = Path.GetDirectoryName(SelectedGridFile.FilePath)!;
+            string workDir = Path.GetDirectoryName(Path.GetDirectoryName(groupDir))!;
+            string pdfDocsDir = Path.Combine(workDir, "pdf_docs", SelectedGridFile.Group);
+            Directory.CreateDirectory(pdfDocsDir);
+
+            string pdfFileName = Path.GetFileNameWithoutExtension(SelectedGridFile.FilePath) + ".pdf";
+            string pdfPath = Path.Combine(pdfDocsDir, pdfFileName);
+
+            if (File.Exists(pdfPath))
+            {
+                var choice = _dialogService.ShowOverwriteConfirmation(1, 1);
+                if (choice == OverwriteChoice.Cancel)
+                    return;
+                if (choice == OverwriteChoice.Skip)
+                {
+                    Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = pdfDocsDir, UseShellExecute = true });
+                    return;
+                }
+            }
+
+            var success = await _pdfService.ExportPdfAsync(CurrentGrid, pdfPath);
+            if (success)
+            {
+                _dialogService.ShowToast("PDF exporté avec succès");
+                Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = pdfDocsDir, UseShellExecute = true });
+            }
+            else
+            {
+                _dialogService.ShowToast("Erreur lors de l'exportation PDF");
+            }
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowToast($"Erreur: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
     private async Task ExportPdf()
     {
         if (SelectedGridFile == null)
@@ -481,7 +541,21 @@ public partial class GridEditorViewModel : ObservableObject
             string workDir = Path.GetDirectoryName(Path.GetDirectoryName(groupDir))!;
             string pdfDocsDir = Path.Combine(workDir, "pdf_docs", SelectedGridFile.Group);
 
-            var success = await _pdfService.ExportGroupPdfsAsync(groupDir, pdfDocsDir);
+            int totalCount = Directory.GetFiles(groupDir, "*.json").Length;
+            int existingCount = Directory.Exists(pdfDocsDir)
+                ? Directory.GetFiles(pdfDocsDir, "*.pdf").Length
+                : 0;
+
+            bool overwrite = false;
+            if (existingCount > 0)
+            {
+                var choice = _dialogService.ShowOverwriteConfirmation(existingCount, totalCount);
+                if (choice == OverwriteChoice.Cancel)
+                    return;
+                overwrite = choice == OverwriteChoice.Overwrite;
+            }
+
+            var success = await _pdfService.ExportGroupPdfsAsync(groupDir, pdfDocsDir, overwrite);
 
             if (success)
             {

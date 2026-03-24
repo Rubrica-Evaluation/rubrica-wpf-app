@@ -66,7 +66,7 @@ public class GridService : IGridService
 
     public bool GridExists(StudentModel student, string basePath)
     {
-        var gradingPath = Path.Combine(basePath, "grading", student.GroupCode);
+        var gradingPath = Path.Combine(basePath, student.GroupCode);
         var fileName = GenerateFileName(student);
         var filePath = Path.Combine(gradingPath, fileName);
 
@@ -165,7 +165,7 @@ public class GridService : IGridService
             return false;
 
         var firstStudent = teamStudents[0];
-        var gradingPath = Path.Combine(basePath, "grading", firstStudent.GroupCode);
+        var gradingPath = Path.Combine(basePath, firstStudent.GroupCode);
         var fileName = GenerateTeamFileName(teamStudents, teamNumber);
         var filePath = Path.Combine(gradingPath, fileName);
 
@@ -192,7 +192,7 @@ public class GridService : IGridService
     {
         try
         {
-            var gradingPath = Path.Combine(basePath, "grading", grid.Meta.Student.GroupCode);
+            var gradingPath = Path.Combine(basePath, grid.Meta.Student.GroupCode);
             Directory.CreateDirectory(gradingPath);
 
             var fileName = GenerateTeamFileName(teamStudents, teamNumber);

@@ -5,5 +5,5 @@ namespace GradingTool.Services;
 public interface IPdfService
 {
     Task<bool> ExportPdfAsync(GridModel grid, string outputPath);
-    Task<bool> ExportGroupPdfsAsync(string groupGradingPath, string groupPdfPath);
+    Task<bool> ExportGroupPdfsAsync(string groupGradingPath, string groupPdfPath, bool overwrite = false);
 }

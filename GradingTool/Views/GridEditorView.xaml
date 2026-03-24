@@ -27,11 +27,57 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Chemin: Session/Cours/Travail/Groupe -->
-                <TextBlock Grid.Column="0"
-                           Text="{Binding NavigationPath}"
-                           VerticalAlignment="Center"
-                           FontSize="15"
-                           Foreground="#5C5C5C"/>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding NavigationPath}"
+                               VerticalAlignment="Center"
+                               FontSize="15"
+                               Foreground="#5C5C5C"/>
+                    <Border Background="#F0FAF0"
+                            BorderBrush="#A8D5A8"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="6,2"
+                            Margin="12,0,0,0"
+                            VerticalAlignment="Center"
+                            Opacity="0">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding JustSaved}" Value="True">
+                                        <DataTrigger.EnterActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                     To="1" Duration="0:0:0.2"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.EnterActions>
+                                        <DataTrigger.ExitActions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                     To="0" Duration="0:0:0.6"/>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </DataTrigger.ExitActions>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE73E;"
+                                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                       FontSize="11"
+                                       Foreground="#2E7D32"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,4,0"/>
+                            <TextBlock Text="Sauvegardé"
+                                       FontSize="11"
+                                       Foreground="#2E7D32"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
 
                 <!-- Boutons -->
                 <StackPanel Grid.Column="1" 
@@ -43,18 +89,18 @@
                             Margin="0,0,8,0"
                             Style="{StaticResource GhostButton}"
                             ToolTip="Générer un fichier csv des résultats de tous les étudiants du groupe (pour importation Léa)"/>
-                    <Button Content="Exporter PDF"
+                    <Button Content="PDF étudiant"
+                            Command="{Binding ExportSinglePdfCommand}"
+                            Padding="16,8"
+                            Margin="0,0,8,0"
+                            Style="{StaticResource GhostButton}"
+                            ToolTip="Exporter le PDF de l'étudiant ou équipe actuellement affiché"/>
+                    <Button Content="PDF groupe"
                             Command="{Binding ExportPdfCommand}"
                             Padding="16,8"
                             Margin="0,0,8,0"
                             Style="{StaticResource DangerButton}"
                             ToolTip="Exporter toutes les grilles du groupe en PDF (et travaux.zip)"/>
-                    <Button Content="Enregistrer"
-                            Command="{Binding SaveCommand}"
-                            Padding="16,8"
-                            Margin="0,0,8,0"
-                            Style="{StaticResource RoundedButton}"
-                            ToolTip="Enregistrer les modifications de la grille courante"/>
                     <Button Content="Retour"
                             Command="{Binding GoBackCommand}"
                             Padding="16,8"
@@ -282,6 +328,7 @@
                                                                   helpers:ScrollHelper.BubbleToParent="True">
                                                             <ComboBox.Style>
                                                                 <Style TargetType="ComboBox" BasedOn="{StaticResource ModernComboBox}">
+                                                                    <Setter Property="Background" Value="{Binding SelectedItem.Points, RelativeSource={RelativeSource Self}, Converter={StaticResource ScalePointsColorConverter}}"/>
                                                                     <Style.Triggers>
                                                                         <DataTrigger Binding="{Binding Result}" Value="">
                                                                             <Setter Property="SelectedIndex" Value="0"/>
@@ -291,15 +338,29 @@
                                                             </ComboBox.Style>
                                                             <ComboBox.ItemTemplate>
                                                                 <DataTemplate>
-                                                                    <TextBlock>
-                                                                        <TextBlock.Text>
-                                                                            <MultiBinding StringFormat="{}{0} - {1} ({2} %)">
-                                                                                <Binding Path="Qualitative"/>
-                                                                                <Binding Path="Label"/>
-                                                                                <Binding Path="Points"/>
-                                                                            </MultiBinding>
-                                                                        </TextBlock.Text>
-                                                                    </TextBlock>
+                                                                    <Border CornerRadius="3"
+                                                                            Padding="4,2"
+                                                                            Margin="-4,-2">
+                                                                        <Border.Style>
+                                                                            <Style TargetType="Border">
+                                                                                <Setter Property="Background" Value="Transparent"/>
+                                                                                <Style.Triggers>
+                                                                                    <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ComboBoxItem}}" Value="True">
+                                                                                        <Setter Property="Background" Value="{Binding Points, Converter={StaticResource ScalePointsColorConverter}}"/>
+                                                                                    </DataTrigger>
+                                                                                </Style.Triggers>
+                                                                            </Style>
+                                                                        </Border.Style>
+                                                                        <TextBlock>
+                                                                            <TextBlock.Text>
+                                                                                <MultiBinding StringFormat="{}{0} - {1} ({2} %)">
+                                                                                    <Binding Path="Qualitative"/>
+                                                                                    <Binding Path="Label"/>
+                                                                                    <Binding Path="Points"/>
+                                                                                </MultiBinding>
+                                                                            </TextBlock.Text>
+                                                                        </TextBlock>
+                                                                    </Border>
                                                                 </DataTemplate>
                                                             </ComboBox.ItemTemplate>
                                                         </ComboBox>

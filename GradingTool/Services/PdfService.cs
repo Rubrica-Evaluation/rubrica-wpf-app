@@ -157,29 +157,33 @@ public class PdfService : IPdfService
 
     private void DrawFeedbackSection(RenderContext ctx, GridModel grid)
     {
+        var criteriaWithFeedback = grid.Criteria
+            .Where(c => c.Feedback != null && c.Feedback.Count > 0)
+            .ToList();
+
+        if (criteriaWithFeedback.Count == 0)
+            return;
+
         ctx.Gfx.DrawString("Rétroaction par critère", ctx.Fonts.Section, XBrushes.Black,
             new XRect(LeftMargin, ctx.Y, ctx.ContentWidth, 18), XStringFormats.TopLeft);
         ctx.Y += 25;
 
-        foreach (var criterion in grid.Criteria)
+        foreach (var criterion in criteriaWithFeedback)
             DrawCriterionFeedback(ctx, criterion);
     }
 
     private void DrawCriterionFeedback(RenderContext ctx, CriterionModel criterion)
     {
-        ctx.Gfx.DrawString($"{criterion.Label} — Résultat: {criterion.Result ?? "—"}", ctx.Fonts.BoldRegular, XBrushes.Black,
+        var scale = criterion.Scale.FirstOrDefault(s => s.Qualitative == criterion.Result);
+        var resultText = scale != null
+            ? $"{scale.Qualitative} — {scale.Label}"
+            : criterion.Result ?? "—";
+
+        ctx.Gfx.DrawString($"{criterion.Label} — Résultat : {resultText}", ctx.Fonts.BoldRegular, XBrushes.Black,
             new XRect(LeftMargin, ctx.Y, ctx.ContentWidth, 20), XStringFormats.TopLeft);
         ctx.Y += 22;
 
-        var hasFeedback = criterion.Feedback != null && criterion.Feedback.Count > 0;
-        if (hasFeedback)
-            DrawFeedbackItems(ctx, criterion.Feedback!);
-        else
-        {
-            ctx.Gfx.DrawString("—", ctx.Fonts.Table, XBrushes.Black,
-                new XRect(LeftMargin, ctx.Y, ctx.ContentWidth, 16), XStringFormats.TopLeft);
-            ctx.Y += 18;
-        }
+        DrawFeedbackItems(ctx, criterion.Feedback!);
 
         ctx.Y += 4;
         ctx.EnsureSpace(40);
@@ -220,7 +224,7 @@ public class PdfService : IPdfService
 
     private void DrawPenaltyReason(RenderContext ctx, PenaltyItemModel penalty)
     {
-        ctx.Gfx.DrawString($"{penalty.Label} — Nombre: {penalty.Count}", ctx.Fonts.BoldRegular, XBrushes.Black,
+        ctx.Gfx.DrawString($"{penalty.Label} — Nombre : {penalty.Count} fois -{-penalty.ComputedPenalty:F1} pts", ctx.Fonts.BoldRegular, XBrushes.Black,
             new XRect(LeftMargin, ctx.Y, ctx.ContentWidth, 20), XStringFormats.TopLeft);
         ctx.Y += 22;
 
@@ -297,7 +301,7 @@ public class PdfService : IPdfService
         return lines;
     }
 
-    public async Task<bool> ExportGroupPdfsAsync(string groupGradingPath, string groupPdfPath)
+    public async Task<bool> ExportGroupPdfsAsync(string groupGradingPath, string groupPdfPath, bool overwrite = false)
     {
         try
         {
@@ -306,7 +310,7 @@ public class PdfService : IPdfService
             var jsonFiles = Directory.GetFiles(groupGradingPath, "*.json");
             if (jsonFiles.Length == 0) return false;
 
-            var pdfFiles = await GeneratePdfsFromJsonFiles(jsonFiles, groupPdfPath);
+            var pdfFiles = await GeneratePdfsFromJsonFiles(jsonFiles, groupPdfPath, overwrite);
             if (pdfFiles.Count == 0) return false;
 
             CreateZipArchive(pdfFiles, groupPdfPath);
@@ -319,15 +323,22 @@ public class PdfService : IPdfService
         }
     }
 
-    private async Task<List<string>> GeneratePdfsFromJsonFiles(string[] jsonFiles, string outputDirectory)
+    private async Task<List<string>> GeneratePdfsFromJsonFiles(string[] jsonFiles, string outputDirectory, bool overwrite)
     {
         var pdfFiles = new List<string>();
         foreach (var jsonFile in jsonFiles)
         {
+            var pdfPath = Path.Combine(outputDirectory, Path.GetFileNameWithoutExtension(jsonFile) + ".pdf");
+
+            if (File.Exists(pdfPath) && !overwrite)
+            {
+                pdfFiles.Add(pdfPath);
+                continue;
+            }
+
             var grid = await _gridService.LoadGridAsync(jsonFile);
             if (grid == null) continue;
 
-            var pdfPath = Path.Combine(outputDirectory, Path.GetFileNameWithoutExtension(jsonFile) + ".pdf");
             if (await ExportPdfAsync(grid, pdfPath))
                 pdfFiles.Add(pdfPath);
         }
@@ -337,6 +348,8 @@ public class PdfService : IPdfService
     private static void CreateZipArchive(List<string> pdfFiles, string outputDirectory)
     {
         var zipPath = Path.Combine(outputDirectory, "travaux.zip");
+        if (File.Exists(zipPath))
+            File.Delete(zipPath);
         using var zipArchive = ZipFile.Open(zipPath, ZipArchiveMode.Create);
         foreach (var pdfFile in pdfFiles)
             zipArchive.CreateEntryFromFile(pdfFile, Path.GetFileName(pdfFile));
