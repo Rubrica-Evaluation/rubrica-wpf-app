@@ -8,7 +8,7 @@
         MinHeight="220"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResizeWithGrip"
-        Background="#F5F5F5">
+        Background="White">
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -60,9 +60,7 @@
             <ComboBox ItemsSource="{Binding SeverityValues}"
                       SelectedItem="{Binding SelectedSeverity, Mode=TwoWay}"
                       Width="140"
-                      Height="28"
-                      FontSize="12"
-                      Padding="8,2"/>
+                      Style="{StaticResource ModernComboBox}"/>
         </StackPanel>
 
         <CheckBox Grid.Row="4"
@@ -78,68 +76,14 @@
                     HorizontalAlignment="Right">
             <Button Content="Annuler"
                     Click="Cancel_Click"
-                    MinWidth="90"
-                    Height="32"
-                    Padding="16,0"
+                    Padding="16,8"
                     Margin="0,0,8,0"
-                    Background="#E0E0E0"
-                    BorderThickness="0"
-                    Cursor="Hand">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <Border Background="{TemplateBinding Background}"
-                                            CornerRadius="4"
-                                            Padding="{TemplateBinding Padding}">
-                                        <ContentPresenter HorizontalAlignment="Center"
-                                                        VerticalAlignment="Center"/>
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#D0D0D0"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-
+                    Style="{StaticResource GhostButton}"/>
             <Button Content="OK"
                     Click="OK_Click"
                     IsDefault="True"
-                    MinWidth="90"
-                    Height="32"
-                    Padding="16,0"
-                    Background="#0078D4"
-                    Foreground="White"
-                    BorderThickness="0"
-                    Cursor="Hand">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <Border Background="{TemplateBinding Background}"
-                                            CornerRadius="4"
-                                            Padding="{TemplateBinding Padding}">
-                                        <ContentPresenter HorizontalAlignment="Center"
-                                                        VerticalAlignment="Center"/>
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#006AC1"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
+                    Padding="16,8"
+                    Style="{StaticResource RoundedButton}"/>
         </StackPanel>
     </Grid>
 </Window>

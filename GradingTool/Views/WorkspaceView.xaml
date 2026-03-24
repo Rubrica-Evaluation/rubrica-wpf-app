@@ -91,42 +91,31 @@
                                VerticalAlignment="Center"/>
                     
                     <Button Grid.Column="1"
-                            Content="+"
+                            Content="&#xE710;"
                             Command="{Binding CreateNewSessionCommand}"
-                            FontSize="16"
-                            FontWeight="Bold"
-                            Padding="8,4"
-                            MinWidth="32"
+                            Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            Style="{StaticResource RoundedButton}"/>
+                            ToolTip="Nouvelle session"/>
                     
                     <Button Grid.Column="2"
-                            Content="✏"
+                            Content="&#xE70F;"
                             Command="{Binding EditSessionCommand}"
-                            FontSize="14"
-                            Padding="8,4"
-                            MinWidth="32"
+                            Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            Background="#FFA500"
-                            Style="{StaticResource RoundedButton}"/>
+                            ToolTip="Renommer la session"/>
                     
                     <Button Grid.Column="3"
-                            Content="−"
+                            Content="&#xE74D;"
                             Command="{Binding DeleteSessionCommand}"
-                            FontSize="16"
-                            FontWeight="Bold"
-                            Padding="8,4"
-                            MinWidth="32"
-                            Background="#DC3545"
-                            Style="{StaticResource RoundedButton}"/>
+                            Style="{StaticResource DangerIconButton}"
+                            ToolTip="Supprimer la session"/>
                 </Grid>
                 
                 <ComboBox Grid.Row="5"
                           ItemsSource="{Binding Sessions}"
                           SelectedItem="{Binding SelectedSession}"
-                          FontSize="13"
-                          Padding="8,6"
                           Margin="0,0,0,10"
+                          Style="{StaticResource ModernComboBox}"
                           Visibility="{Binding IsSessionsRootConfigured, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 
                 <!-- Section Cours -->
@@ -148,34 +137,24 @@
                                VerticalAlignment="Center"/>
                     
                     <Button Grid.Column="1"
-                            Content="+"
+                            Content="&#xE710;"
                             Command="{Binding CreateNewCourseCommand}"
-                            FontSize="16"
-                            FontWeight="Bold"
-                            Padding="8,4"
-                            MinWidth="32"
+                            Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            Style="{StaticResource RoundedButton}"/>
+                            ToolTip="Nouveau cours"/>
                     
                     <Button Grid.Column="2"
-                            Content="✏"
+                            Content="&#xE70F;"
                             Command="{Binding EditCourseCommand}"
-                            FontSize="14"
-                            Padding="8,4"
-                            MinWidth="32"
+                            Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            Background="#FFA500"
-                            Style="{StaticResource RoundedButton}"/>
+                            ToolTip="Renommer le cours"/>
                     
                     <Button Grid.Column="3"
-                            Content="−"
+                            Content="&#xE74D;"
                             Command="{Binding DeleteCourseCommand}"
-                            FontSize="16"
-                            FontWeight="Bold"
-                            Padding="8,4"
-                            MinWidth="32"
-                            Background="#DC3545"
-                            Style="{StaticResource RoundedButton}"/>
+                            Style="{StaticResource DangerIconButton}"
+                            ToolTip="Supprimer le cours"/>
                 </Grid>
                 
                 <ListBox Grid.Row="7"
@@ -212,34 +191,24 @@
                                VerticalAlignment="Center"/>
                     
                     <Button Grid.Column="1"
-                            Content="+"
+                            Content="&#xE710;"
                             Command="{Binding CreateNewWorkCommand}"
-                            FontSize="16"
-                            FontWeight="Bold"
-                            Padding="8,4"
-                            MinWidth="32"
+                            Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            Style="{StaticResource RoundedButton}"/>
+                            ToolTip="Nouvelle évaluation"/>
                     
                     <Button Grid.Column="2"
-                            Content="✏"
+                            Content="&#xE70F;"
                             Command="{Binding EditWorkCommand}"
-                            FontSize="14"
-                            Padding="8,4"
-                            MinWidth="32"
+                            Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            Background="#FFA500"
-                            Style="{StaticResource RoundedButton}"/>
+                            ToolTip="Renommer l'évaluation"/>
                     
                     <Button Grid.Column="3"
-                            Content="−"
+                            Content="&#xE74D;"
                             Command="{Binding DeleteWorkCommand}"
-                            FontSize="16"
-                            FontWeight="Bold"
-                            Padding="8,4"
-                            MinWidth="32"
-                            Background="#DC3545"
-                            Style="{StaticResource RoundedButton}"/>
+                            Style="{StaticResource DangerIconButton}"
+                            ToolTip="Supprimer l'évaluation"/>
                 </Grid>
                 
                 <ListBox Grid.Row="10"
@@ -323,10 +292,10 @@
                                Foreground="#333333"
                                Margin="0,0,0,16"/>
 
-                    <Border Background="#F5F5F5"
-                            BorderBrush="#E0E0E0"
+                    <Border Background="White"
+                            CornerRadius="8"
+                            BorderBrush="#E8E8E8"
                             BorderThickness="1"
-                            CornerRadius="6"
                             Padding="16"
                             Margin="0,0,0,12">
                         <StackPanel>
@@ -348,7 +317,6 @@
                                     FontSize="13"
                                     Padding="16,8"
                                     Margin="0,0,0,0"
-                                    Background="#0D6EFD"
                                     ToolTip="Créer ou modifier la rubrique du travail (critères, niveaux qualitatifs, pénalités)"/>
                             </StackPanel>
                         </StackPanel>
@@ -361,10 +329,10 @@
                                Foreground="#333333"
                                Margin="0,24,0,16"/>
 
-                    <Border Background="#F5F5F5"
-                            BorderBrush="#E0E0E0"
+                    <Border Background="White"
+                            CornerRadius="8"
+                            BorderBrush="#E8E8E8"
                             BorderThickness="1"
-                            CornerRadius="6"
                             Padding="16"
                             Margin="0,0,0,12">
                         <StackPanel>
@@ -384,7 +352,7 @@
                                      Margin="0,0,0,12"
                                      Visibility="{Binding RosterExists, Converter={StaticResource BoolToVisibilityConverter}}"
                                      BorderThickness="1"
-                                     BorderBrush="#28A745"
+                                     BorderBrush="#D8E8F8"
                                      Background="White">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
@@ -395,27 +363,22 @@
                                             </Grid.ColumnDefinitions>
                                             
                                             <Border Grid.Column="0"
-                                                    Background="#E8F5E8"
-                                                    BorderBrush="#28A745"
+                                                    Background="#EBF4FC"
+                                                    BorderBrush="#B3D4F5"
                                                     BorderThickness="1"
                                                     CornerRadius="4"
                                                     Padding="8"
                                                     Margin="0,0,8,0">
                                                 <TextBlock Text="{Binding DisplayName}"
                                                            FontSize="12"
-                                                           Foreground="#155724"/>
+                                                           Foreground="#0078D4"/>
                                             </Border>
                                             
                                             <Button Grid.Column="1"
-                                                    Content="X"
+                                                    Content="&#xE74D;"
                                                     Command="{Binding DataContext.DeleteRosterFileCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                                     CommandParameter="{Binding}"
-                                                    FontSize="12"
-                                                    FontWeight="Bold"
-                                                    Padding="6,2"
-                                                    MinWidth="24"
-                                                    Background="#DC3545"
-                                                    Style="{StaticResource RoundedButton}"
+                                                    Style="{StaticResource DangerIconButton}"
                                                     ToolTip="Supprimer cette liste d'étudiants"/>
                                         </Grid>
                                     </DataTemplate>
@@ -423,10 +386,10 @@
                             </ListBox>
 
                             <!-- Options de génération pour équipes -->
-                            <Border Background="#FFF8E1"
-                                    BorderBrush="#FFC107"
-                                    BorderThickness="1"
-                                    CornerRadius="4"
+                            <Border Background="#FFFBF2"
+                                    BorderBrush="#F0C040"
+                                    BorderThickness="3,0,0,0"
+                                    CornerRadius="0,4,4,0"
                                     Padding="12"
                                     Margin="0,0,0,12"
                                     Visibility="{Binding HasTeams, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -456,40 +419,36 @@
                                         Style="{StaticResource RoundedButton}"
                                         FontSize="13"
                                         Padding="16,8"
-                                        Margin="0,0,12,0"/>
+                                        Margin="0,0,10,0"/>
                                 
                                 <Button Content="Télécharger template"
                                         Command="{Binding DownloadRosterTemplateCommand}"
-                                        Style="{StaticResource RoundedButton}"
+                                        Style="{StaticResource GhostButton}"
                                         FontSize="13"
                                         Padding="16,8"
-                                        Margin="0,0,12,0"
-                                        Background="#6C757D"/>
+                                        Margin="0,0,10,0"/>
                                 
                                 <Button Content="Générer tout le groupe"
                                         Command="{Binding GenerateGroupGridsCommand}"
                                         Style="{StaticResource RoundedButton}"
                                         FontSize="13"
                                         Padding="16,8"
-                                        Margin="0,0,12,0"
-                                        Background="#007BFF"
+                                        Margin="0,0,10,0"
                                         IsEnabled="{Binding CanGenerateGroupGrids}"/>
                                 
                                 <Button Content="Ouvrir dossier de grading"
                                         Command="{Binding OpenGradingFolderCommand}"
-                                        Style="{StaticResource RoundedButton}"
+                                        Style="{StaticResource GhostButton}"
                                         FontSize="13"
                                         Padding="16,8"
-                                        Margin="0,0,12,0"
-                                        Background="#17A2B8"
+                                        Margin="0,0,10,0"
                                         IsEnabled="{Binding SelectedGroup, Converter={StaticResource NullToBoolConverter}}"/>
                                 
                                 <Button Content="Ouvrir l'éditeur"
                                         Command="{Binding NavigateToGridEditorCommand}"
                                         Style="{StaticResource RoundedButton}"
                                         FontSize="13"
-                                        Padding="16,8"
-                                        Background="#28A745"/>
+                                        Padding="16,8"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>

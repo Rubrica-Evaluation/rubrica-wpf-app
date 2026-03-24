@@ -11,7 +11,8 @@
         Height="800" 
         Width="1280"
         WindowStartupLocation="CenterScreen"
-        Background="White">
+        Background="White"
+        FontFamily="Segoe UI">
 
     <Window.Resources>
         <!-- DataTemplate pour WorkspaceViewModel -->
@@ -37,11 +38,11 @@
         </Grid.RowDefinitions>
         
         <!-- En-tête -->
-        <Border Grid.Row="0" Background="#F5F5F5" Padding="20,16">
+        <Border Grid.Row="0" Background="White" BorderBrush="#E8E8E8" BorderThickness="0,0,0,1" Padding="20,14">
             <TextBlock Text="Outil d'évaluation"
-                       FontSize="24"
-                       FontWeight="Bold"
-                       Foreground="#333333"/>
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       Foreground="#1A1A1A"/>
         </Border>
         
         <!-- Contenu - Affiche CurrentView -->

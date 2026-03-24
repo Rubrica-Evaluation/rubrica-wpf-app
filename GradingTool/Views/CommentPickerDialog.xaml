@@ -8,7 +8,7 @@
         MinWidth="400"
         MinHeight="320"
         WindowStartupLocation="CenterOwner"
-        Background="#F5F5F5">
+        Background="White">
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -35,7 +35,7 @@
             <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                      Padding="8,6"
                      FontSize="13"
-                     BorderBrush="#CCCCCC"
+                     BorderBrush="#E8E8E8"
                      BorderThickness="1"/>
             <TextBlock Text="🔍  Filtrer les commentaires..."
                        Foreground="#AAAAAA"
@@ -58,9 +58,9 @@
 
         <!-- Liste des commentaires -->
         <Border Grid.Row="2"
-                BorderBrush="#DDDDDD"
+                BorderBrush="#E8E8E8"
                 BorderThickness="1"
-                CornerRadius="4"
+                CornerRadius="6"
                 Background="White"
                 Margin="0,0,0,14">
             <Grid>
@@ -218,23 +218,17 @@
                 <!-- Modifier / Supprimer (gauche) -->
                 <StackPanel Grid.Column="0"
                             Orientation="Horizontal">
-                    <Button Content="✏️  Modifier"
+                    <Button Content="Modifier"
                             Command="{Binding EditCommand}"
-                            Height="34"
-                            MinWidth="100"
-                            Padding="12,0"
+                            Padding="12,8"
                             Margin="0,0,6,0"
                             FontSize="13"
-                            Style="{StaticResource RoundedButton}"
-                            Background="#FFC107"/>
-                    <Button Content="🗑️  Supprimer"
+                            Style="{StaticResource GhostButton}"/>
+                    <Button Content="Supprimer"
                             Command="{Binding DeleteCommand}"
-                            Height="34"
-                            MinWidth="110"
-                            Padding="12,0"
+                            Padding="12,8"
                             FontSize="13"
-                            Style="{StaticResource RoundedButton}"
-                            Background="#DC3545"/>
+                            Style="{StaticResource DangerButton}"/>
                 </StackPanel>
 
                 <!-- Annuler / Sélectionner (droite) -->
@@ -242,23 +236,15 @@
                             Orientation="Horizontal">
                     <Button Content="Annuler"
                             Command="{Binding CancelCommand}"
-                            Height="34"
-                            MinWidth="100"
-                            Padding="16,0"
+                            Padding="16,8"
                             Margin="0,0,8,0"
                             FontSize="13"
-                            FontWeight="SemiBold"
-                            Style="{StaticResource RoundedButton}"
-                            Background="#6C757D"/>
+                            Style="{StaticResource GhostButton}"/>
                     <Button Content="Sélectionner"
                             Command="{Binding ConfirmCommand}"
-                            Height="34"
-                            MinWidth="120"
-                            Padding="16,0"
+                            Padding="16,8"
                             FontSize="13"
-                            FontWeight="SemiBold"
-                            Style="{StaticResource RoundedButton}"
-                            Background="#0D6EFD"/>
+                            Style="{StaticResource RoundedButton}"/>
                 </StackPanel>
             </Grid>
         </Grid>

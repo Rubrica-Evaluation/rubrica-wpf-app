@@ -14,8 +14,8 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0"
-                Background="#F8F9FA"
-                BorderBrush="#E0E0E0"
+                Background="White"
+                BorderBrush="#E8E8E8"
                 BorderThickness="0,0,0,1"
                 Padding="16,12">
             <Grid>
@@ -26,12 +26,12 @@
 
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="{Binding NavigationPath}"
-                               FontSize="18"
-                               Foreground="#444444"
-                               Margin="0,0,0,4"/>
+                               FontSize="16"
+                               Foreground="#5C5C5C"
+                               Margin="0,0,0,3"/>
                     <TextBlock Text="Concevez la rubrique du travail: critères, niveaux qualitatifs et pénalités."
-                               FontSize="13"
-                               Foreground="#6C757D"/>
+                               FontSize="12"
+                               Foreground="#9E9E9E"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1"
@@ -39,30 +39,22 @@
                             HorizontalAlignment="Right">
                     <Button Content="Charger une rubrique"
                             Command="{Binding LoadRubricFromFileCommand}"
-                            Style="{StaticResource RoundedButton}"
-                            Padding="18,8"
-                            Margin="0,0,10,0"
-                            Background="#17A2B8"
+                            Style="{StaticResource GhostButton}"
+                            Margin="0,0,8,0"
                             ToolTip="Importer un fichier rubric.json existant dans le concepteur pour le consulter ou le modifier"/>
                     <Button Content="Nouvelle rubrique"
                             Command="{Binding NewRubricCommand}"
-                            Style="{StaticResource RoundedButton}"
-                            Padding="18,8"
-                            Margin="0,0,10,0"
-                            Background="#6C757D"
+                            Style="{StaticResource GhostButton}"
+                            Margin="0,0,8,0"
                             ToolTip="Réinitialiser le concepteur avec une rubrique vide"/>
                     <Button Content="Enregistrer"
                             Command="{Binding SaveCommand}"
                             Style="{StaticResource RoundedButton}"
-                            Padding="18,8"
-                            Margin="0,0,10,0"
-                            Background="#28A745"
+                            Margin="0,0,8,0"
                             ToolTip="Valider et enregistrer la rubrique comme rubric.json pour ce travail"/>
                     <Button Content="Retour"
                             Command="{Binding GoBackCommand}"
-                            Style="{StaticResource RoundedButton}"
-                            Padding="18,8"
-                            Background="#495057"
+                            Style="{StaticResource GhostButton}"
                             ToolTip="Retourner à la page d'accueil"/>
                 </StackPanel>
             </Grid>
@@ -78,10 +70,10 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0">
-                    <Border Background="#F8F9FA"
-                            BorderBrush="#E0E0E0"
+                    <Border Background="White"
+                            CornerRadius="8"
+                            BorderBrush="#E8E8E8"
                             BorderThickness="1"
-                            CornerRadius="6"
                             Padding="16"
                             Margin="0,0,0,16">
                         <StackPanel>
@@ -105,10 +97,8 @@
                                        Foreground="#666666"
                                        Margin="0,0,0,8"/>
 
-                            <Border Background="White"
-                                    BorderBrush="#E0E0E0"
-                                    BorderThickness="1"
-                                    CornerRadius="4"
+                            <Border Background="#FAFAFA"
+                                    CornerRadius="6"
                                     Padding="12"
                                     Margin="0,0,0,8">
                                 <StackPanel>
@@ -144,37 +134,37 @@
                         </StackPanel>
                     </Border>
 
-                    <Border Background="#FFF8E1"
-                            BorderBrush="#FFCA2C"
-                            BorderThickness="1"
-                            CornerRadius="6"
-                            Padding="16">
+                    <Border Background="#FFFBF2"
+                            BorderBrush="#F0C040"
+                            BorderThickness="3,0,0,0"
+                            CornerRadius="0,6,6,0"
+                            Padding="14">
                         <StackPanel>
                             <TextBlock Text="Conseils"
-                                       FontSize="16"
+                                       FontSize="13"
                                        FontWeight="SemiBold"
                                        Foreground="#7A5D00"
-                                       Margin="0,0,0,10"/>
+                                       Margin="0,0,0,8"/>
                             <TextBlock Text="1. Ajoutez un critère par dimension évaluée."
-                                       FontSize="13"
+                                       FontSize="12"
                                        Foreground="#7A5D00"
-                                       Margin="0,0,0,6"/>
+                                       Margin="0,0,0,4"/>
                             <TextBlock Text="2. Définissez les niveaux qualitatifs avec leur pourcentage."
-                                       FontSize="13"
+                                       FontSize="12"
                                        Foreground="#7A5D00"
-                                       Margin="0,0,0,6"/>
+                                       Margin="0,0,0,4"/>
                             <TextBlock Text="3. Décrivez les pénalités appliquées au travail."
-                                       FontSize="13"
+                                       FontSize="12"
                                        Foreground="#7A5D00"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
 
                 <StackPanel Grid.Column="2">
-                    <Border Background="#F5F5F5"
-                            BorderBrush="#E0E0E0"
+                    <Border Background="White"
+                            CornerRadius="8"
+                            BorderBrush="#E8E8E8"
                             BorderThickness="1"
-                            CornerRadius="6"
                             Padding="16"
                             Margin="0,0,0,16">
                         <Grid>
@@ -192,8 +182,7 @@
                                     Content="Ajouter un critère"
                                     Command="{Binding AddCriterionCommand}"
                                     Style="{StaticResource RoundedButton}"
-                                    Padding="16,8"
-                                    Background="#0D6EFD"/>
+                                    Padding="16,8"/>
                         </Grid>
                     </Border>
 
@@ -201,9 +190,9 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Background="White"
-                                        BorderBrush="#DEE2E6"
+                                        CornerRadius="8"
+                                        BorderBrush="#E8E8E8"
                                         BorderThickness="1"
-                                        CornerRadius="6"
                                         Padding="16"
                                         Margin="0,0,0,16">
                                     <StackPanel>
@@ -238,9 +227,8 @@
                                                     Content="Supprimer"
                                                     Command="{Binding DataContext.RemoveCriterionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}"
-                                                    Style="{StaticResource RoundedButton}"
-                                                    Padding="16,8"
-                                                    Background="#DC3545"
+                                                    Style="{StaticResource DangerButton}"
+                                                    Padding="14,8"
                                                     VerticalAlignment="Bottom"/>
                                         </Grid>
 
@@ -294,12 +282,11 @@
                                                                          Padding="10,8"
                                                                          Margin="0,0,8,0"/>
                                                                 <Button Grid.Column="3"
-                                                                        Content="X"
+                                                                        Content="&#xE74D;"
                                                                         Command="{Binding DataContext.RemoveScaleItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding}"
-                                                                        Style="{StaticResource RoundedButton}"
-                                                                        Padding="12,6"
-                                                                        Background="#DC3545"/>
+                                                                        Style="{StaticResource DangerIconButton}"
+                                                                        ToolTip="Supprimer ce niveau"/>
                                                             </Grid>
                                                         </DataTemplate>
                                                     </ItemsControl.ItemTemplate>
@@ -312,10 +299,10 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <Border Background="#F5F5F5"
-                            BorderBrush="#E0E0E0"
+                    <Border Background="White"
+                            CornerRadius="8"
+                            BorderBrush="#E8E8E8"
                             BorderThickness="1"
-                            CornerRadius="6"
                             Padding="16"
                             Margin="0,8,0,16">
                         <Grid>
@@ -333,8 +320,7 @@
                                     Content="Ajouter une pénalité"
                                     Command="{Binding AddPenaltyCommand}"
                                     Style="{StaticResource RoundedButton}"
-                                    Padding="16,8"
-                                    Background="#FD7E14"/>
+                                    Padding="16,8"/>
                         </Grid>
                     </Border>
 
@@ -342,9 +328,9 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Background="White"
-                                        BorderBrush="#DEE2E6"
+                                        CornerRadius="8"
+                                        BorderBrush="#E8E8E8"
                                         BorderThickness="1"
-                                        CornerRadius="6"
                                         Padding="16"
                                         Margin="0,0,0,12">
                                     <Grid>
@@ -371,9 +357,8 @@
                                                 Content="Supprimer"
                                                 Command="{Binding DataContext.RemovePenaltyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}"
-                                                Style="{StaticResource RoundedButton}"
-                                                Padding="16,8"
-                                                Background="#DC3545"/>
+                                                Style="{StaticResource DangerButton}"
+                                                Padding="14,8"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

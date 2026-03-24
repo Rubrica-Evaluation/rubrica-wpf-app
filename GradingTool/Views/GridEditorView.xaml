@@ -16,10 +16,10 @@
 
         <!-- En-tête avec chemin et bouton retour -->
         <Border Grid.Row="0" 
-                Background="#F8F9FA" 
-                BorderBrush="#E0E0E0" 
+                Background="White" 
+                BorderBrush="#E8E8E8" 
                 BorderThickness="0,0,0,1"
-                Padding="16,8">
+                Padding="16,10">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -30,8 +30,8 @@
                 <TextBlock Grid.Column="0"
                            Text="{Binding NavigationPath}"
                            VerticalAlignment="Center"
-                           FontSize="18"
-                           Foreground="#555555"/>
+                           FontSize="15"
+                           Foreground="#5C5C5C"/>
 
                 <!-- Boutons -->
                 <StackPanel Grid.Column="1" 
@@ -39,31 +39,23 @@
                            HorizontalAlignment="Right">
                     <Button Content="Produire sommaire"
                             Command="{Binding ExportSummaryCommand}"
-                            Height="35"
-                            Padding="20,0"
-                            Margin="0,0,10,0"
-                            Style="{StaticResource RoundedButton}"
-                            Background="#17A2B8"/>
+                            Padding="16,8"
+                            Margin="0,0,8,0"
+                            Style="{StaticResource GhostButton}"/>
                     <Button Content="Exporter PDF"
                             Command="{Binding ExportPdfCommand}"
-                            Height="35"
-                            Padding="20,0"
-                            Margin="0,0,10,0"
-                            Style="{StaticResource RoundedButton}"
-                            Background="#DC3545"/>
+                            Padding="16,8"
+                            Margin="0,0,8,0"
+                            Style="{StaticResource DangerButton}"/>
                     <Button Content="Enregistrer"
                             Command="{Binding SaveCommand}"
-                            Height="35"
-                            Padding="20,0"
-                            Margin="0,0,10,0"
-                            Style="{StaticResource RoundedButton}"
-                            Background="#28A745"/>
+                            Padding="16,8"
+                            Margin="0,0,8,0"
+                            Style="{StaticResource RoundedButton}"/>
                     <Button Content="Retour"
                             Command="{Binding GoBackCommand}"
-                            Height="35"
-                            Padding="20,0"
-                            Style="{StaticResource RoundedButton}"
-                            Background="#6C757D"/>
+                            Padding="16,8"
+                            Style="{StaticResource GhostButton}"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -77,18 +69,18 @@
 
             <!-- Panneau gauche - Liste des fichiers JSON -->
             <Border Grid.Column="0" 
-                    Background="#F8F9FA" 
-                    BorderBrush="#E0E0E0" 
+                    Background="#FAFAFA" 
+                    BorderBrush="#E8E8E8" 
                     BorderThickness="0,0,1,0">
                 <DockPanel>
                     <!-- Titre de la section -->
                     <TextBlock DockPanel.Dock="Top"
                                Text="Grilles du groupe"
-                               FontSize="16"
+                               FontSize="13"
                                FontWeight="SemiBold"
                                TextWrapping="Wrap"
-                               Foreground="#333333"
-                               Padding="16"
+                               Foreground="#1A1A1A"
+                               Padding="16,12"
                                Background="White"
                                TextAlignment="Center"/>
 
@@ -168,10 +160,10 @@
                 <DockPanel>
                     <!-- En-tête de l'éditeur avec 3 colonnes -->
                     <Border DockPanel.Dock="Top"
-                            Background="#F8F9FA"
-                            BorderBrush="#E0E0E0"
+                            Background="White"
+                            BorderBrush="#E8E8E8"
                             BorderThickness="0,0,0,1"
-                            Padding="20,16">
+                            Padding="20,14">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -182,13 +174,13 @@
                             <!-- Colonne 1: Noms des étudiants -->
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="Étudiants" 
-                                           FontSize="14"
+                                           FontSize="12"
                                            FontWeight="SemiBold"
-                                           Foreground="#555555"
+                                           Foreground="#5C5C5C"
                                            Margin="0,0,0,6"/>
                                 <TextBlock Text="{Binding SelectedGridFile.MembersWithDaDisplay}"
-                                           FontSize="14"
-                                           Foreground="#666666"
+                                           FontSize="13"
+                                           Foreground="#5C5C5C"
                                            TextWrapping="Wrap"
                                            LineHeight="18"/>
                             </StackPanel>
@@ -196,17 +188,19 @@
                             <!-- Colonne 2: Total des pénalités -->
                             <StackPanel Grid.Column="1" Margin="0,0,10,0">
                                 <TextBlock Text="Pénalités appliquées" 
-                                           FontSize="14"
+                                           FontSize="12"
                                            FontWeight="SemiBold"
-                                           Foreground="#555555"
+                                           Foreground="#5C5C5C"
                                            Margin="0,0,0,6"/>
-                                <Border Background="#FFF3CD" 
-                                        CornerRadius="4"
+                                <Border Background="#FFFBF2" 
+                                        BorderBrush="#F0C040"
+                                        BorderThickness="3,0,0,0"
+                                        CornerRadius="0,4,4,0"
                                         Padding="12">
                                     <TextBlock Text="{Binding TotalPenalties, StringFormat={}{0:F1} pts}"
                                                FontSize="14"
-                                               FontWeight="Bold"
-                                               Foreground="#856404"
+                                               FontWeight="SemiBold"
+                                               Foreground="#7A5D00"
                                                HorizontalAlignment="Center"/>
                                 </Border>
                             </StackPanel>
@@ -214,17 +208,19 @@
                             <!-- Colonne 3: Total des points -->
                             <StackPanel Grid.Column="2">
                                 <TextBlock Text="Total des points" 
-                                           FontSize="14"
+                                           FontSize="12"
                                            FontWeight="SemiBold"
-                                           Foreground="#555555"
+                                           Foreground="#5C5C5C"
                                            Margin="0,0,0,6"/>
-                                <Border Background="#E8F4F8" 
-                                        CornerRadius="4"
+                                <Border Background="#EBF4FC" 
+                                        BorderBrush="#B3D4F5"
+                                        BorderThickness="3,0,0,0"
+                                        CornerRadius="0,4,4,0"
                                         Padding="12">
                                     <TextBlock Text="{Binding TotalPoints, StringFormat={}{0:F1} pts}"
                                                FontSize="14"
-                                               FontWeight="Bold"
-                                               Foreground="#0D6EFD"
+                                               FontWeight="SemiBold"
+                                               Foreground="#0078D4"
                                                HorizontalAlignment="Center"/>
                                 </Border>
                             </StackPanel>
@@ -279,11 +275,9 @@
                                                                   ItemsSource="{Binding Scale}"
                                                                   SelectedValue="{Binding Result}"
                                                                   SelectedValuePath="Qualitative"
-                                                                  Height="32"
-                                                                  Padding="8,4"
                                                                   helpers:ScrollHelper.BubbleToParent="True">
                                                             <ComboBox.Style>
-                                                                <Style TargetType="ComboBox">
+                                                                <Style TargetType="ComboBox" BasedOn="{StaticResource ModernComboBox}">
                                                                     <Style.Triggers>
                                                                         <DataTrigger Binding="{Binding Result}" Value="">
                                                                             <Setter Property="SelectedIndex" Value="0"/>
@@ -423,52 +417,38 @@
                                                         </ListBox>
                                                         
                                                         <!-- StackPanel pour les boutons d'action -->
-                                                        <Grid Margin="0,0,0,8">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto"/>
-                                                                <ColumnDefinition Width="*"/>
-                                                            </Grid.ColumnDefinitions>
-                                                            
+                                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                                                             <!-- Boutons -->
-                                                            <StackPanel Grid.Column="0" Orientation="Horizontal">
-                                                                <Button Content="➕"
-                                                                        Height="28"
-                                                                        Padding="6,0"
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <Button Content="&#xE710;"
+                                                                        Style="{StaticResource IconButton}"
+                                                                        ToolTip="Ajouter un commentaire"
                                                                         Margin="0,0,2,0"
-                                                                        Background="#28A745"
-                                                                        Style="{StaticResource RoundedButton}"
                                                                         Command="{Binding DataContext.AddFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding}"/>
-                                                                <Button Content="✏️"
-                                                                        Height="28"
-                                                                        Padding="6,0"
+                                                                <Button Content="&#xE70F;"
+                                                                        Style="{StaticResource IconButton}"
+                                                                        ToolTip="Modifier le commentaire sélectionné"
                                                                         Margin="0,0,2,0"
-                                                                        Background="#0D6EFD"
-                                                                        Style="{StaticResource RoundedButton}"
                                                                         Command="{Binding DataContext.EditFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding}"/>
-                                                                <Button Content="🗑️"
-                                                                        Height="28"
-                                                                        Padding="6,0"
-                                                                        Background="#DC3545"
-                                                                        Style="{StaticResource RoundedButton}"
+                                                                <Button Content="&#xE74D;"
+                                                                        Style="{StaticResource DangerIconButton}"
+                                                                        ToolTip="Supprimer le commentaire sélectionné"
                                                                         Command="{Binding DataContext.DeleteFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding}"/>
                                                             </StackPanel>
                                                             
                                                             <!-- Bouton banque de commentaires -->
-                                                            <Button Grid.Column="1"
-                                                                    Content="💬 Banque"
-                                                                    Height="28"
-                                                                    Padding="10,0"
+                                                            <Button Content="Banque"
+                                                                    Padding="12,0"
                                                                     Margin="8,0,0,0"
                                                                     FontSize="12"
-                                                                    Background="#6C757D"
-                                                                    Style="{StaticResource RoundedButton}"
+                                                                    Style="{StaticResource GhostButton}"
                                                                     ToolTip="Choisir un commentaire depuis la banque"
                                                                     Command="{Binding DataContext.OpenCommentPickerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                     CommandParameter="{Binding}"/>
-                                                        </Grid>
+                                                        </StackPanel>
                                                         
                                                     </StackPanel>
                                                 </Grid>
