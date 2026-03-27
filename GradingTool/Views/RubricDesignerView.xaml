@@ -51,7 +51,7 @@
                             Command="{Binding SaveCommand}"
                             Style="{StaticResource RoundedButton}"
                             Margin="0,0,8,0"
-                            ToolTip="Valider et enregistrer la rubrique comme rubric.json pour ce travail"/>
+                            ToolTip="Valider et enregistrer la rubrique dans un fichier rubric.json pour ce travail"/>
                     <Button Content="Retour"
                             Command="{Binding GoBackCommand}"
                             Style="{StaticResource GhostButton}"
@@ -112,7 +112,8 @@
                                                Margin="0,0,0,6"/>
                                     <TextBlock Text="{Binding TotalWeight, StringFormat=Poids total: {0} %}"
                                                FontSize="14"
-                                               FontWeight="SemiBold">
+                                               FontWeight="SemiBold"
+                                               ToolTip="Affiche la somme des poids de tous les critères. Idéalement, le total devrait atteindre 100 % .">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Foreground" Value="#333333"/>
@@ -182,7 +183,8 @@
                                     Content="Ajouter un critère"
                                     Command="{Binding AddCriterionCommand}"
                                     Style="{StaticResource RoundedButton}"
-                                    Padding="16,8"/>
+                                    Padding="16,8"
+                                    ToolTip="Ajoute un nouveau critère avec un libellé, un poids et des niveaux qualitatifs."/>
                         </Grid>
                     </Border>
 
@@ -229,7 +231,8 @@
                                                     CommandParameter="{Binding}"
                                                     Style="{StaticResource DangerButton}"
                                                     Padding="14,8"
-                                                    VerticalAlignment="Bottom"/>
+                                                    VerticalAlignment="Bottom"
+                                                    ToolTip="Supprime ce critère ainsi que ses niveaux qualitatifs."/>
                                         </Grid>
 
                                         <Border Background="#F8F9FA"
@@ -255,33 +258,61 @@
                                                             CommandParameter="{Binding}"
                                                             Style="{StaticResource RoundedButton}"
                                                             Padding="14,6"
-                                                            Background="#198754"/>
+                                                            Background="#198754"
+                                                            ToolTip="Ajoute un niveau qualitatif supplémentaire à ce critère."/>
                                                 </Grid>
 
                                                 <ItemsControl ItemsSource="{Binding Scale}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
-                                                            <Grid Margin="0,0,0,8">
+                                                            <Grid Margin="0,0,0,12">
                                                                 <Grid.ColumnDefinitions>
                                                                     <ColumnDefinition Width="120"/>
                                                                     <ColumnDefinition Width="*"/>
                                                                     <ColumnDefinition Width="120"/>
                                                                     <ColumnDefinition Width="Auto"/>
                                                                 </Grid.ColumnDefinitions>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                </Grid.RowDefinitions>
 
-                                                                <TextBox Grid.Column="0"
+                                                                <TextBlock Grid.Row="0"
+                                                                           Grid.Column="0"
+                                                                           Text="Niveau"
+                                                                           FontSize="12"
+                                                                           Foreground="#666666"
+                                                                           Margin="0,0,8,6"/>
+                                                                <TextBlock Grid.Row="0"
+                                                                           Grid.Column="1"
+                                                                           Text="Description"
+                                                                           FontSize="12"
+                                                                           Foreground="#666666"
+                                                                           Margin="0,0,8,6"/>
+                                                                <TextBlock Grid.Row="0"
+                                                                           Grid.Column="2"
+                                                                           Text="Points (%)"
+                                                                           FontSize="12"
+                                                                           Foreground="#666666"
+                                                                           Margin="0,0,8,6"/>
+
+                                                                <TextBox Grid.Row="1"
+                                                                         Grid.Column="0"
                                                                          Text="{Binding Qualitative, UpdateSourceTrigger=PropertyChanged}"
                                                                          Padding="10,8"
                                                                          Margin="0,0,8,0"/>
-                                                                <TextBox Grid.Column="1"
+                                                                <TextBox Grid.Row="1"
+                                                                         Grid.Column="1"
                                                                          Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}"
                                                                          Padding="10,8"
                                                                          Margin="0,0,8,0"/>
-                                                                <TextBox Grid.Column="2"
+                                                                <TextBox Grid.Row="1"
+                                                                         Grid.Column="2"
                                                                          Text="{Binding Points, UpdateSourceTrigger=PropertyChanged}"
                                                                          Padding="10,8"
                                                                          Margin="0,0,8,0"/>
-                                                                <Button Grid.Column="3"
+                                                                <Button Grid.Row="1"
+                                                                        Grid.Column="3"
                                                                         Content="&#xE74D;"
                                                                         Command="{Binding DataContext.RemoveScaleItemCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding}"
@@ -320,7 +351,8 @@
                                     Content="Ajouter une pénalité"
                                     Command="{Binding AddPenaltyCommand}"
                                     Style="{StaticResource RoundedButton}"
-                                    Padding="16,8"/>
+                                    Padding="16,8"
+                                    ToolTip="Ajoute une nouvelle pénalité avec son nom, son facteur et son minimum."/>
                         </Grid>
                     </Border>
 
@@ -340,25 +372,53 @@
                                             <ColumnDefinition Width="120"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
 
-                                        <TextBox Grid.Column="0"
+                                        <TextBlock Grid.Row="0"
+                                                   Grid.Column="0"
+                                                   Text="Libellé"
+                                                   FontSize="12"
+                                                   Foreground="#666666"
+                                                   Margin="0,0,8,6"/>
+                                        <TextBlock Grid.Row="0"
+                                                   Grid.Column="1"
+                                                   Text="Facteur"
+                                                   FontSize="12"
+                                                   Foreground="#666666"
+                                                   Margin="0,0,8,6"/>
+                                        <TextBlock Grid.Row="0"
+                                                   Grid.Column="2"
+                                                   Text="Minimum"
+                                                   FontSize="12"
+                                                   Foreground="#666666"
+                                                   Margin="0,0,8,6"/>
+
+                                        <TextBox Grid.Row="1"
+                                                 Grid.Column="0"
                                                  Text="{Binding Label, UpdateSourceTrigger=PropertyChanged}"
                                                  Padding="10,8"
                                                  Margin="0,0,8,0"/>
-                                        <TextBox Grid.Column="1"
+                                        <TextBox Grid.Row="1"
+                                                 Grid.Column="1"
                                                  Text="{Binding Factor, UpdateSourceTrigger=PropertyChanged}"
                                                  Padding="10,8"
                                                  Margin="0,0,8,0"/>
-                                        <TextBox Grid.Column="2"
+                                        <TextBox Grid.Row="1"
+                                                 Grid.Column="2"
                                                  Text="{Binding Min, UpdateSourceTrigger=PropertyChanged}"
                                                  Padding="10,8"
                                                  Margin="0,0,8,0"/>
-                                        <Button Grid.Column="3"
+                                        <Button Grid.Row="1"
+                                                Grid.Column="3"
                                                 Content="Supprimer"
                                                 Command="{Binding DataContext.RemovePenaltyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                 CommandParameter="{Binding}"
                                                 Style="{StaticResource DangerButton}"
-                                                Padding="14,8"/>
+                                                Padding="14,8"
+                                                ToolTip="Supprime cette pénalité de la rubrique."/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

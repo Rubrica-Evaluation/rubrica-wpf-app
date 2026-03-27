@@ -263,7 +263,7 @@ public partial class RubricDesignerViewModel : ObservableObject
                 new() { Qualitative = "Très bien", Label = "[Descripteur du niveau: Très bien]", Points = 80 },
                 new() { Qualitative = "Suffisant", Label = "[Descripteur du niveau: Suffisant]", Points = 60 },
                 new() { Qualitative = "Insuffisant", Label = "[Descripteur du niveau: Insuffisant]", Points = 40 },
-                new() { Qualitative = "Inacceptable", Label = "[Descripteur du niveau: Inacceptable]", Points = 0 }
+                new() { Qualitative = "Invalide", Label = "[Descripteur du niveau: Invalide]", Points = 0 }
             }
         };
     }

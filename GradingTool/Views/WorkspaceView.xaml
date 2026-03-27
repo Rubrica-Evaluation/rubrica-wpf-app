@@ -1,9 +1,9 @@
 <UserControl x:Class="GradingTool.Views.WorkspaceView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="1200"
              Background="White">
     <Grid>
@@ -11,10 +11,10 @@
             <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        
+
         <!-- Panneau gauche - Navigation -->
-        <Border Grid.Column="0" 
-                BorderBrush="#E0E0E0" 
+        <Border Grid.Column="0"
+                BorderBrush="#E0E0E0"
                 BorderThickness="0,0,1,0"
                 Background="White"
                 Padding="20">
@@ -32,28 +32,29 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                
+
                 <Grid Grid.Row="0" Margin="0,0,0,8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
+
                     <TextBlock Grid.Column="0"
                                Text="Dossier racine"
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="#333333"
                                VerticalAlignment="Center"/>
-                    
+
                     <Button Grid.Column="1"
                             Content="{Binding SelectFolderButtonText}"
                             Style="{StaticResource RoundedButton}"
                             Command="{Binding SelectSessionsRootCommand}"
                             FontSize="11"
-                            Padding="10,4"/>
+                            Padding="10,4"
+                            ToolTip="Choisir ou modifier le dossier racine de travail."/>
                 </Grid>
-                
+
                 <!-- Affichage du chemin configuré -->
                 <TextBlock Grid.Row="1"
                            Text="{Binding SessionsRootPath, FallbackValue='Non configuré'}"
@@ -62,7 +63,7 @@
                            TextWrapping="Wrap"
                            Margin="0,0,0,20"
                            Visibility="{Binding IsSessionsRootConfigured, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                
+
                 <!-- Message si non configuré -->
                 <TextBlock Grid.Row="1"
                            Text="Aucun dossier racine configuré"
@@ -73,7 +74,7 @@
                            Visibility="{Binding IsSessionsRootConfigured, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
 
                 <!-- Section Sessions -->
-                <Grid Grid.Row="3" 
+                <Grid Grid.Row="3"
                       Margin="0,0,0,10"
                       Visibility="{Binding IsSessionsRootConfigured, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
@@ -82,44 +83,44 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
+
                     <TextBlock Grid.Column="0"
                                Text="Sessions"
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="#333333"
                                VerticalAlignment="Center"/>
-                    
+
                     <Button Grid.Column="1"
                             Content="&#xE710;"
                             Command="{Binding CreateNewSessionCommand}"
                             Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            ToolTip="Nouvelle session"/>
-                    
+                            ToolTip="Créer une nouvelle session"/>
+
                     <Button Grid.Column="2"
                             Content="&#xE70F;"
                             Command="{Binding EditSessionCommand}"
                             Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            ToolTip="Renommer la session"/>
-                    
+                            ToolTip="Renommer la session sélectionnée"/>
+
                     <Button Grid.Column="3"
                             Content="&#xE74D;"
                             Command="{Binding DeleteSessionCommand}"
                             Style="{StaticResource DangerIconButton}"
-                            ToolTip="Supprimer la session"/>
+                            ToolTip="Supprimer la session sélectionnée"/>
                 </Grid>
-                
+
                 <ComboBox Grid.Row="5"
                           ItemsSource="{Binding Sessions}"
                           SelectedItem="{Binding SelectedSession}"
                           Margin="0,0,0,10"
                           Style="{StaticResource ModernComboBox}"
                           Visibility="{Binding IsSessionsRootConfigured, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                
+
                 <!-- Section Cours -->
-                <Grid Grid.Row="6" 
+                <Grid Grid.Row="6"
                       Margin="0,20,0,12"
                       Visibility="{Binding IsSessionSelected, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
@@ -128,35 +129,35 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
+
                     <TextBlock Grid.Column="0"
                                Text="Cours"
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="#333333"
                                VerticalAlignment="Center"/>
-                    
+
                     <Button Grid.Column="1"
                             Content="&#xE710;"
                             Command="{Binding CreateNewCourseCommand}"
                             Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            ToolTip="Nouveau cours"/>
-                    
+                            ToolTip="Créer un nouveau cours"/>
+
                     <Button Grid.Column="2"
                             Content="&#xE70F;"
                             Command="{Binding EditCourseCommand}"
                             Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            ToolTip="Renommer le cours"/>
-                    
+                            ToolTip="Renommer le cours sélectionné"/>
+
                     <Button Grid.Column="3"
                             Content="&#xE74D;"
                             Command="{Binding DeleteCourseCommand}"
                             Style="{StaticResource DangerIconButton}"
-                            ToolTip="Supprimer le cours"/>
+                            ToolTip="Supprimer le cours sélectionné"/>
                 </Grid>
-                
+
                 <ListBox Grid.Row="7"
                          ItemsSource="{Binding Courses}"
                          SelectedItem="{Binding SelectedCourse}"
@@ -173,7 +174,7 @@
                 </ListBox>
 
                 <!-- Section Évaluations -->
-                <Grid Grid.Row="8" 
+                <Grid Grid.Row="8"
                       Margin="0,20,0,12"
                       Visibility="{Binding IsCourseSelected, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
@@ -182,35 +183,35 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
+
                     <TextBlock Grid.Column="0"
                                Text="Évaluations"
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="#333333"
                                VerticalAlignment="Center"/>
-                    
+
                     <Button Grid.Column="1"
                             Content="&#xE710;"
                             Command="{Binding CreateNewWorkCommand}"
                             Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            ToolTip="Nouvelle évaluation"/>
-                    
+                            ToolTip="Créer une nouvelle évaluation"/>
+
                     <Button Grid.Column="2"
                             Content="&#xE70F;"
                             Command="{Binding EditWorkCommand}"
                             Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            ToolTip="Renommer l'évaluation"/>
-                    
+                            ToolTip="Renommer l'évaluation sélectionnée"/>
+
                     <Button Grid.Column="3"
                             Content="&#xE74D;"
                             Command="{Binding DeleteWorkCommand}"
                             Style="{StaticResource DangerIconButton}"
-                            ToolTip="Supprimer l'évaluation"/>
+                            ToolTip="Supprimer l'évaluation sélectionnée"/>
                 </Grid>
-                
+
                 <ListBox Grid.Row="10"
                          ItemsSource="{Binding Works}"
                          SelectedItem="{Binding SelectedWork}"
@@ -225,7 +226,7 @@
                 </ListBox>
             </Grid>
         </Border>
-        
+
         <!-- Panneau droit - Contenu principal -->
         <Grid Grid.Column="1" Margin="20">
             <!-- Message si aucune évaluation sélectionnée -->
@@ -242,14 +243,14 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                
+
                 <TextBlock Text="Espace de travail"
                            FontSize="32"
                            FontWeight="Bold"
                            Foreground="#333333"
                            HorizontalAlignment="Center"
                            Margin="0,0,0,20"/>
-                
+
                 <TextBlock Text="Sélectionnez une évaluation pour voir les détails."
                            FontSize="16"
                            Foreground="#666666"
@@ -270,14 +271,14 @@
                         </Style.Triggers>
                     </Style>
                 </ScrollViewer.Style>
-                
+
                 <StackPanel>
                     <TextBlock Text="Détails de l'évaluation"
                                FontSize="24"
                                FontWeight="Bold"
                                Foreground="#333333"
                                Margin="0,0,0,20"/>
-                    
+
                     <TextBlock FontSize="16"
                                Foreground="#666666"
                                Margin="0,0,0,20">
@@ -302,7 +303,8 @@
                             <!-- Statut de la rubrique -->
                             <TextBlock FontSize="14"
                                        FontWeight="SemiBold"
-                                       Margin="0,0,0,12">
+                                       Margin="0,0,0,12"
+                                       ToolTip="Indique si une rubrique est déjà disponible pour cette évaluation.">
                                 <Run Text="{Binding RubricStatusText}"/>
                                 <Run.Foreground>
                                     <SolidColorBrush Color="{Binding RubricStatusColor}"/>
@@ -312,12 +314,12 @@
                             <!-- Boutons -->
                             <StackPanel Orientation="Horizontal">
                                 <Button Content="Concepteur de grille"
-                                    Command="{Binding OpenRubricDesignerCommand}"
-                                    Style="{StaticResource RoundedButton}"
-                                    FontSize="13"
-                                    Padding="16,8"
-                                    Margin="0,0,0,0"
-                                    ToolTip="Créer ou modifier la rubrique du travail (critères, niveaux qualitatifs, pénalités)"/>
+                                        Command="{Binding OpenRubricDesignerCommand}"
+                                        Style="{StaticResource RoundedButton}"
+                                        FontSize="13"
+                                        Padding="16,8"
+                                        Margin="0,0,0,0"
+                                        ToolTip="Créer ou modifier la rubrique du travail, incluant les critères, niveaux qualitatifs et pénalités."/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -339,7 +341,8 @@
                             <!-- Statut du roster -->
                             <TextBlock FontSize="14"
                                        FontWeight="SemiBold"
-                                       Margin="0,0,0,12">
+                                       Margin="0,0,0,12"
+                                       ToolTip="Indique si une liste d'étudiants ou d'équipes a été chargée pour cette évaluation.">
                                 <Run Text="{Binding RosterStatusText}"/>
                                 <Run.Foreground>
                                     <SolidColorBrush Color="{Binding RosterStatusColor}"/>
@@ -361,7 +364,7 @@
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            
+
                                             <Border Grid.Column="0"
                                                     Background="#EBF4FC"
                                                     BorderBrush="#B3D4F5"
@@ -373,7 +376,7 @@
                                                            FontSize="12"
                                                            Foreground="#0078D4"/>
                                             </Border>
-                                            
+
                                             <Button Grid.Column="1"
                                                     Content="&#xE74D;"
                                                     Command="{Binding DataContext.DeleteRosterFileCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
@@ -398,17 +401,19 @@
                                                FontWeight="SemiBold"
                                                FontSize="13"
                                                Margin="0,0,0,8"/>
-                                    
+
                                     <RadioButton Content="Une grille par étudiant"
                                                  IsChecked="{Binding GenerationMode, Converter={StaticResource GenerationModeConverter}, ConverterParameter=individual}"
                                                  GroupName="GenerationMode"
                                                  FontSize="13"
-                                                 Margin="0,0,0,4"/>
-                                    
+                                                 Margin="0,0,0,4"
+                                                 ToolTip="Créer une grille distincte pour chaque étudiant du roster."/>
+
                                     <RadioButton Content="Une grille par équipe"
                                                  IsChecked="{Binding GenerationMode, Converter={StaticResource GenerationModeConverter}, ConverterParameter=team}"
                                                  GroupName="GenerationMode"
-                                                 FontSize="13"/>
+                                                 FontSize="13"
+                                                 ToolTip="Créer une seule grille pour chaque équipe détectée."/>
                                 </StackPanel>
                             </Border>
 
@@ -419,36 +424,41 @@
                                         Style="{StaticResource RoundedButton}"
                                         FontSize="13"
                                         Padding="16,8"
-                                        Margin="0,0,10,0"/>
-                                
+                                        Margin="0,0,10,0"
+                                        ToolTip="Importer une liste d'étudiants ou d'équipes pour cette évaluation."/>
+
                                 <Button Content="Télécharger template"
                                         Command="{Binding DownloadRosterTemplateCommand}"
                                         Style="{StaticResource GhostButton}"
                                         FontSize="13"
                                         Padding="16,8"
-                                        Margin="0,0,10,0"/>
-                                
+                                        Margin="0,0,10,0"
+                                        ToolTip="Télécharger un modèle CSV pour préparer la liste des étudiants ou des équipes."/>
+
                                 <Button Content="Générer tout le groupe"
                                         Command="{Binding GenerateGroupGridsCommand}"
                                         Style="{StaticResource RoundedButton}"
                                         FontSize="13"
                                         Padding="16,8"
                                         Margin="0,0,10,0"
-                                        IsEnabled="{Binding CanGenerateGroupGrids}"/>
-                                
+                                        IsEnabled="{Binding CanGenerateGroupGrids}"
+                                        ToolTip="Générer toutes les grilles d'évaluation pour le groupe ou les équipes."/>
+
                                 <Button Content="Ouvrir dossier de grading"
                                         Command="{Binding OpenGradingFolderCommand}"
                                         Style="{StaticResource GhostButton}"
                                         FontSize="13"
                                         Padding="16,8"
                                         Margin="0,0,10,0"
-                                        IsEnabled="{Binding SelectedGroup, Converter={StaticResource NullToBoolConverter}}"/>
-                                
+                                        IsEnabled="{Binding SelectedGroup, Converter={StaticResource NullToBoolConverter}}"
+                                        ToolTip="Ouvrir le dossier contenant les fichiers de correction du groupe sélectionné."/>
+
                                 <Button Content="Ouvrir l'éditeur"
                                         Command="{Binding NavigateToGridEditorCommand}"
                                         Style="{StaticResource RoundedButton}"
                                         FontSize="13"
-                                        Padding="16,8"/>
+                                        Padding="16,8"
+                                        ToolTip="Ouvrir l'éditeur de grille pour corriger ou consulter l'évaluation."/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
