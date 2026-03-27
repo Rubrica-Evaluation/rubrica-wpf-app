@@ -427,7 +427,7 @@
                                         Margin="0,0,10,0"
                                         ToolTip="Importer une liste d'étudiants ou d'équipes pour cette évaluation."/>
 
-                                <Button Content="Télécharger template"
+                                <Button Content="Télécharger modèle CSV"
                                         Command="{Binding DownloadRosterTemplateCommand}"
                                         Style="{StaticResource GhostButton}"
                                         FontSize="13"
@@ -444,7 +444,7 @@
                                         IsEnabled="{Binding CanGenerateGroupGrids}"
                                         ToolTip="Générer toutes les grilles d'évaluation pour le groupe ou les équipes."/>
 
-                                <Button Content="Ouvrir dossier de grading"
+                                <Button Content="Ouvrir dossier des grilles"
                                         Command="{Binding OpenGradingFolderCommand}"
                                         Style="{StaticResource GhostButton}"
                                         FontSize="13"
