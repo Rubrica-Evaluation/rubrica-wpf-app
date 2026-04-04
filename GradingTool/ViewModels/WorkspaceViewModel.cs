@@ -773,6 +773,12 @@ public partial class WorkspaceViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void NavigateToConfiguration()
+    {
+        _navigationService.NavigateTo<ConfigurationViewModel>();
+    }
+
+    [RelayCommand]
     private void OpenGradingFolder()
     {
         if (string.IsNullOrEmpty(SelectedSession) || string.IsNullOrEmpty(SelectedCourse) || string.IsNullOrEmpty(SelectedWork) || SelectedGroup == null)

@@ -82,6 +82,7 @@ public partial class App : Application
         // ViewModels
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<WorkspaceViewModel>();
+        services.AddSingleton<ConfigurationViewModel>();
         services.AddSingleton<GridEditorViewModel>();
         services.AddSingleton<RubricDesignerViewModel>();
 

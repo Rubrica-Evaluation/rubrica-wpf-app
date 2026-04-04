@@ -1,0 +1,59 @@
+<UserControl x:Class="GradingTool.Views.ConfigurationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="1000"
+             Background="White">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Configuration" FontSize="20" FontWeight="SemiBold" Foreground="#333333" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Content="Retour" Command="{Binding GoBackCommand}" Style="{StaticResource GhostButton}"/>
+        </Grid>
+
+        <StackPanel Grid.Row="1" Orientation="Vertical">
+            <Border Background="White" CornerRadius="8" BorderBrush="#E8E8E8" BorderThickness="1" Padding="16" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="Dossier racine" FontSize="16" FontWeight="SemiBold" Foreground="#333333" Margin="0,0,0,10"/>
+                    <TextBlock Text="Définissez ici le chemin racine des sessions"
+                               FontSize="12" Foreground="#666666" Margin="0,0,0,12" TextWrapping="Wrap"/>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="{Binding SessionsRootPath, FallbackValue='Non configuré'}"
+                                   VerticalAlignment="Center"
+                                   FontSize="12"
+                                   Foreground="#333333"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,8,0"/>
+
+                        <Button Grid.Column="1"
+                                Content="{Binding SelectFolderButtonText}"
+                                Command="{Binding SelectSessionsRootCommand}"
+                                Style="{StaticResource RoundedButton}"/>
+                    </Grid>
+
+                </StackPanel>
+            </Border>
+
+            <Border Background="#FAFAFA" CornerRadius="8" BorderBrush="#E8E8E8" BorderThickness="1" Padding="16">
+                <TextBlock Text="Autres options de configuration seront ajoutées ici." FontSize="13" Foreground="#555555"/>
+            </Border>
+        </StackPanel>
+    </Grid>
+</UserControl>

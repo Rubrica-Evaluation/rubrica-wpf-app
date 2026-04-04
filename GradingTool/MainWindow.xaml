@@ -30,6 +30,11 @@
         <DataTemplate DataType="{x:Type vm:RubricDesignerViewModel}">
             <views:RubricDesignerView/>
         </DataTemplate>
+
+        <!-- DataTemplate pour ConfigurationViewModel -->
+        <DataTemplate DataType="{x:Type vm:ConfigurationViewModel}">
+            <views:ConfigurationView/>
+        </DataTemplate>
     </Window.Resources>
     
     <Grid>
