@@ -21,6 +21,7 @@ public partial class WorkspaceViewModel : ObservableObject
     private readonly IRosterService _rosterService;
     private readonly IGridService _gridService;
     private readonly INavigationService _navigationService;
+    private readonly ILocalizationService _localizationService;
 
     [ObservableProperty]
     private string? _sessionsRootPath;
@@ -29,7 +30,22 @@ public partial class WorkspaceViewModel : ObservableObject
     private bool _isSessionsRootConfigured;
 
     [ObservableProperty]
-    private string _selectFolderButtonText = "Sélectionner dossier";
+    private string _selectFolderButtonText = string.Empty;
+
+    [ObservableProperty]
+    private string _rubricStatusText = string.Empty;
+
+    [ObservableProperty]
+    private string _rubricStatusColor = "#DC3545";
+
+    [ObservableProperty]
+    private bool _rosterExists;
+
+    [ObservableProperty]
+    private string _rosterStatusText = string.Empty;
+
+    [ObservableProperty]
+    private string _rosterStatusColor = "#DC3545";
 
     [ObservableProperty]
     private ObservableCollection<string> _sessions = new();
@@ -37,7 +53,6 @@ public partial class WorkspaceViewModel : ObservableObject
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(EditSessionCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteSessionCommand))]
-    [NotifyPropertyChangedFor(nameof(IsSessionSelected))]
     private string? _selectedSession;
 
     [ObservableProperty]
@@ -65,26 +80,50 @@ public partial class WorkspaceViewModel : ObservableObject
     private bool _rubricExists;
 
     [ObservableProperty]
-    private string _rubricStatusText = "Aucune rubrique trouvée";
-
-    [ObservableProperty]
-    private string _rubricStatusColor = "#DC3545";
-
-    [ObservableProperty]
-    private bool _rosterExists;
-
-    [ObservableProperty]
-    private string _rosterStatusText = "Aucune liste d'étudiants trouvée";
-
-    [ObservableProperty]
-    private string _rosterStatusColor = "#DC3545";
-
-    [ObservableProperty]
     private ObservableCollection<GroupModel> _groups = new();
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(GenerateGroupGridsCommand))]
     private GroupModel? _selectedGroup;
+
+    [ObservableProperty]
+    private bool _hasTeams;
+
+    [ObservableProperty]
+    private bool _canGenerateGroupGrids;
+
+    [ObservableProperty]
+    private string _generationMode = "individual";
+
+    public bool IsCourseSelected => !string.IsNullOrEmpty(SelectedCourse);
+
+    public WorkspaceViewModel(
+        IDialogService dialogService,
+        ISessionsRootService sessionsRootService,
+        ISessionService sessionService,
+        ICourseService courseService,
+        IWorkService workService,
+        IConfigurationService configurationService,
+        IRubricService rubricService,
+        IRosterService rosterService,
+        IGridService gridService,
+        INavigationService navigationService,
+        ILocalizationService localizationService)
+    {
+        _dialogService = dialogService;
+        _sessionsRootService = sessionsRootService;
+        _sessionService = sessionService;
+        _courseService = courseService;
+        _workService = workService;
+        _configurationService = configurationService;
+        _rubricService = rubricService;
+        _rosterService = rosterService;
+        _gridService = gridService;
+        _navigationService = navigationService;
+        _localizationService = localizationService;
+        _localizationService.LanguageChanged += RefreshLocalizedTexts;
+        LoadSessionsRootPath();
+    }
 
     partial void OnSelectedGroupChanged(GroupModel? value)
     {
@@ -98,43 +137,13 @@ public partial class WorkspaceViewModel : ObservableObject
         }
     }
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(GenerateGroupGridsCommand))]
-    private bool _canGenerateGroupGrids;
-
-    [ObservableProperty]
-    private bool _hasTeams;
-
-    [ObservableProperty]
-    private string _generationMode = "individual"; // "individual" or "team"
-
-    public bool IsSessionSelected => !string.IsNullOrEmpty(SelectedSession);
-
-    public bool IsCourseSelected => !string.IsNullOrEmpty(SelectedCourse);
-
-    public WorkspaceViewModel(
-        IDialogService dialogService, 
-        ISessionsRootService sessionsRootService,
-        ISessionService sessionService,
-        ICourseService courseService,
-        IWorkService workService,
-        IConfigurationService configurationService,
-        IRubricService rubricService,
-        IRosterService rosterService,
-        IGridService gridService,
-        INavigationService navigationService)
+    private void RefreshLocalizedTexts()
     {
-        _dialogService = dialogService;
-        _sessionsRootService = sessionsRootService;
-        _sessionService = sessionService;
-        _courseService = courseService;
-        _workService = workService;
-        _configurationService = configurationService;
-        _rubricService = rubricService;
-        _rosterService = rosterService;
-        _gridService = gridService;
-        _navigationService = navigationService;
-        LoadSessionsRootPath();
+        SelectFolderButtonText = IsSessionsRootConfigured
+            ? _localizationService["Workspace_ChangeFolder"]
+            : _localizationService["Workspace_SelectFolder"];
+        UpdateRubricStatus();
+        UpdateRosterStatus();
     }
 
     private void LoadSessionsRootPath()
@@ -143,18 +152,18 @@ public partial class WorkspaceViewModel : ObservableObject
         {
             SessionsRootPath = _sessionsRootService.GetSessionsRootPath();
             IsSessionsRootConfigured = true;
-            SelectFolderButtonText = "Modifier dossier racine";
+            SelectFolderButtonText = _localizationService["Workspace_ChangeFolder"];
             LoadSessions();
         }
         else
         {
             // Essayer de détecter automatiquement le dossier sessions
             TryAutoDetectSessionsRoot();
-            
+
             if (!IsSessionsRootConfigured)
             {
                 IsSessionsRootConfigured = false;
-                SelectFolderButtonText = "Sélectionner dossier racine";
+                SelectFolderButtonText = _localizationService["Workspace_SelectFolder"];
             }
         }
     }
@@ -176,7 +185,7 @@ public partial class WorkspaceViewModel : ObservableObject
                     _sessionsRootService.SetupSessionsRoot(sessionsPath, false);
                     SessionsRootPath = sessionsPath;
                     IsSessionsRootConfigured = true;
-                    SelectFolderButtonText = "Modifier dossier racine";
+                    SelectFolderButtonText = _localizationService["Workspace_ChangeFolder"];
                     LoadSessions();
                     _dialogService.ShowToast("Dossier racine détecté automatiquement");
                     return;
@@ -271,7 +280,7 @@ public partial class WorkspaceViewModel : ObservableObject
         {
             WorkSubdirectories = null;
             RubricExists = false;
-            RubricStatusText = "Aucune rubrique trouvée";
+            RubricStatusText = _localizationService["Workspace_RubricNotFound"];
             RubricStatusColor = "#DC3545";
             return;
         }
@@ -314,7 +323,7 @@ public partial class WorkspaceViewModel : ObservableObject
         if (string.IsNullOrEmpty(SelectedSession) || string.IsNullOrEmpty(SelectedCourse) || string.IsNullOrEmpty(SelectedWork))
         {
             RubricExists = false;
-            RubricStatusText = "Aucune rubrique trouvée";
+            RubricStatusText = _localizationService["Workspace_RubricNotFound"];
             RubricStatusColor = "#DC3545";
             return;
         }
@@ -328,18 +337,18 @@ public partial class WorkspaceViewModel : ObservableObject
             var rubric = _rubricService.LoadRubric(SelectedSession, SelectedCourse, SelectedWork, out string errorMessage);
             if (rubric != null)
             {
-                RubricStatusText = "✓ Rubrique valide trouvée";
+                RubricStatusText = _localizationService["Workspace_RubricValid"];
                 RubricStatusColor = "#28A745";
             }
             else
             {
-                RubricStatusText = $"✗ Rubrique invalide: {errorMessage}";
+                RubricStatusText = string.Format(_localizationService["Workspace_RubricInvalid"], errorMessage);
                 RubricStatusColor = "#FFA500";
             }
         }
         else
         {
-            RubricStatusText = "Aucune rubrique trouvée";
+            RubricStatusText = _localizationService["Workspace_RubricNotFound"];
             RubricStatusColor = "#DC3545";
         }
 
@@ -352,7 +361,7 @@ public partial class WorkspaceViewModel : ObservableObject
         if (string.IsNullOrEmpty(SelectedSession) || string.IsNullOrEmpty(SelectedCourse) || string.IsNullOrEmpty(SelectedWork))
         {
             RosterExists = false;
-            RosterStatusText = "Aucun roster trouvé";
+            RosterStatusText = _localizationService["Workspace_RosterNotFound"];
             RosterStatusColor = "#DC3545";
             Groups.Clear();
             return;
@@ -367,7 +376,7 @@ public partial class WorkspaceViewModel : ObservableObject
             var roster = _rosterService.LoadRoster(SelectedSession, SelectedCourse, SelectedWork, out string errorMessage);
             if (roster != null)
             {
-                RosterStatusText = "✓ Liste d'étudiants valide trouvée";
+                RosterStatusText = _localizationService["Workspace_RosterValid"];
                 RosterStatusColor = "#28A745";
 
                 // Update groups list
@@ -385,14 +394,14 @@ public partial class WorkspaceViewModel : ObservableObject
 
                 if (roster.Groups.Count == 0)
                 {
-                    RosterStatusText = "✓ Liste d'étudiants trouvée (aucun groupe détecté)";
+                    RosterStatusText = _localizationService["Workspace_RosterNoGroups"];
                     RosterStatusColor = "#FFA500";
                     SelectedGroup = null;
                 }
             }
             else
             {
-                RosterStatusText = $"✗ Liste d'étudiants invalide: {errorMessage}";
+                RosterStatusText = string.Format(_localizationService["Workspace_RosterInvalid"], errorMessage);
                 RosterStatusColor = "#FFA500";
                 Groups.Clear();
                 SelectedGroup = null;
@@ -401,7 +410,7 @@ public partial class WorkspaceViewModel : ObservableObject
         }
         else
         {
-            RosterStatusText = "Aucune liste d'étudiants trouvée";
+            RosterStatusText = _localizationService["Workspace_RosterNotFound"];
             RosterStatusColor = "#DC3545";
             Groups.Clear();
             SelectedGroup = null;
@@ -441,7 +450,7 @@ public partial class WorkspaceViewModel : ObservableObject
         {
             _sessionsRootService.SetupSessionsRoot(selectedPath, needsEvaluationAppFolder);
             
-            SelectFolderButtonText = "Modifier dossier";
+            SelectFolderButtonText = _localizationService["Workspace_ChangeFolder"];
             SessionsRootPath = _sessionsRootService.GetSessionsRootPath();
             IsSessionsRootConfigured = true;
 

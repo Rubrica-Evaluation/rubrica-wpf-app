@@ -14,6 +14,7 @@ public partial class RubricDesignerViewModel : ObservableObject
     private readonly INavigationService _navigationService;
     private readonly IRubricService _rubricService;
     private readonly IDialogService _dialogService;
+    private readonly ILocalizationService _localizationService;
 
     [ObservableProperty]
     private string _sessionName = string.Empty;
@@ -40,7 +41,7 @@ public partial class RubricDesignerViewModel : ObservableObject
 
     public bool HasUnsavedChanges => _isDirty;
 
-    public string NavigationPath => $"{SessionName} / {CourseName} / {WorkName} / Concepteur de grille";
+    public string NavigationPath => $"{SessionName} / {CourseName} / {WorkName} / {_localizationService["RubricDesigner_NavLabel"]}";
 
     public int CriteriaCount => Criteria.Count;
 
@@ -48,14 +49,29 @@ public partial class RubricDesignerViewModel : ObservableObject
 
     public int TotalWeight => Criteria.OfType<RubricCriterionEditorModel>().Sum(criterion => criterion.Weight);
 
+    public string CriteriaCountText => string.Format(_localizationService["RubricDesigner_CriteriaCountFmt"], CriteriaCount);
+
+    public string PenaltiesCountText => string.Format(_localizationService["RubricDesigner_PenaltiesCountFmt"], PenaltiesCount);
+
+    public string TotalWeightText => string.Format(_localizationService["RubricDesigner_TotalWeightFmt"], TotalWeight);
+
     public RubricDesignerViewModel(
         INavigationService navigationService,
         IRubricService rubricService,
-        IDialogService dialogService)
+        IDialogService dialogService,
+        ILocalizationService localizationService)
     {
         _navigationService = navigationService;
         _rubricService = rubricService;
         _dialogService = dialogService;
+        _localizationService = localizationService;
+        _localizationService.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged()
+    {
+        OnPropertyChanged(nameof(NavigationPath));
+        RefreshSummaryProperties();
     }
 
     public void Initialize(string sessionName, string courseName, string workName)
@@ -223,6 +239,9 @@ public partial class RubricDesignerViewModel : ObservableObject
         OnPropertyChanged(nameof(CriteriaCount));
         OnPropertyChanged(nameof(PenaltiesCount));
         OnPropertyChanged(nameof(TotalWeight));
+        OnPropertyChanged(nameof(CriteriaCountText));
+        OnPropertyChanged(nameof(PenaltiesCountText));
+        OnPropertyChanged(nameof(TotalWeightText));
     }
 
     private static RubricCriterionEditorModel CreateCriterionEditor(CriterionModel criterion)

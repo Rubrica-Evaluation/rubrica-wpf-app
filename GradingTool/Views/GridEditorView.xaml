@@ -71,7 +71,7 @@
                                        Foreground="#2E7D32"
                                        VerticalAlignment="Center"
                                        Margin="0,0,4,0"/>
-                            <TextBlock Text="Sauvegardé"
+                            <TextBlock Text="{DynamicResource GridEditor_Saved}"
                                        FontSize="11"
                                        Foreground="#2E7D32"
                                        VerticalAlignment="Center"/>
@@ -83,29 +83,29 @@
                 <StackPanel Grid.Column="1" 
                            Orientation="Horizontal" 
                            HorizontalAlignment="Right">
-                    <Button Content="Produire sommaire"
+                    <Button Content="{DynamicResource GridEditor_BtnExportSummary}"
                             Command="{Binding ExportSummaryCommand}"
                             Padding="16,8"
                             Margin="0,0,8,0"
                             Style="{StaticResource GhostButton}"
-                            ToolTip="Générer un fichier csv des résultats de tous les étudiants du groupe (pour importation Léa)"/>
-                    <Button Content="PDF étudiant"
+                            ToolTip="{DynamicResource GridEditor_Tooltip_ExportSummary}"/>
+                    <Button Content="{DynamicResource GridEditor_BtnExportSinglePdf}"
                             Command="{Binding ExportSinglePdfCommand}"
                             Padding="16,8"
                             Margin="0,0,8,0"
                             Style="{StaticResource GhostButton}"
-                            ToolTip="Exporter le PDF de l'étudiant ou équipe actuellement affiché"/>
-                    <Button Content="PDF groupe"
+                            ToolTip="{DynamicResource GridEditor_Tooltip_ExportSinglePdf}"/>
+                    <Button Content="{DynamicResource GridEditor_BtnExportPdf}"
                             Command="{Binding ExportPdfCommand}"
                             Padding="16,8"
                             Margin="0,0,8,0"
                             Style="{StaticResource DangerButton}"
-                            ToolTip="Exporter toutes les grilles du groupe en PDF (et travaux.zip)"/>
-                    <Button Content="Retour"
+                            ToolTip="{DynamicResource GridEditor_Tooltip_ExportPdf}"/>
+                    <Button Content="{DynamicResource Common_Back}"
                             Command="{Binding GoBackCommand}"
                             Padding="16,8"
                             Style="{StaticResource GhostButton}"
-                            ToolTip="Retourner à l'espace de travail"/>
+                            ToolTip="{DynamicResource GridEditor_Tooltip_Back}"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -125,7 +125,7 @@
                 <DockPanel>
                     <!-- Titre de la section -->
                     <TextBlock DockPanel.Dock="Top"
-                               Text="Grilles du groupe"
+                               Text="{DynamicResource GridEditor_GroupGrids}"
                                FontSize="13"
                                FontWeight="SemiBold"
                                TextWrapping="Wrap"
@@ -223,7 +223,7 @@
 
                             <!-- Colonne 1: Noms des étudiants -->
                             <StackPanel Grid.Column="0">
-                                <TextBlock Text="Étudiants" 
+                                <TextBlock Text="{DynamicResource GridEditor_Students}" 
                                            FontSize="12"
                                            FontWeight="SemiBold"
                                            Foreground="#5C5C5C"
@@ -237,7 +237,7 @@
 
                             <!-- Colonne 2: Total des pénalités -->
                             <StackPanel Grid.Column="1" Margin="0,0,10,0">
-                                <TextBlock Text="Pénalités appliquées" 
+                                <TextBlock Text="{DynamicResource GridEditor_PenaltiesApplied}" 
                                            FontSize="12"
                                            FontWeight="SemiBold"
                                            Foreground="#5C5C5C"
@@ -257,7 +257,7 @@
 
                             <!-- Colonne 3: Total des points -->
                             <StackPanel Grid.Column="2">
-                                <TextBlock Text="Total des points" 
+                                <TextBlock Text="{DynamicResource GridEditor_TotalPoints}" 
                                            FontSize="12"
                                            FontWeight="SemiBold"
                                            Foreground="#5C5C5C"
@@ -281,7 +281,7 @@
                     <ScrollViewer Padding="20">
                         <StackPanel>
                             <!-- Titre Critères -->
-                            <TextBlock Text="Critères"
+                            <TextBlock Text="{DynamicResource GridEditor_Criteria}"
                                        FontSize="16"
                                        FontWeight="SemiBold"
                                        Foreground="#333333"
@@ -413,7 +413,7 @@
                                                     
                                                     <!-- Label et Champ Rétroaction -->
                                                     <StackPanel Grid.Column="2">
-                                                        <TextBlock Text="Rétroaction"
+                                                        <TextBlock Text="{DynamicResource GridEditor_Feedback}"
                                                                    FontSize="12"
                                                                    Foreground="#666666"
                                                                    Margin="0,0,0,4"/>
@@ -518,30 +518,30 @@
                                                             <StackPanel Orientation="Horizontal">
                                                                 <Button Content="&#xE710;"
                                                                         Style="{StaticResource IconButton}"
-                                                                        ToolTip="Ajouter un commentaire"
+                                                                        ToolTip="{DynamicResource GridEditor_Tooltip_AddComment}"
                                                                         Margin="0,0,2,0"
                                                                         Command="{Binding DataContext.AddFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding}"/>
                                                                 <Button Content="&#xE70F;"
                                                                         Style="{StaticResource IconButton}"
-                                                                        ToolTip="Modifier le commentaire sélectionné"
+                                                                        ToolTip="{DynamicResource GridEditor_Tooltip_EditComment}"
                                                                         Margin="0,0,2,0"
                                                                         Command="{Binding DataContext.EditFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding}"/>
                                                                 <Button Content="&#xE74D;"
                                                                         Style="{StaticResource DangerIconButton}"
-                                                                        ToolTip="Supprimer le commentaire sélectionné"
+                                                                        ToolTip="{DynamicResource GridEditor_Tooltip_DeleteComment}"
                                                                         Command="{Binding DataContext.DeleteFeedbackCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                         CommandParameter="{Binding}"/>
                                                             </StackPanel>
                                                             
                                                             <!-- Bouton banque de commentaires -->
-                                                            <Button Content="Banque"
+                                                            <Button Content="{DynamicResource GridEditor_BtnBank}"
                                                                     Padding="12,0"
                                                                     Margin="8,0,0,0"
                                                                     FontSize="12"
                                                                     Style="{StaticResource GhostButton}"
-                                                                    ToolTip="Choisir un commentaire depuis la banque"
+                                                                    ToolTip="{DynamicResource GridEditor_Tooltip_Bank}"
                                                                     Command="{Binding DataContext.OpenCommentPickerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                     CommandParameter="{Binding}"/>
                                                         </StackPanel>
@@ -555,7 +555,7 @@
                             </ItemsControl>
 
                             <!-- Titre Pénalités -->
-                            <TextBlock Text="Pénalités"
+                            <TextBlock Text="{DynamicResource GridEditor_Penalties}"
                                        FontSize="16"
                                        FontWeight="SemiBold"
                                        Foreground="#333333"
@@ -592,7 +592,7 @@
                                                     
                                                     <!-- Champ Count -->
                                                     <StackPanel Grid.Column="0">
-                                                        <TextBlock Text="Nombre"
+                                                        <TextBlock Text="{DynamicResource GridEditor_Count}"
                                                                    FontSize="12"
                                                                    Foreground="#666666"
                                                                    Margin="0,0,0,4"/>
@@ -606,7 +606,7 @@
                                                     
                                                     <!-- Champ Reason -->
                                                     <StackPanel Grid.Column="2">
-                                                        <TextBlock Text="Raison"
+                                                        <TextBlock Text="{DynamicResource GridEditor_Reason}"
                                                                    FontSize="12"
                                                                    Foreground="#666666"
                                                                    Margin="0,0,0,4"/>

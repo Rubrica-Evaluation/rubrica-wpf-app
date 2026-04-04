@@ -10,4 +10,6 @@ public interface IConfigurationService
     void SaveSelectedCourse(string? courseName);
     string? LoadSelectedWork();
     void SaveSelectedWork(string? workName);
+    string? LoadLanguage();
+    void SaveLanguage(string language);
 }

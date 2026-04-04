@@ -23,7 +23,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Espace de travail"
+                <TextBlock Text="{DynamicResource Workspace_Title}"
                            FontSize="20"
                            FontWeight="SemiBold"
                            Foreground="#333333"
@@ -33,7 +33,7 @@
                         FontSize="24"
                         Command="{Binding NavigateToConfigurationCommand}"
                         Style="{StaticResource IconButton}"
-                        ToolTip="Paramètres"/>
+                        ToolTip="{DynamicResource Workspace_Tooltip_Settings}"/>
             </Grid>
         </Border>
 
@@ -77,7 +77,7 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0"
-                               Text="Sessions"
+                               Text="{DynamicResource Workspace_Sessions}"
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="#333333"
@@ -88,20 +88,20 @@
                             Command="{Binding CreateNewSessionCommand}"
                             Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            ToolTip="Créer une nouvelle session"/>
+                            ToolTip="{DynamicResource Workspace_Tooltip_CreateSession}"/>
 
                     <Button Grid.Column="2"
                             Content="&#xE70F;"
                             Command="{Binding EditSessionCommand}"
                             Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            ToolTip="Renommer la session sélectionnée"/>
+                            ToolTip="{DynamicResource Workspace_Tooltip_RenameSession}"/>
 
                     <Button Grid.Column="3"
                             Content="&#xE74D;"
                             Command="{Binding DeleteSessionCommand}"
                             Style="{StaticResource DangerIconButton}"
-                            ToolTip="Supprimer la session sélectionnée"/>
+                            ToolTip="{DynamicResource Workspace_Tooltip_DeleteSession}"/>
                 </Grid>
 
                 <ComboBox Grid.Row="5"
@@ -123,7 +123,7 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0"
-                               Text="Cours"
+                               Text="{DynamicResource Workspace_Courses}"
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="#333333"
@@ -134,20 +134,20 @@
                             Command="{Binding CreateNewCourseCommand}"
                             Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            ToolTip="Créer un nouveau cours"/>
+                            ToolTip="{DynamicResource Workspace_Tooltip_CreateCourse}"/>
 
                     <Button Grid.Column="2"
                             Content="&#xE70F;"
                             Command="{Binding EditCourseCommand}"
                             Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            ToolTip="Renommer le cours sélectionné"/>
+                            ToolTip="{DynamicResource Workspace_Tooltip_RenameCourse}"/>
 
                     <Button Grid.Column="3"
                             Content="&#xE74D;"
                             Command="{Binding DeleteCourseCommand}"
                             Style="{StaticResource DangerIconButton}"
-                            ToolTip="Supprimer le cours sélectionné"/>
+                            ToolTip="{DynamicResource Workspace_Tooltip_DeleteCourse}"/>
                 </Grid>
 
                 <ListBox Grid.Row="7"
@@ -177,7 +177,7 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Column="0"
-                               Text="Évaluations"
+                               Text="{DynamicResource Workspace_Evaluations}"
                                FontSize="14"
                                FontWeight="SemiBold"
                                Foreground="#333333"
@@ -188,20 +188,20 @@
                             Command="{Binding CreateNewWorkCommand}"
                             Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            ToolTip="Créer une nouvelle évaluation"/>
+                            ToolTip="{DynamicResource Workspace_Tooltip_CreateWork}"/>
 
                     <Button Grid.Column="2"
                             Content="&#xE70F;"
                             Command="{Binding EditWorkCommand}"
                             Style="{StaticResource IconButton}"
                             Margin="0,0,4,0"
-                            ToolTip="Renommer l'évaluation sélectionnée"/>
+                            ToolTip="{DynamicResource Workspace_Tooltip_RenameWork}"/>
 
                     <Button Grid.Column="3"
                             Content="&#xE74D;"
                             Command="{Binding DeleteWorkCommand}"
                             Style="{StaticResource DangerIconButton}"
-                            ToolTip="Supprimer l'évaluation sélectionnée"/>
+                            ToolTip="{DynamicResource Workspace_Tooltip_DeleteWork}"/>
                 </Grid>
 
                 <ListBox Grid.Row="10"
@@ -236,14 +236,14 @@
                     </Style>
                 </StackPanel.Style>
 
-                <TextBlock Text="Espace de travail"
+                <TextBlock Text="{DynamicResource Workspace_Title}"
                            FontSize="32"
                            FontWeight="Bold"
                            Foreground="#333333"
                            HorizontalAlignment="Center"
                            Margin="0,0,0,20"/>
 
-                <TextBlock Text="Sélectionnez une évaluation pour voir les détails."
+                <TextBlock Text="{DynamicResource Workspace_SelectWorkPrompt}"
                            FontSize="16"
                            Foreground="#666666"
                            TextWrapping="Wrap"
@@ -265,7 +265,7 @@
                 </ScrollViewer.Style>
 
                 <StackPanel>
-                    <TextBlock Text="Détails de l'évaluation"
+                    <TextBlock Text="{DynamicResource Workspace_WorkDetails}"
                                FontSize="24"
                                FontWeight="Bold"
                                Foreground="#333333"
@@ -274,12 +274,12 @@
                     <TextBlock FontSize="16"
                                Foreground="#666666"
                                Margin="0,0,0,20">
-                        <Run Text="Évaluation:"/>
+                        <Run Text="{DynamicResource Workspace_EvaluationLabel}"/>
                         <Run Text="{Binding SelectedWork, FallbackValue='N/A'}" FontWeight="SemiBold" Foreground="#333333"/>
                     </TextBlock>
 
                     <!-- Section Rubrique -->
-                    <TextBlock Text="Rubrique (rubric.json)"
+                    <TextBlock Text="{DynamicResource Workspace_RubricSection}"
                                FontSize="18"
                                FontWeight="SemiBold"
                                Foreground="#333333"
@@ -296,7 +296,7 @@
                             <TextBlock FontSize="14"
                                        FontWeight="SemiBold"
                                        Margin="0,0,0,12"
-                                       ToolTip="Indique si une rubrique est déjà disponible pour cette évaluation.">
+                                       ToolTip="{DynamicResource Workspace_Tooltip_RubricStatus}">
                                 <Run Text="{Binding RubricStatusText}"/>
                                 <Run.Foreground>
                                     <SolidColorBrush Color="{Binding RubricStatusColor}"/>
@@ -305,19 +305,19 @@
 
                             <!-- Boutons -->
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="Concepteur de grille"
+                                <Button Content="{DynamicResource Workspace_BtnRubricDesigner}"
                                         Command="{Binding OpenRubricDesignerCommand}"
                                         Style="{StaticResource RoundedButton}"
                                         FontSize="13"
                                         Padding="16,8"
                                         Margin="0,0,0,0"
-                                        ToolTip="Créer ou modifier la rubrique du travail, incluant les critères, niveaux qualitatifs et pénalités."/>
+                                        ToolTip="{DynamicResource Workspace_Tooltip_RubricDesigner}"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
                     <!-- Section Étudiants -->
-                    <TextBlock Text="Étudiants"
+                    <TextBlock Text="{DynamicResource Workspace_StudentsSection}"
                                FontSize="18"
                                FontWeight="SemiBold"
                                Foreground="#333333"
@@ -334,7 +334,7 @@
                             <TextBlock FontSize="14"
                                        FontWeight="SemiBold"
                                        Margin="0,0,0,12"
-                                       ToolTip="Indique si une liste d'étudiants ou d'équipes a été chargée pour cette évaluation.">
+                                       ToolTip="{DynamicResource Workspace_Tooltip_RosterStatus}">
                                 <Run Text="{Binding RosterStatusText}"/>
                                 <Run.Foreground>
                                     <SolidColorBrush Color="{Binding RosterStatusColor}"/>
@@ -374,7 +374,7 @@
                                                     Command="{Binding DataContext.DeleteRosterFileCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                                     CommandParameter="{Binding}"
                                                     Style="{StaticResource DangerIconButton}"
-                                                    ToolTip="Supprimer cette liste d'étudiants"/>
+                                                    ToolTip="{DynamicResource Workspace_Tooltip_DeleteRoster}"/>
                                         </Grid>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
@@ -389,68 +389,68 @@
                                     Margin="0,0,0,12"
                                     Visibility="{Binding HasTeams, Converter={StaticResource BoolToVisibilityConverter}}">
                                 <StackPanel>
-                                    <TextBlock Text="Mode de génération des grilles"
+                                    <TextBlock Text="{DynamicResource Workspace_GenerationMode}"
                                                FontWeight="SemiBold"
                                                FontSize="13"
                                                Margin="0,0,0,8"/>
 
-                                    <RadioButton Content="Une grille par étudiant"
+                                    <RadioButton Content="{DynamicResource Workspace_GenerationModeIndividual}"
                                                  IsChecked="{Binding GenerationMode, Converter={StaticResource GenerationModeConverter}, ConverterParameter=individual}"
                                                  GroupName="GenerationMode"
                                                  FontSize="13"
                                                  Margin="0,0,0,4"
-                                                 ToolTip="Créer une grille distincte pour chaque étudiant du roster."/>
+                                                 ToolTip="{DynamicResource Workspace_Tooltip_ModeIndividual}"/>
 
-                                    <RadioButton Content="Une grille par équipe"
+                                    <RadioButton Content="{DynamicResource Workspace_GenerationModeTeam}"
                                                  IsChecked="{Binding GenerationMode, Converter={StaticResource GenerationModeConverter}, ConverterParameter=team}"
                                                  GroupName="GenerationMode"
                                                  FontSize="13"
-                                                 ToolTip="Créer une seule grille pour chaque équipe détectée."/>
+                                                 ToolTip="{DynamicResource Workspace_Tooltip_ModeTeam}"/>
                                 </StackPanel>
                             </Border>
 
                             <!-- Boutons -->
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="Charger des groupes"
+                                <Button Content="{DynamicResource Workspace_BtnLoadGroups}"
                                         Command="{Binding LoadRosterCommand}"
                                         Style="{StaticResource RoundedButton}"
                                         FontSize="13"
                                         Padding="16,8"
                                         Margin="0,0,10,0"
-                                        ToolTip="Importer une liste d'étudiants ou d'équipes pour cette évaluation."/>
+                                        ToolTip="{DynamicResource Workspace_Tooltip_LoadGroups}"/>
 
-                                <Button Content="Télécharger modèle CSV"
+                                <Button Content="{DynamicResource Workspace_BtnDownloadTemplate}"
                                         Command="{Binding DownloadRosterTemplateCommand}"
                                         Style="{StaticResource GhostButton}"
                                         FontSize="13"
                                         Padding="16,8"
                                         Margin="0,0,10,0"
-                                        ToolTip="Télécharger un modèle CSV pour préparer la liste des étudiants ou des équipes."/>
+                                        ToolTip="{DynamicResource Workspace_Tooltip_DownloadTemplate}"/>
 
-                                <Button Content="Générer tout le groupe"
+                                <Button Content="{DynamicResource Workspace_BtnGenerateGrids}"
                                         Command="{Binding GenerateGroupGridsCommand}"
                                         Style="{StaticResource RoundedButton}"
                                         FontSize="13"
                                         Padding="16,8"
                                         Margin="0,0,10,0"
                                         IsEnabled="{Binding CanGenerateGroupGrids}"
-                                        ToolTip="Générer toutes les grilles d'évaluation pour le groupe ou les équipes."/>
+                                        ToolTip="{DynamicResource Workspace_Tooltip_GenerateGrids}"/>
 
-                                <Button Content="Ouvrir dossier des grilles"
+                                <Button Content="{DynamicResource Workspace_BtnOpenGradingFolder}"
                                         Command="{Binding OpenGradingFolderCommand}"
                                         Style="{StaticResource GhostButton}"
                                         FontSize="13"
                                         Padding="16,8"
                                         Margin="0,0,10,0"
                                         IsEnabled="{Binding SelectedGroup, Converter={StaticResource NullToBoolConverter}}"
-                                        ToolTip="Ouvrir le dossier contenant les fichiers de correction du groupe sélectionné."/>
+                                        ToolTip="{DynamicResource Workspace_Tooltip_OpenGradingFolder}"/>
 
-                                <Button Content="Ouvrir l'éditeur"
+                                <Button Content="{DynamicResource Workspace_BtnOpenEditor}"
                                         Command="{Binding NavigateToGridEditorCommand}"
                                         Style="{StaticResource RoundedButton}"
                                         FontSize="13"
                                         Padding="16,8"
-                                        ToolTip="Ouvrir l'éditeur de grille pour corriger ou consulter l'évaluation."/>
+                                        ToolTip="{DynamicResource Workspace_Tooltip_OpenEditor}"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>

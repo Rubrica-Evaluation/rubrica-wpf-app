@@ -1,6 +1,4 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Text;
+﻿using System.Text;
 using System.Windows;
 using GradingTool.Helpers;
 using GradingTool.Services;
@@ -26,6 +24,9 @@ public partial class App : Application
         var services = new ServiceCollection();
         ConfigureServices(services);
         _serviceProvider = services.BuildServiceProvider();
+
+        // Initialiser la langue avant d'afficher la fenêtre
+        _serviceProvider.GetRequiredService<ILocalizationService>();
 
         var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.Show();
@@ -58,6 +59,7 @@ public partial class App : Application
         // Services
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<IConfigurationService, ConfigurationService>();
+        services.AddSingleton<ILocalizationService, LocalizationService>();
         services.AddSingleton<ISessionsRootService, SessionsRootService>();
         services.AddSingleton<ISessionService, SessionService>();
         services.AddSingleton<ICourseService, CourseService>();

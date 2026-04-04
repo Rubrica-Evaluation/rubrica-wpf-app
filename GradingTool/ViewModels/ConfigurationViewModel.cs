@@ -10,6 +10,7 @@ public partial class ConfigurationViewModel : ObservableObject
     private readonly IDialogService _dialogService;
     private readonly ISessionsRootService _sessionsRootService;
     private readonly INavigationService _navigationService;
+    private readonly ILocalizationService _localizationService;
 
     [ObservableProperty]
     private string? _sessionsRootPath;
@@ -18,18 +19,36 @@ public partial class ConfigurationViewModel : ObservableObject
     private bool _isSessionsRootConfigured;
 
     [ObservableProperty]
-    private string _selectFolderButtonText = "Sélectionner dossier";
+    private string _selectFolderButtonText = string.Empty;
+
+    [ObservableProperty]
+    private string _selectedLanguage = "fr";
 
     public ConfigurationViewModel(
         IDialogService dialogService,
         ISessionsRootService sessionsRootService,
-        INavigationService navigationService)
+        INavigationService navigationService,
+        ILocalizationService localizationService)
     {
         _dialogService = dialogService;
         _sessionsRootService = sessionsRootService;
         _navigationService = navigationService;
+        _localizationService = localizationService;
+
+        _selectedLanguage = _localizationService.CurrentLanguage;
+        _localizationService.LanguageChanged += OnLanguageChanged;
 
         LoadSessionsRootPath();
+    }
+
+    partial void OnSelectedLanguageChanged(string value)
+    {
+        _localizationService.SetLanguage(value);
+    }
+
+    private void OnLanguageChanged()
+    {
+        RefreshButtonText();
     }
 
     private void LoadSessionsRootPath()
@@ -38,14 +57,21 @@ public partial class ConfigurationViewModel : ObservableObject
         {
             SessionsRootPath = _sessionsRootService.GetSessionsRootPath();
             IsSessionsRootConfigured = true;
-            SelectFolderButtonText = "Modifier dossier";
         }
         else
         {
             SessionsRootPath = null;
             IsSessionsRootConfigured = false;
-            SelectFolderButtonText = "Sélectionner dossier";
         }
+
+        RefreshButtonText();
+    }
+
+    private void RefreshButtonText()
+    {
+        SelectFolderButtonText = IsSessionsRootConfigured
+            ? _localizationService["Config_ChangeFolder"]
+            : _localizationService["Config_SelectFolder"];
     }
 
     [RelayCommand]
@@ -73,7 +99,7 @@ public partial class ConfigurationViewModel : ObservableObject
 
             SessionsRootPath = _sessionsRootService.GetSessionsRootPath();
             IsSessionsRootConfigured = true;
-            SelectFolderButtonText = "Modifier dossier";
+            RefreshButtonText();
 
             WarnIfOneDriveInactive(SessionsRootPath);
 
@@ -91,7 +117,6 @@ public partial class ConfigurationViewModel : ObservableObject
     [RelayCommand]
     private void GoBack()
     {
-        // Recharger si le dossier racine a changé
         LoadSessionsRootPath();
         _navigationService.NavigateBack();
     }

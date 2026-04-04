@@ -1,0 +1,144 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Common -->
+    <system:String x:Key="Common_AppTitle">Grading Tool</system:String>
+    <system:String x:Key="Common_Back">Back</system:String>
+    <system:String x:Key="Common_Save">Save</system:String>
+    <system:String x:Key="Common_Delete">Delete</system:String>
+    <system:String x:Key="Common_Error">Error</system:String>
+    <system:String x:Key="Common_Settings">Settings</system:String>
+
+    <!-- Workspace -->
+    <system:String x:Key="Workspace_Title">Workspace</system:String>
+    <system:String x:Key="Workspace_SelectWorkPrompt">Select an assignment to see details.</system:String>
+    <system:String x:Key="Workspace_WorkDetails">Assignment Details</system:String>
+    <system:String x:Key="Workspace_EvaluationLabel">Assignment:</system:String>
+    <system:String x:Key="Workspace_Sessions">Semesters</system:String>
+    <system:String x:Key="Workspace_Courses">Courses</system:String>
+    <system:String x:Key="Workspace_Evaluations">Assignments</system:String>
+    <system:String x:Key="Workspace_RubricSection">Rubric (rubric.json)</system:String>
+    <system:String x:Key="Workspace_StudentsSection">Students</system:String>
+    <system:String x:Key="Workspace_GenerationMode">Grid Generation Mode</system:String>
+    <system:String x:Key="Workspace_GenerationModeIndividual">One grid per student</system:String>
+    <system:String x:Key="Workspace_GenerationModeTeam">One grid per team</system:String>
+    <system:String x:Key="Workspace_BtnRubricDesigner">Rubric Designer</system:String>
+    <system:String x:Key="Workspace_BtnLoadGroups">Load Groups</system:String>
+    <system:String x:Key="Workspace_BtnDownloadTemplate">Download CSV Template</system:String>
+    <system:String x:Key="Workspace_BtnGenerateGrids">Generate All Grids</system:String>
+    <system:String x:Key="Workspace_BtnOpenGradingFolder">Open Grading Folder</system:String>
+    <system:String x:Key="Workspace_BtnOpenEditor">Open Editor</system:String>
+    <system:String x:Key="Workspace_SelectFolder">Select Root Folder</system:String>
+    <system:String x:Key="Workspace_ChangeFolder">Change Root Folder</system:String>
+    <system:String x:Key="Workspace_RubricNotFound">No rubric found</system:String>
+    <system:String x:Key="Workspace_RubricValid">✓ Valid rubric found</system:String>
+    <system:String x:Key="Workspace_RubricInvalid">✗ Invalid rubric: {0}</system:String>
+    <system:String x:Key="Workspace_RosterNotFound">No student list found</system:String>
+    <system:String x:Key="Workspace_RosterValid">✓ Valid student list found</system:String>
+    <system:String x:Key="Workspace_RosterNoGroups">✓ Student list found (no group detected)</system:String>
+    <system:String x:Key="Workspace_RosterInvalid">✗ Invalid student list: {0}</system:String>
+    <system:String x:Key="Workspace_RosterEmpty">No roster found</system:String>
+
+    <!-- Tooltips Workspace -->
+    <system:String x:Key="Workspace_Tooltip_Settings">Access application settings</system:String>
+    <system:String x:Key="Workspace_Tooltip_CreateSession">Create a new semester</system:String>
+    <system:String x:Key="Workspace_Tooltip_RenameSession">Rename the selected semester</system:String>
+    <system:String x:Key="Workspace_Tooltip_DeleteSession">Delete the selected semester</system:String>
+    <system:String x:Key="Workspace_Tooltip_CreateCourse">Create a new course</system:String>
+    <system:String x:Key="Workspace_Tooltip_RenameCourse">Rename the selected course</system:String>
+    <system:String x:Key="Workspace_Tooltip_DeleteCourse">Delete the selected course</system:String>
+    <system:String x:Key="Workspace_Tooltip_CreateWork">Create a new assignment</system:String>
+    <system:String x:Key="Workspace_Tooltip_RenameWork">Rename the selected assignment</system:String>
+    <system:String x:Key="Workspace_Tooltip_DeleteWork">Delete the selected assignment</system:String>
+    <system:String x:Key="Workspace_Tooltip_RubricStatus">Indicates whether a rubric is already available for this assignment.</system:String>
+    <system:String x:Key="Workspace_Tooltip_RubricDesigner">Create or edit the assignment rubric, including criteria, qualitative levels, and penalties.</system:String>
+    <system:String x:Key="Workspace_Tooltip_RosterStatus">Indicates whether a student or team list has been loaded for this assignment.</system:String>
+    <system:String x:Key="Workspace_Tooltip_DeleteRoster">Delete this student list</system:String>
+    <system:String x:Key="Workspace_Tooltip_ModeIndividual">Create a separate grid for each student in the roster.</system:String>
+    <system:String x:Key="Workspace_Tooltip_ModeTeam">Create a single grid for each detected team.</system:String>
+    <system:String x:Key="Workspace_Tooltip_LoadGroups">Import a student or team list for this assignment.</system:String>
+    <system:String x:Key="Workspace_Tooltip_DownloadTemplate">Download a CSV template to prepare the student or team list.</system:String>
+    <system:String x:Key="Workspace_Tooltip_GenerateGrids">Generate all grading grids for the group or teams.</system:String>
+    <system:String x:Key="Workspace_Tooltip_OpenGradingFolder">Open the folder containing the grading files for the selected group.</system:String>
+    <system:String x:Key="Workspace_Tooltip_OpenEditor">Open the grid editor to grade or review the assignment.</system:String>
+
+    <!-- GridEditor -->
+    <system:String x:Key="GridEditor_Saved">Saved</system:String>
+    <system:String x:Key="GridEditor_GroupGrids">Group Grids</system:String>
+    <system:String x:Key="GridEditor_Students">Students</system:String>
+    <system:String x:Key="GridEditor_PenaltiesApplied">Applied Penalties</system:String>
+    <system:String x:Key="GridEditor_TotalPoints">Total Points</system:String>
+    <system:String x:Key="GridEditor_Criteria">Criteria</system:String>
+    <system:String x:Key="GridEditor_Penalties">Penalties</system:String>
+    <system:String x:Key="GridEditor_Feedback">Feedback</system:String>
+    <system:String x:Key="GridEditor_Count">Count</system:String>
+    <system:String x:Key="GridEditor_Reason">Reason</system:String>
+    <system:String x:Key="GridEditor_BtnExportSummary">Export Summary</system:String>
+    <system:String x:Key="GridEditor_BtnExportSinglePdf">Student PDF</system:String>
+    <system:String x:Key="GridEditor_BtnExportPdf">Group PDF</system:String>
+    <system:String x:Key="GridEditor_BtnBank">Bank</system:String>
+
+    <!-- Tooltips GridEditor -->
+    <system:String x:Key="GridEditor_Tooltip_Back">Return to workspace</system:String>
+    <system:String x:Key="GridEditor_Tooltip_ExportSummary">Generate a CSV file with all student results for the group (for Léa import)</system:String>
+    <system:String x:Key="GridEditor_Tooltip_ExportSinglePdf">Export the PDF for the currently displayed student or team</system:String>
+    <system:String x:Key="GridEditor_Tooltip_ExportPdf">Export all group grids as PDF (and assignments.zip)</system:String>
+    <system:String x:Key="GridEditor_Tooltip_AddComment">Add a comment</system:String>
+    <system:String x:Key="GridEditor_Tooltip_EditComment">Edit the selected comment</system:String>
+    <system:String x:Key="GridEditor_Tooltip_DeleteComment">Delete the selected comment</system:String>
+    <system:String x:Key="GridEditor_Tooltip_Bank">Pick a comment from the bank</system:String>
+
+    <!-- RubricDesigner -->
+    <system:String x:Key="RubricDesigner_NavLabel">Rubric Designer</system:String>
+    <system:String x:Key="RubricDesigner_Subtitle">Design the assignment rubric: criteria, qualitative levels, and penalties.</system:String>
+    <system:String x:Key="RubricDesigner_BtnLoadRubric">Load Rubric</system:String>
+    <system:String x:Key="RubricDesigner_BtnNewRubric">New Rubric</system:String>
+    <system:String x:Key="RubricDesigner_Settings">Settings</system:String>
+    <system:String x:Key="RubricDesigner_WorkName">Assignment Name</system:String>
+    <system:String x:Key="RubricDesigner_Summary">Summary</system:String>
+    <system:String x:Key="RubricDesigner_CriteriaCountFmt">Criteria: {0}</system:String>
+    <system:String x:Key="RubricDesigner_PenaltiesCountFmt">Penalties: {0}</system:String>
+    <system:String x:Key="RubricDesigner_TotalWeightFmt">Total weight: {0} %</system:String>
+    <system:String x:Key="RubricDesigner_InfoNote">The saved rubric will replace rubric.json for this assignment.</system:String>
+    <system:String x:Key="RubricDesigner_Tips">Tips</system:String>
+    <system:String x:Key="RubricDesigner_Tip1">1. Add one criterion per evaluated dimension.</system:String>
+    <system:String x:Key="RubricDesigner_Tip2">2. Define qualitative levels with their percentage.</system:String>
+    <system:String x:Key="RubricDesigner_Tip3">3. Describe the penalties applied to the assignment.</system:String>
+    <system:String x:Key="RubricDesigner_CriteriaSection">Criteria and Qualitative Levels</system:String>
+    <system:String x:Key="RubricDesigner_BtnAddCriterion">Add Criterion</system:String>
+    <system:String x:Key="RubricDesigner_CriterionLabel">Criterion Label</system:String>
+    <system:String x:Key="RubricDesigner_CriterionWeight">Weight (%)</system:String>
+    <system:String x:Key="RubricDesigner_ScaleItems">Qualitative Levels</system:String>
+    <system:String x:Key="RubricDesigner_BtnAddScaleItem">Add Level</system:String>
+    <system:String x:Key="RubricDesigner_ScaleQualitative">Level</system:String>
+    <system:String x:Key="RubricDesigner_ScaleDescription">Description</system:String>
+    <system:String x:Key="RubricDesigner_ScalePoints">Points (%)</system:String>
+    <system:String x:Key="RubricDesigner_PenaltiesSection">Assignment Penalties</system:String>
+    <system:String x:Key="RubricDesigner_BtnAddPenalty">Add Penalty</system:String>
+    <system:String x:Key="RubricDesigner_PenaltyLabel">Label</system:String>
+    <system:String x:Key="RubricDesigner_PenaltyFactor">Factor</system:String>
+    <system:String x:Key="RubricDesigner_PenaltyMin">Minimum</system:String>
+
+    <!-- Tooltips RubricDesigner -->
+    <system:String x:Key="RubricDesigner_Tooltip_Back">Return to home page</system:String>
+    <system:String x:Key="RubricDesigner_Tooltip_LoadRubric">Import an existing rubric.json file into the designer to view or edit it</system:String>
+    <system:String x:Key="RubricDesigner_Tooltip_NewRubric">Reset the designer with an empty rubric</system:String>
+    <system:String x:Key="RubricDesigner_Tooltip_Save">Validate and save the rubric to a rubric.json file for this assignment</system:String>
+    <system:String x:Key="RubricDesigner_Tooltip_AddCriterion">Add a new criterion with a label, weight, and qualitative levels.</system:String>
+    <system:String x:Key="RubricDesigner_Tooltip_DeleteCriterion">Delete this criterion along with its qualitative levels.</system:String>
+    <system:String x:Key="RubricDesigner_Tooltip_AddScaleItem">Add an additional qualitative level to this criterion.</system:String>
+    <system:String x:Key="RubricDesigner_Tooltip_DeleteScale">Delete this level</system:String>
+    <system:String x:Key="RubricDesigner_Tooltip_AddPenalty">Add a new penalty with its name, factor, and minimum.</system:String>
+    <system:String x:Key="RubricDesigner_Tooltip_DeletePenalty">Delete this penalty from the rubric.</system:String>
+
+    <!-- Configuration -->
+    <system:String x:Key="Config_Title">Configuration</system:String>
+    <system:String x:Key="Config_RootFolder">Root Folder</system:String>
+    <system:String x:Key="Config_RootFolderDescription">Set the root path for semesters here</system:String>
+    <system:String x:Key="Config_Language">Language</system:String>
+    <system:String x:Key="Config_LanguageDescription">Choose the interface language</system:String>
+    <system:String x:Key="Config_SelectFolder">Select Folder</system:String>
+    <system:String x:Key="Config_ChangeFolder">Change Folder</system:String>
+
+</ResourceDictionary>

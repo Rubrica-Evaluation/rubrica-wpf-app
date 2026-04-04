@@ -109,11 +109,29 @@ public class ConfigurationService : IConfigurationService
         File.WriteAllText(ConfigFilePath, JsonSerializer.Serialize(config, _jsonOptions), Encoding.UTF8);
     }
 
+    public string? LoadLanguage()
+    {
+        try { return LoadConfig()?.Language; }
+        catch { return null; }
+    }
+
+    public void SaveLanguage(string language)
+    {
+        try
+        {
+            var config = LoadConfig() ?? new AppConfig();
+            config.Language = language;
+            SaveConfig(config);
+        }
+        catch { }
+    }
+
     private class AppConfig
     {
         public string? SessionsRootPath { get; set; }
         public string? SelectedSession { get; set; }
         public string? SelectedCourse { get; set; }
         public string? SelectedWork { get; set; }
+        public string? Language { get; set; }
     }
 }
