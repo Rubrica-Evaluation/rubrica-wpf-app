@@ -837,6 +837,8 @@ public partial class WorkspaceViewModel : ObservableObject
         }
 
         var rootPath = _sessionsRootService.GetSessionsRootPath();
+        if (string.IsNullOrEmpty(rootPath))
+            return;
         var gradingPath = Path.Combine(rootPath, SelectedSession, SelectedCourse, SelectedWork, "grading", SelectedGroup.GroupCode);
 
         _navigationService.NavigateTo<GridEditorViewModel>();

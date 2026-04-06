@@ -31,7 +31,7 @@ public class PdfService : IPdfService
         GlobalFontSettings.UseWindowsFontsUnderWindows = true;
     }
 
-    public async Task<bool> ExportPdfAsync(GridModel grid, string outputPath)
+    public Task<bool> ExportPdfAsync(GridModel grid, string outputPath)
     {
         try
         {
@@ -44,11 +44,11 @@ public class PdfService : IPdfService
             DrawPenaltyReasonsSection(ctx, grid);
 
             document.Save(outputPath);
-            return true;
+            return Task.FromResult(true);
         }
         catch
         {
-            return false;
+            return Task.FromResult(false);
         }
     }
 
@@ -179,9 +179,14 @@ public class PdfService : IPdfService
             ? $"{scale.Qualitative} — {scale.Label}"
             : criterion.Result ?? "—";
 
-        ctx.Gfx.DrawString($"{criterion.Label} — Résultat : {resultText}", ctx.Fonts.BoldRegular, XBrushes.Black,
-            new XRect(LeftMargin, ctx.Y, ctx.ContentWidth, 20), XStringFormats.TopLeft);
-        ctx.Y += 22;
+        var headerLines = WrapText(ctx.Gfx, $"{criterion.Label} \u2014 R\u00e9sultat\u00a0: {resultText}", ctx.Fonts.BoldRegular, ctx.ContentWidth);
+        foreach (var line in headerLines)
+        {
+            ctx.Gfx.DrawString(line, ctx.Fonts.BoldRegular, XBrushes.Black,
+                new XRect(LeftMargin, ctx.Y, ctx.ContentWidth, 20), XStringFormats.TopLeft);
+            ctx.Y += 20;
+        }
+        ctx.Y += 2;
 
         DrawFeedbackItems(ctx, criterion.Feedback!);
 
@@ -224,9 +229,14 @@ public class PdfService : IPdfService
 
     private void DrawPenaltyReason(RenderContext ctx, PenaltyItemModel penalty)
     {
-        ctx.Gfx.DrawString($"{penalty.Label} — Nombre : {penalty.Count} fois -{-penalty.ComputedPenalty:F1} pts", ctx.Fonts.BoldRegular, XBrushes.Black,
-            new XRect(LeftMargin, ctx.Y, ctx.ContentWidth, 20), XStringFormats.TopLeft);
-        ctx.Y += 22;
+        var headerLines = WrapText(ctx.Gfx, $"{penalty.Label} \u2014 Nombre\u00a0: {penalty.Count} fois -{-penalty.ComputedPenalty:F1}\u00a0pts", ctx.Fonts.BoldRegular, ctx.ContentWidth);
+        foreach (var line in headerLines)
+        {
+            ctx.Gfx.DrawString(line, ctx.Fonts.BoldRegular, XBrushes.Black,
+                new XRect(LeftMargin, ctx.Y, ctx.ContentWidth, 20), XStringFormats.TopLeft);
+            ctx.Y += 20;
+        }
+        ctx.Y += 2;
 
         var lines = WrapText(ctx.Gfx, penalty.Reason, ctx.Fonts.Table, ctx.ContentWidth - 15);
         ctx.Gfx.DrawString("•", ctx.Fonts.Table, XBrushes.Black,
@@ -380,13 +390,13 @@ public class PdfService : IPdfService
             Fonts = fonts;
             Page = document.AddPage();
             Gfx = XGraphics.FromPdfPage(Page);
-            ContentWidth = Page.Width - PdfService.LeftMargin - PdfService.RightMargin;
+            ContentWidth = Page.Width.Point - PdfService.LeftMargin - PdfService.RightMargin;
             Y = PdfService.LeftMargin;
         }
 
         public void EnsureSpace(double requiredHeight)
         {
-            if (Y > Page.Height - requiredHeight)
+            if (Y > Page.Height.Point - requiredHeight)
                 AddPage();
         }
 
