@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
 using GradingTool.Controls;
+using GradingTool.Views;
 
 namespace GradingTool.Services;
 
@@ -54,45 +55,49 @@ public class DialogService : IDialogService
 
     public void ShowMessage(string message, string title, MessageBoxImage icon = MessageBoxImage.Information)
     {
-        MessageBox.Show(message, title, MessageBoxButton.OK, icon);
+        var dialogIcon = icon switch
+        {
+            MessageBoxImage.Warning  => CustomDialogIcon.Warning,
+            MessageBoxImage.Error    => CustomDialogIcon.Error,
+            MessageBoxImage.Question => CustomDialogIcon.Question,
+            _                        => CustomDialogIcon.Info
+        };
+        new CustomDialog(title, message, dialogIcon, ("OK", true)).ShowDialog();
     }
 
     public bool ShowConfirmation(string message, string title)
     {
-        return MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+        var dialog = new CustomDialog(title, message, CustomDialogIcon.Question,
+            ("Non", false), ("Oui", true));
+        dialog.ShowDialog();
+        return dialog.ClickedButtonIndex == 1;
     }
 
     public OverwriteChoice ShowOverwriteConfirmation(int existingCount, int totalCount)
     {
-        string message = $"{existingCount} fichier(s) sur {totalCount} existe(nt) déjà.\n\n" +
-                        "Voulez-vous :\n" +
-                        "• [Oui] Écraser les fichiers existants\n" +
-                        "• [Non] Ignorer et conserver les existants\n" +
-                        "• [Annuler] Annuler l'opération";
-
-        var result = MessageBox.Show(message, "Fichiers existants", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-        
-        return result switch
+        string message = $"{existingCount} fichier(s) sur {totalCount} existe(nt) déjà.\n\n"
+                       + "Voulez-vous écraser les fichiers existants, les ignorer ou annuler l'opération ?";
+        var dialog = new CustomDialog("Fichiers existants", message, CustomDialogIcon.Question,
+            ("Annuler", false), ("Ignorer", false), ("Écraser", true));
+        dialog.ShowDialog();
+        return dialog.ClickedButtonIndex switch
         {
-            MessageBoxResult.Yes => OverwriteChoice.Overwrite,
-            MessageBoxResult.No => OverwriteChoice.Skip,
+            2 => OverwriteChoice.Overwrite,
+            1 => OverwriteChoice.Skip,
             _ => OverwriteChoice.Cancel
         };
     }
 
     public UnsavedChangesChoice ShowUnsavedChangesConfirmation(string context)
     {
-        string message = $"Des modifications non enregistrées sont en cours dans {context}.\n\n"
-                       + "• [Oui] Enregistrer avant de quitter\n"
-                       + "• [Non] Quitter sans enregistrer\n"
-                       + "• [Annuler] Rester dans le concepteur";
-
-        var result = MessageBox.Show(message, "Modifications non enregistrées", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
-
-        return result switch
+        string message = $"Des modifications non enregistrées sont en cours dans {context}.\n\nVoulez-vous enregistrer avant de quitter ?";
+        var dialog = new CustomDialog("Modifications non enregistrées", message, CustomDialogIcon.Warning,
+            ("Annuler", false), ("Quitter sans enregistrer", false), ("Enregistrer", true));
+        dialog.ShowDialog();
+        return dialog.ClickedButtonIndex switch
         {
-            MessageBoxResult.Yes => UnsavedChangesChoice.Save,
-            MessageBoxResult.No => UnsavedChangesChoice.Discard,
+            2 => UnsavedChangesChoice.Save,
+            1 => UnsavedChangesChoice.Discard,
             _ => UnsavedChangesChoice.Cancel
         };
     }
