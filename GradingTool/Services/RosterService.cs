@@ -61,8 +61,7 @@ public class RosterService : IRosterService
             {
                 errorMessage = "Le fichier roster.json ne peut pas etre deserialis�.";
                 return null;
-            }
-            return roster;
+            }            RehydrateGroupInfo(roster);            return roster;
         }
         catch (Exception ex)
         {
@@ -78,6 +77,18 @@ public class RosterService : IRosterService
         var roster = new RosterModel { Groups = groups };
         var json = JsonSerializer.Serialize(roster, JsonOptions);
         File.WriteAllText(filePath, json, Encoding.UTF8);
+    }
+
+    private static void RehydrateGroupInfo(RosterModel roster)
+    {
+        foreach (var group in roster.Groups)
+        {
+            foreach (var student in group.Students)
+            {
+                student.Group = group.DisplayName;
+                student.GroupCode = group.GroupCode;
+            }
+        }
     }
 
     public void ImportCsv(string sessionName, string courseName, string workName, string csvFilePath)
@@ -99,12 +110,6 @@ public class RosterService : IRosterService
             groupCode = GenerateNextGroupCode(roster.Groups);
 
         var displayName = BuildDisplayName(groupCode);
-
-        foreach (var student in students)
-        {
-            student.Group = displayName;
-            student.GroupCode = groupCode;
-        }
 
         var existingGroup = roster.Groups.FirstOrDefault(g => g.GroupCode == groupCode);
         if (existingGroup != null)

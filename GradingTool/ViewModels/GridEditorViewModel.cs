@@ -574,6 +574,33 @@ public partial class GridEditorViewModel : ObservableObject
         }
     }
 
+    private bool CanDeleteGrid() => SelectedGridFile != null;
+
+    [RelayCommand(CanExecute = nameof(CanDeleteGrid))]
+    private void DeleteGrid()
+    {
+        if (SelectedGridFile == null)
+            return;
+
+        var confirmed = _dialogService.ShowConfirmation(
+            $"Voulez-vous vraiment supprimer la grille de {SelectedGridFile.DisplayName} ?\n\nCette action est irréversible.",
+            "Supprimer la grille");
+
+        if (!confirmed)
+            return;
+
+        try
+        {
+            File.Delete(SelectedGridFile.FilePath);
+            GridFiles.Remove(SelectedGridFile);
+            SelectedGridFile = GridFiles.Count > 0 ? GridFiles[0] : null;
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowToast($"Erreur lors de la suppression: {ex.Message}");
+        }
+    }
+
     [RelayCommand]
     private void OpenGradingFolder()
     {

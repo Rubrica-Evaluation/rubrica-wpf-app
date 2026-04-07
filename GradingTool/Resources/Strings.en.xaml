@@ -82,6 +82,7 @@
 
     <!-- Tooltips GridEditor -->
     <system:String x:Key="GridEditor_Tooltip_Back">Return to workspace</system:String>
+    <system:String x:Key="GridEditor_Tooltip_DeleteGrid">Delete the selected grid</system:String>
     <system:String x:Key="GridEditor_Tooltip_ExportSummary">Generate a CSV file with all student results for the group (for Léa import)</system:String>
     <system:String x:Key="GridEditor_Tooltip_ExportSinglePdf">Export the PDF for the currently displayed student or team</system:String>
     <system:String x:Key="GridEditor_Tooltip_ExportPdf">Export all group grids as PDF (and assignments.zip)</system:String>

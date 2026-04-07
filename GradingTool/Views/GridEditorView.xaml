@@ -140,6 +140,18 @@
                                Background="White"
                                TextAlignment="Center"/>
 
+                    <!-- Bouton supprimer -->
+                    <Border DockPanel.Dock="Bottom"
+                            Padding="8,6"
+                            BorderBrush="#E8E8E8"
+                            BorderThickness="0,1,0,0">
+                        <Button Content="&#xE74D;"
+                                Command="{Binding DeleteGridCommand}"
+                                Style="{StaticResource DangerIconButton}"
+                                HorizontalAlignment="Left"
+                                ToolTip="{DynamicResource GridEditor_Tooltip_DeleteGrid}"/>
+                    </Border>
+
                     <!-- Liste des fichiers -->
                     <ListBox ItemsSource="{Binding GridFiles}"
                              SelectedItem="{Binding SelectedGridFile}"

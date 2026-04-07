@@ -80,12 +80,18 @@ public class DialogService : IDialogService
         var dialog = new CustomDialog("Fichiers existants", message, CustomDialogIcon.Question,
             ("Annuler", false), ("Ignorer", false), ("Écraser", true));
         dialog.ShowDialog();
-        return dialog.ClickedButtonIndex switch
-        {
-            2 => OverwriteChoice.Overwrite,
-            1 => OverwriteChoice.Skip,
-            _ => OverwriteChoice.Cancel
-        };
+
+        if (dialog.ClickedButtonIndex != 2)
+            return dialog.ClickedButtonIndex == 1 ? OverwriteChoice.Skip : OverwriteChoice.Cancel;
+
+        var confirm = new CustomDialog(
+            "Confirmation d'écrasement",
+            "Attention : toutes les données saisies dans les grilles existantes seront définitivement perdues.\n\nCette action est irréversible. Confirmer ?",
+            CustomDialogIcon.Warning,
+            ("Annuler", false), ("Confirmer l'écrasement", true));
+        confirm.ShowDialog();
+
+        return confirm.ClickedButtonIndex == 1 ? OverwriteChoice.Overwrite : OverwriteChoice.Cancel;
     }
 
     public UnsavedChangesChoice ShowUnsavedChangesConfirmation(string context)

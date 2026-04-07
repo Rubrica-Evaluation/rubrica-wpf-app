@@ -64,10 +64,12 @@ namespace GradingTool.Models
         public string LastName { get; set; } = string.Empty;
 
         [JsonPropertyName("group")]
-        public string Group { get; set; } = string.Empty;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Group { get; set; }
 
         [JsonPropertyName("groupCode")]
-        public string GroupCode { get; set; } = string.Empty;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? GroupCode { get; set; }
 
         [JsonPropertyName("team")]
         public int Team { get; set; }

@@ -24,13 +24,11 @@ public partial class EditableStudentModel : ObservableObject
         Team = student.Team
     };
 
-    public StudentModel ToStudent(string groupDisplayName, string groupCode) => new()
+    public StudentModel ToStudent() => new()
     {
         Da = Da,
         FirstName = FirstName,
         LastName = LastName,
-        Group = groupDisplayName,
-        GroupCode = groupCode,
         Team = Team
     };
 }

@@ -82,6 +82,7 @@
 
     <!-- Tooltips GridEditor -->
     <system:String x:Key="GridEditor_Tooltip_Back">Retourner à l'espace de travail</system:String>
+    <system:String x:Key="GridEditor_Tooltip_DeleteGrid">Supprimer la grille sélectionnée</system:String>
     <system:String x:Key="GridEditor_Tooltip_ExportSummary">Générer un fichier csv des résultats de tous les étudiants du groupe (pour importation Léa)</system:String>
     <system:String x:Key="GridEditor_Tooltip_ExportSinglePdf">Exporter le PDF de l'étudiant ou équipe actuellement affiché</system:String>
     <system:String x:Key="GridEditor_Tooltip_ExportPdf">Exporter toutes les grilles du groupe en PDF (et travaux.zip)</system:String>

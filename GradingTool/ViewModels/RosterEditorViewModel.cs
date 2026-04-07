@@ -103,7 +103,7 @@ public partial class RosterEditorViewModel : ObservableObject
         group.Students.Clear();
         foreach (var editable in Students)
         {
-            group.Students.Add(editable.ToStudent(group.DisplayName, group.GroupCode));
+            group.Students.Add(editable.ToStudent());
         }
     }
 
