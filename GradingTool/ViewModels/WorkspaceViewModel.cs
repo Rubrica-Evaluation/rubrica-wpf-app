@@ -9,7 +9,7 @@ using System.IO;
 
 namespace GradingTool.ViewModels;
 
-public partial class WorkspaceViewModel : ObservableObject
+public partial class WorkspaceViewModel : ObservableObject, IActivatable
 {
     private readonly IDialogService _dialogService;
     private readonly ISessionsRootService _sessionsRootService;
@@ -83,14 +83,7 @@ public partial class WorkspaceViewModel : ObservableObject
     private ObservableCollection<GroupModel> _groups = new();
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(GenerateGroupGridsCommand))]
-    private GroupModel? _selectedGroup;
-
-    [ObservableProperty]
     private bool _hasTeams;
-
-    [ObservableProperty]
-    private bool _canGenerateGroupGrids;
 
     [ObservableProperty]
     private string _generationMode = "individual";
@@ -125,16 +118,10 @@ public partial class WorkspaceViewModel : ObservableObject
         LoadSessionsRootPath();
     }
 
-    partial void OnSelectedGroupChanged(GroupModel? value)
+    public void OnActivated()
     {
-        // Détecter si le groupe sélectionné contient des équipes
-        HasTeams = value != null && value.Students.Any(s => s.Team > 0);
-        
-        // Réinitialiser le mode de génération à individual par défaut
-        if (HasTeams)
-        {
-            GenerationMode = "individual";
-        }
+        UpdateRubricStatus();
+        UpdateRosterStatus();
     }
 
     private void RefreshLocalizedTexts()
@@ -352,8 +339,6 @@ public partial class WorkspaceViewModel : ObservableObject
             RubricStatusColor = "#DC3545";
         }
 
-        // Update group grid generation capability
-        UpdateCanGenerateGroupGrids();
     }
 
     private void UpdateRosterStatus()
@@ -386,17 +371,14 @@ public partial class WorkspaceViewModel : ObservableObject
                     Groups.Add(group);
                 }
 
-                // Sélectionner le premier groupe automatiquement
-                if (Groups.Count > 0)
-                {
-                    SelectedGroup = Groups[0];
-                }
+                HasTeams = Groups.Any(g => g.Students.Any(s => s.Team > 0));
+                if (HasTeams)
+                    GenerationMode = "individual";
 
                 if (roster.Groups.Count == 0)
                 {
                     RosterStatusText = _localizationService["Workspace_RosterNoGroups"];
                     RosterStatusColor = "#FFA500";
-                    SelectedGroup = null;
                 }
             }
             else
@@ -404,7 +386,6 @@ public partial class WorkspaceViewModel : ObservableObject
                 RosterStatusText = string.Format(_localizationService["Workspace_RosterInvalid"], errorMessage);
                 RosterStatusColor = "#FFA500";
                 Groups.Clear();
-                SelectedGroup = null;
                 HasTeams = false;
             }
         }
@@ -413,17 +394,8 @@ public partial class WorkspaceViewModel : ObservableObject
             RosterStatusText = _localizationService["Workspace_RosterNotFound"];
             RosterStatusColor = "#DC3545";
             Groups.Clear();
-            SelectedGroup = null;
             HasTeams = false;
         }
-
-        // Update test grid generation capability
-        UpdateCanGenerateGroupGrids();
-    }
-
-    private void UpdateCanGenerateGroupGrids()
-    {
-        CanGenerateGroupGrids = RubricExists && RosterExists && SelectedGroup != null;
     }
 
     [RelayCommand]
@@ -687,9 +659,14 @@ public partial class WorkspaceViewModel : ObservableObject
         {
             _workService.CreateWork(SelectedSession, SelectedCourse, workName);
             LoadWorks();
-            SelectedWork = workName;
 
-            _dialogService.ShowToast($"Évaluation '{workName}' créée avec succès (rubric, roster, submissions, grading, pdf_docs)");
+            var rosterCopied = TryCopyRosterFromExistingWork(workName);
+            SelectedWork = workName;
+            var toastMessage = rosterCopied
+                ? $"Évaluation '{workName}' créée avec succès — liste d'étudiants copiée"
+                : $"Évaluation '{workName}' créée avec succès (rubric, roster, submissions, grading, pdf_docs)";
+
+            _dialogService.ShowToast(toastMessage);
         }
         catch (Exception ex)
         {
@@ -698,6 +675,27 @@ public partial class WorkspaceViewModel : ObservableObject
                 "Erreur",
                 System.Windows.MessageBoxImage.Error);
         }
+    }
+
+    private bool TryCopyRosterFromExistingWork(string newWorkName)
+    {
+        var worksWithRoster = Works
+            .Where(w => w != newWorkName && _rosterService.RosterExists(SelectedSession!, SelectedCourse!, w))
+            .ToList();
+
+        if (worksWithRoster.Count == 0)
+            return false;
+
+        var sourceWork = worksWithRoster[^1];
+        var confirmed = _dialogService.ShowConfirmation(
+            $"Copier la liste d'étudiants depuis '{sourceWork}' vers '{newWorkName}' ?",
+            "Copier le roster");
+
+        if (!confirmed)
+            return false;
+
+        _rosterService.CopyRoster(SelectedSession!, SelectedCourse!, sourceWork, newWorkName);
+        return true;
     }
 
     [RelayCommand(CanExecute = nameof(CanDeleteWork))]
@@ -788,65 +786,19 @@ public partial class WorkspaceViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void OpenGradingFolder()
+    private void NavigateToGridEditor(GroupModel group)
     {
-        if (string.IsNullOrEmpty(SelectedSession) || string.IsNullOrEmpty(SelectedCourse) || string.IsNullOrEmpty(SelectedWork) || SelectedGroup == null)
-            return;
-
-        try
-        {
-            var rootPath = _sessionsRootService.GetSessionsRootPath();
-            if (string.IsNullOrEmpty(rootPath))
-            {
-                _dialogService.ShowMessage(
-                    "Le dossier racine des sessions n'est pas configuré.",
-                    "Erreur de configuration",
-                    System.Windows.MessageBoxImage.Error);
-                return;
-            }
-
-            var gradingPath = Path.Combine(rootPath, SelectedSession, SelectedCourse, SelectedWork, "grading", SelectedGroup.GroupCode);
-            
-            if (!Directory.Exists(gradingPath))
-            {
-                Directory.CreateDirectory(gradingPath);
-            }
-
-            Process.Start("explorer.exe", gradingPath);
-        }
-        catch (Exception ex)
-        {
-            _dialogService.ShowMessage(
-                $"Impossible d'ouvrir le dossier de grading:\n\n{ex.Message}",
-                "Erreur",
-                System.Windows.MessageBoxImage.Error);
-        }
-    }
-
-    [RelayCommand]
-    private void NavigateToGridEditor()
-    {
-        if (SelectedGroup == null || string.IsNullOrEmpty(SelectedSession) || 
-            string.IsNullOrEmpty(SelectedCourse) || string.IsNullOrEmpty(SelectedWork))
-        {
-            _dialogService.ShowMessage(
-                "Veuillez sélectionner un groupe avant d'ouvrir l'éditeur.",
-                "Groupe requis",
-                System.Windows.MessageBoxImage.Warning);
-            return;
-        }
-
         var rootPath = _sessionsRootService.GetSessionsRootPath();
         if (string.IsNullOrEmpty(rootPath))
             return;
-        var gradingPath = Path.Combine(rootPath, SelectedSession, SelectedCourse, SelectedWork, "grading", SelectedGroup.GroupCode);
+
+        var gradingPath = Path.Combine(rootPath, SelectedSession!, SelectedCourse!, SelectedWork!, "grading", group.GroupCode);
 
         _navigationService.NavigateTo<GridEditorViewModel>();
-        
-        // Initialiser l'éditeur avec les données du groupe
+
         if (_navigationService.CurrentView is GridEditorViewModel editor)
         {
-            editor.Initialize(SelectedGroup, gradingPath, SelectedSession ?? "", SelectedCourse ?? "", SelectedWork ?? "");
+            editor.Initialize(group, gradingPath, SelectedSession ?? "", SelectedCourse ?? "", SelectedWork ?? "");
         }
     }
 
@@ -857,133 +809,26 @@ public partial class WorkspaceViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void LoadRoster()
+    private void OpenRosterEditor()
     {
         if (string.IsNullOrEmpty(SelectedSession) || string.IsNullOrEmpty(SelectedCourse) || string.IsNullOrEmpty(SelectedWork))
             return;
 
-        var selectedFiles = _dialogService.SelectFiles(
-            "Sélectionner des fichiers CSV d'étudiants", 
-            "Fichiers CSV|*.csv|Tous les fichiers|*.*");
+        _navigationService.NavigateTo<RosterEditorViewModel>();
 
-        if (selectedFiles == null || selectedFiles.Length == 0)
-            return;
-
-        int successCount = 0;
-        int skipCount = 0;
-        var errorMessages = new List<string>();
-
-        foreach (var selectedFile in selectedFiles)
+        if (_navigationService.CurrentView is RosterEditorViewModel editor)
         {
-            var fileName = Path.GetFileName(selectedFile);
-
-            // Vérifier si un fichier avec le même nom existe déjà
-            if (_rosterService.FileExistsInRosterFolder(SelectedSession, SelectedCourse, SelectedWork, fileName))
-            {
-                if (!_dialogService.ShowConfirmation(
-                    $"Un fichier '{fileName}' existe déjà pour cette évaluation.\n\nVoulez-vous le remplacer?",
-                    "Fichier existant"))
-                {
-                    skipCount++;
-                    continue;
-                }
-            }
-
-            try
-            {
-                _rosterService.ImportRoster(SelectedSession, SelectedCourse, SelectedWork, selectedFile);
-                successCount++;
-            }
-            catch (Exception ex)
-            {
-                errorMessages.Add($"{fileName}: {ex.Message}");
-            }
-        }
-
-        // Mettre à jour l'interface une seule fois à la fin
-        UpdateRosterStatus();
-
-        // Afficher le résumé
-        if (successCount > 0)
-        {
-            var message = $"{successCount} groupe(s) chargé(s) avec succès";
-            if (skipCount > 0)
-                message += $", {skipCount} ignoré(s)";
-            if (errorMessages.Count > 0)
-                message += $", {errorMessages.Count} erreur(s)";
-
-            _dialogService.ShowToast(message);
-        }
-
-        // Afficher les erreurs détaillées si nécessaire
-        if (errorMessages.Count > 0)
-        {
-            var errorSummary = string.Join("\n", errorMessages);
-            _dialogService.ShowMessage(
-                $"Erreurs lors du chargement:\n\n{errorSummary}",
-                "Erreurs de chargement",
-                System.Windows.MessageBoxImage.Warning);
+            editor.Initialize(SelectedSession, SelectedCourse, SelectedWork);
         }
     }
 
     [RelayCommand]
-    private void DownloadRosterTemplate()
+    private async Task GenerateGroupGrids(GroupModel group)
     {
-        var saveFile = _dialogService.SaveFile(
-            "Enregistrer le template de roster",
-            "roster_template.csv",
-            "Fichiers CSV|*.csv");
-
-        if (string.IsNullOrEmpty(saveFile))
+        if (group == null || string.IsNullOrEmpty(SelectedSession) || string.IsNullOrEmpty(SelectedCourse) || string.IsNullOrEmpty(SelectedWork))
             return;
 
-        try
-        {
-            _rosterService.SaveRosterTemplate(saveFile);
-            _dialogService.ShowToast($"Template enregistré: {Path.GetFileName(saveFile)}");
-        }
-        catch (Exception ex)
-        {
-            _dialogService.ShowMessage(
-                $"Erreur lors de la création du template:\n\n{ex.Message}",
-                "Erreur",
-                System.Windows.MessageBoxImage.Error);
-        }
-    }
-
-    [RelayCommand]
-    private void DeleteRosterFile(GroupModel group)
-    {
-        if (group == null || string.IsNullOrEmpty(group.FilePath))
-            return;
-
-        var confirmed = _dialogService.ShowConfirmation(
-            $"Voulez-vous vraiment supprimer la liste d'étudiants '{group.DisplayName}' ?\n\nLe fichier sera envoyé à la corbeille.",
-            "Confirmer la suppression");
-
-        if (!confirmed)
-            return;
-
-        try
-        {
-            _rosterService.DeleteRosterFile(group.FilePath);
-            _dialogService.ShowToast($"Liste d'étudiants '{group.DisplayName}' supprimée");
-            UpdateRosterStatus();
-        }
-        catch (Exception ex)
-        {
-            _dialogService.ShowMessage(
-                $"Erreur lors de la suppression de la liste d'étudiants:\n\n{ex.Message}",
-                "Erreur",
-                System.Windows.MessageBoxImage.Error);
-        }
-    }
-
-    [RelayCommand(CanExecute = nameof(CanGenerateGroupGrids))]
-    private async Task GenerateGroupGrids()
-    {
-        if (string.IsNullOrEmpty(SelectedSession) || string.IsNullOrEmpty(SelectedCourse) || string.IsNullOrEmpty(SelectedWork) || SelectedGroup == null)
-            return;
+        EnsureStudentGroupCodes(group);
 
         try
         {
@@ -1011,13 +856,13 @@ public partial class WorkspaceViewModel : ObservableObject
             var basePath = Path.Combine(rootPath, SelectedSession, SelectedCourse, SelectedWork, "grading");
 
             // Vérifier le mode de génération (individuel ou équipe)
-            if (GenerationMode == "team" && HasTeams)
+            if (GenerationMode == "team" && group.Students.Any(s => s.Team > 0))
             {
-                await GenerateTeamGrids(rubric, basePath);
+                await GenerateTeamGrids(group, rubric, basePath);
             }
             else
             {
-                await GenerateIndividualGrids(rubric, basePath);
+                await GenerateIndividualGrids(group, rubric, basePath);
             }
         }
         catch (Exception ex)
@@ -1029,13 +874,20 @@ public partial class WorkspaceViewModel : ObservableObject
         }
     }
 
-    private async Task GenerateIndividualGrids(RubricModel rubric, string basePath)
+    private static void EnsureStudentGroupCodes(GroupModel group)
     {
-        if (SelectedGroup == null) return;
+        foreach (var student in group.Students)
+        {
+            if (string.IsNullOrEmpty(student.GroupCode))
+                student.GroupCode = group.GroupCode;
+        }
+    }
 
+    private async Task GenerateIndividualGrids(GroupModel group, RubricModel rubric, string basePath)
+    {
         // Vérifier s'il y a des grilles existantes
         int existingCount = 0;
-        foreach (var student in SelectedGroup.Students)
+        foreach (var student in group.Students)
         {
             if (_gridService.GridExists(student, basePath))
             {
@@ -1047,7 +899,7 @@ public partial class WorkspaceViewModel : ObservableObject
         bool shouldOverwrite = true;  // Par défaut, on écrase
         if (existingCount > 0)
         {
-            var choice = _dialogService.ShowOverwriteConfirmation(existingCount, SelectedGroup.Students.Count);
+            var choice = _dialogService.ShowOverwriteConfirmation(existingCount, group.Students.Count);
             if (choice == OverwriteChoice.Cancel)
                 return;
             
@@ -1058,7 +910,7 @@ public partial class WorkspaceViewModel : ObservableObject
         int generatedCount = 0;
         int skippedCount = 0;
 
-        foreach (var student in SelectedGroup.Students)
+        foreach (var student in group.Students)
         {
             // Vérifier si la grille existe déjà
             if (_gridService.GridExists(student, basePath))
@@ -1092,7 +944,7 @@ public partial class WorkspaceViewModel : ObservableObject
 
         if (generatedCount > 0)
         {
-            _dialogService.ShowToast($"{generatedCount} grille(s) générée(s) pour le groupe {SelectedGroup.DisplayName} dans grading/{SelectedGroup.GroupCode}/");
+            _dialogService.ShowToast($"{generatedCount} grille(s) générée(s) pour le groupe {group.DisplayName} dans grading/{group.GroupCode}/");
         }
         
         if (skippedCount > 0)
@@ -1112,12 +964,10 @@ public partial class WorkspaceViewModel : ObservableObject
         }
     }
 
-    private async Task GenerateTeamGrids(RubricModel rubric, string basePath)
+    private async Task GenerateTeamGrids(GroupModel group, RubricModel rubric, string basePath)
     {
-        if (SelectedGroup == null) return;
-
         // Regrouper les étudiants par équipe
-        var teams = SelectedGroup.Students
+        var teams = group.Students
             .Where(s => s.Team > 0)
             .GroupBy(s => s.Team)
             .OrderBy(g => g.Key)
@@ -1133,7 +983,7 @@ public partial class WorkspaceViewModel : ObservableObject
         }
 
         // Récupérer les étudiants sans équipe
-        var studentsWithoutTeam = SelectedGroup.Students
+        var studentsWithoutTeam = group.Students
             .Where(s => s.Team <= 0)
             .ToList();
 
@@ -1250,7 +1100,7 @@ public partial class WorkspaceViewModel : ObservableObject
                 message += $"{(teams.Count > 0 ? ", " : "")} {studentsWithoutTeam.Count} individuelle(s)";
             if (teams.Count > 0)
                 message += ")";
-            message += $" pour le groupe {SelectedGroup.DisplayName} dans grading/{SelectedGroup.GroupCode}/";
+            message += $" pour le groupe {group.DisplayName} dans grading/{group.GroupCode}/";
             
             _dialogService.ShowToast(message);
         }

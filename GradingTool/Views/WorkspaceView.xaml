@@ -341,44 +341,52 @@
                                 </Run.Foreground>
                             </TextBlock>
 
-                            <!-- Liste des groupes détectés -->
-                            <ListBox ItemsSource="{Binding Groups}"
-                                     SelectedItem="{Binding SelectedGroup}"
-                                     Margin="0,0,0,12"
-                                     Visibility="{Binding RosterExists, Converter={StaticResource BoolToVisibilityConverter}}"
-                                     BorderThickness="1"
-                                     BorderBrush="#D8E8F8"
-                                     Background="White">
-                                <ListBox.ItemTemplate>
+                            <!-- Liste des groupes avec boutons inline -->
+                            <ItemsControl ItemsSource="{Binding Groups}"
+                                          Visibility="{Binding RosterExists, Converter={StaticResource BoolToVisibilityConverter}}"
+                                          Margin="0,0,0,12">
+                                <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid Margin="0,0,0,4">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-
-                                            <Border Grid.Column="0"
-                                                    Background="#EBF4FC"
-                                                    BorderBrush="#B3D4F5"
-                                                    BorderThickness="1"
-                                                    CornerRadius="4"
-                                                    Padding="8"
-                                                    Margin="0,0,8,0">
-                                                <TextBlock Text="{Binding DisplayName}"
-                                                           FontSize="12"
-                                                           Foreground="#0078D4"/>
-                                            </Border>
-
-                                            <Button Grid.Column="1"
-                                                    Content="&#xE74D;"
-                                                    Command="{Binding DataContext.DeleteRosterFileCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                                    CommandParameter="{Binding}"
-                                                    Style="{StaticResource DangerIconButton}"
-                                                    ToolTip="{DynamicResource Workspace_Tooltip_DeleteRoster}"/>
-                                        </Grid>
+                                        <Border BorderBrush="#D8E8F8"
+                                                BorderThickness="1"
+                                                CornerRadius="4"
+                                                Padding="10,8"
+                                                Margin="0,0,0,6"
+                                                Background="#F8FBFF">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding DisplayName}"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#0078D4"
+                                                           VerticalAlignment="Center"/>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                    <Button Content="{DynamicResource Workspace_BtnGenerateGrids}"
+                                                            Command="{Binding DataContext.GenerateGroupGridsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}"
+                                                            IsEnabled="{Binding DataContext.RubricExists, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            Style="{StaticResource RoundedButton}"
+                                                            FontSize="12"
+                                                            Padding="12,6"
+                                                            Margin="0,0,8,0"
+                                                            ToolTip="{DynamicResource Workspace_Tooltip_GenerateGrids}"/>
+                                                    <Button Content="{DynamicResource Workspace_BtnOpenEditor}"
+                                                            Command="{Binding DataContext.NavigateToGridEditorCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}"
+                                                            Style="{StaticResource RoundedButton}"
+                                                            FontSize="12"
+                                                            Padding="12,6"
+                                                            ToolTip="{DynamicResource Workspace_Tooltip_OpenEditor}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
                                     </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
                             <!-- Options de génération pour équipes -->
                             <Border Background="#FFFBF2"
@@ -409,48 +417,14 @@
                                 </StackPanel>
                             </Border>
 
-                            <!-- Boutons -->
+                            <!-- Bouton global -->
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="{DynamicResource Workspace_BtnLoadGroups}"
-                                        Command="{Binding LoadRosterCommand}"
+                                <Button Content="{DynamicResource Workspace_BtnEditRoster}"
+                                        Command="{Binding OpenRosterEditorCommand}"
                                         Style="{StaticResource RoundedButton}"
                                         FontSize="13"
                                         Padding="16,8"
-                                        Margin="0,0,10,0"
-                                        ToolTip="{DynamicResource Workspace_Tooltip_LoadGroups}"/>
-
-                                <Button Content="{DynamicResource Workspace_BtnDownloadTemplate}"
-                                        Command="{Binding DownloadRosterTemplateCommand}"
-                                        Style="{StaticResource GhostButton}"
-                                        FontSize="13"
-                                        Padding="16,8"
-                                        Margin="0,0,10,0"
-                                        ToolTip="{DynamicResource Workspace_Tooltip_DownloadTemplate}"/>
-
-                                <Button Content="{DynamicResource Workspace_BtnGenerateGrids}"
-                                        Command="{Binding GenerateGroupGridsCommand}"
-                                        Style="{StaticResource RoundedButton}"
-                                        FontSize="13"
-                                        Padding="16,8"
-                                        Margin="0,0,10,0"
-                                        IsEnabled="{Binding CanGenerateGroupGrids}"
-                                        ToolTip="{DynamicResource Workspace_Tooltip_GenerateGrids}"/>
-
-                                <Button Content="{DynamicResource Workspace_BtnOpenGradingFolder}"
-                                        Command="{Binding OpenGradingFolderCommand}"
-                                        Style="{StaticResource GhostButton}"
-                                        FontSize="13"
-                                        Padding="16,8"
-                                        Margin="0,0,10,0"
-                                        IsEnabled="{Binding SelectedGroup, Converter={StaticResource NullToBoolConverter}}"
-                                        ToolTip="{DynamicResource Workspace_Tooltip_OpenGradingFolder}"/>
-
-                                <Button Content="{DynamicResource Workspace_BtnOpenEditor}"
-                                        Command="{Binding NavigateToGridEditorCommand}"
-                                        Style="{StaticResource RoundedButton}"
-                                        FontSize="13"
-                                        Padding="16,8"
-                                        ToolTip="{DynamicResource Workspace_Tooltip_OpenEditor}"/>
+                                        ToolTip="{DynamicResource Workspace_Tooltip_EditRoster}"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>

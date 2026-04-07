@@ -26,7 +26,7 @@
     <system:String x:Key="Workspace_BtnRubricDesigner">Rubric Designer</system:String>
     <system:String x:Key="Workspace_BtnLoadGroups">Load Groups</system:String>
     <system:String x:Key="Workspace_BtnDownloadTemplate">Download CSV Template</system:String>
-    <system:String x:Key="Workspace_BtnGenerateGrids">Generate All Grids</system:String>
+    <system:String x:Key="Workspace_BtnGenerateGrids">Generate Grids</system:String>
     <system:String x:Key="Workspace_BtnOpenGradingFolder">Open Grading Folder</system:String>
     <system:String x:Key="Workspace_BtnOpenEditor">Open Editor</system:String>
     <system:String x:Key="Workspace_SelectFolder">Select Root Folder</system:String>
@@ -77,6 +77,7 @@
     <system:String x:Key="GridEditor_BtnExportSummary">Export Summary</system:String>
     <system:String x:Key="GridEditor_BtnExportSinglePdf">Student PDF</system:String>
     <system:String x:Key="GridEditor_BtnExportPdf">Group PDF</system:String>
+    <system:String x:Key="GridEditor_BtnOpenGradingFolder">Open Folder</system:String>
     <system:String x:Key="GridEditor_BtnBank">Bank</system:String>
 
     <!-- Tooltips GridEditor -->
@@ -84,6 +85,7 @@
     <system:String x:Key="GridEditor_Tooltip_ExportSummary">Generate a CSV file with all student results for the group (for Léa import)</system:String>
     <system:String x:Key="GridEditor_Tooltip_ExportSinglePdf">Export the PDF for the currently displayed student or team</system:String>
     <system:String x:Key="GridEditor_Tooltip_ExportPdf">Export all group grids as PDF (and assignments.zip)</system:String>
+    <system:String x:Key="GridEditor_Tooltip_OpenGradingFolder">Open the group grading folder in the file explorer</system:String>
     <system:String x:Key="GridEditor_Tooltip_AddComment">Add a comment</system:String>
     <system:String x:Key="GridEditor_Tooltip_EditComment">Edit the selected comment</system:String>
     <system:String x:Key="GridEditor_Tooltip_DeleteComment">Delete the selected comment</system:String>
@@ -131,6 +133,29 @@
     <system:String x:Key="RubricDesigner_Tooltip_DeleteScale">Delete this level</system:String>
     <system:String x:Key="RubricDesigner_Tooltip_AddPenalty">Add a new penalty with its name, factor, and minimum.</system:String>
     <system:String x:Key="RubricDesigner_Tooltip_DeletePenalty">Delete this penalty from the rubric.</system:String>
+
+    <!-- RosterEditor -->
+    <system:String x:Key="RosterEditor_NavLabel">Student List Editor</system:String>
+    <system:String x:Key="RosterEditor_GroupsTitle">Groups</system:String>
+    <system:String x:Key="RosterEditor_StudentsTitle">Students</system:String>
+    <system:String x:Key="RosterEditor_ColDA">ID</system:String>
+    <system:String x:Key="RosterEditor_ColFirstName">First Name</system:String>
+    <system:String x:Key="RosterEditor_ColLastName">Last Name</system:String>
+    <system:String x:Key="RosterEditor_ColTeam">Team</system:String>
+    <system:String x:Key="RosterEditor_BtnImportCsv">Import CSV</system:String>
+    <system:String x:Key="RosterEditor_NoGroupSelected">Select a group to view its students.</system:String>
+    <system:String x:Key="RosterEditor_SavedSuccess">Student list saved successfully</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_ImportCsv">Import one or more CSV files into the roster folder</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_Save">Save all changes to the CSV files</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_Back">Return to workspace</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_AddGroup">Add a new empty group</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_DeleteGroup">Delete the selected group and its CSV file</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_AddStudent">Add a student to the selected group</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_DeleteStudent">Delete the selected student</system:String>
+
+    <!-- Workspace - roster button -->
+    <system:String x:Key="Workspace_BtnEditRoster">Edit Students</system:String>
+    <system:String x:Key="Workspace_Tooltip_EditRoster">Open the student list editor for this assignment</system:String>
 
     <!-- Configuration -->
     <system:String x:Key="Config_Title">Configuration</system:String>

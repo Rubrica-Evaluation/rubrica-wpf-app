@@ -20,6 +20,7 @@ public partial class GridEditorViewModel : ObservableObject
     private readonly ICommentService _commentService;
 
     private string _gradingRootPath = string.Empty;
+    private string _groupGradingPath = string.Empty;
 
     [ObservableProperty]
     private string _groupName = string.Empty;
@@ -74,6 +75,7 @@ public partial class GridEditorViewModel : ObservableObject
         CourseName = course;
         WorkName = work;
         GroupName = group.DisplayName;
+        _groupGradingPath = gradingPath;
         GridFiles.Clear();
 
         var gridFileList = _gridService.LoadGridFiles(gradingPath);
@@ -569,6 +571,27 @@ public partial class GridEditorViewModel : ObservableObject
         catch (Exception ex)
         {
             _dialogService.ShowToast($"Erreur: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private void OpenGradingFolder()
+    {
+        var folder = string.IsNullOrEmpty(_groupGradingPath)
+            ? (SelectedGridFile != null ? Path.GetDirectoryName(SelectedGridFile.FilePath) : null)
+            : _groupGradingPath;
+
+        if (string.IsNullOrEmpty(folder))
+            return;
+
+        try
+        {
+            Directory.CreateDirectory(folder);
+            Process.Start("explorer.exe", folder);
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowToast($"Impossible d'ouvrir le dossier: {ex.Message}");
         }
     }
 

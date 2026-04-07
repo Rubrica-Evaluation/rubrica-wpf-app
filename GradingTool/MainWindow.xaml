@@ -35,6 +35,11 @@
         <DataTemplate DataType="{x:Type vm:ConfigurationViewModel}">
             <views:ConfigurationView/>
         </DataTemplate>
+
+        <!-- DataTemplate pour RosterEditorViewModel -->
+        <DataTemplate DataType="{x:Type vm:RosterEditorViewModel}">
+            <views:RosterEditorView/>
+        </DataTemplate>
     </Window.Resources>
     
     <Grid>

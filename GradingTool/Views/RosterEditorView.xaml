@@ -1,0 +1,242 @@
+<UserControl x:Class="GradingTool.Views.RosterEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             d:DesignHeight="800"
+             d:DesignWidth="1280"
+             Background="White">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- En-tête -->
+        <Border Grid.Row="0"
+                Background="White"
+                BorderBrush="#E8E8E8"
+                BorderThickness="0,0,0,1"
+                Padding="16,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{Binding NavigationPath}"
+                           FontSize="16"
+                           Foreground="#5C5C5C"
+                           VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <Button Content="{DynamicResource RosterEditor_BtnImportCsv}"
+                            Command="{Binding ImportCsvCommand}"
+                            Style="{StaticResource GhostButton}"
+                            Margin="0,0,8,0"
+                            ToolTip="{DynamicResource RosterEditor_Tooltip_ImportCsv}"/>
+                    <Button Content="{DynamicResource Common_Save}"
+                            Command="{Binding SaveCommand}"
+                            Style="{StaticResource RoundedButton}"
+                            Margin="0,0,8,0"
+                            ToolTip="{DynamicResource RosterEditor_Tooltip_Save}"/>
+                    <Button Content="{DynamicResource Common_Back}"
+                            Command="{Binding GoBackCommand}"
+                            Style="{StaticResource GhostButton}"
+                            ToolTip="{DynamicResource RosterEditor_Tooltip_Back}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Contenu principal -->
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Panneau gauche - Groupes -->
+            <Border Grid.Column="0"
+                    Background="White"
+                    CornerRadius="8"
+                    BorderBrush="#E8E8E8"
+                    BorderThickness="1"
+                    Padding="16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0"
+                               Text="{DynamicResource RosterEditor_GroupsTitle}"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="#333333"
+                               Margin="0,0,0,12"/>
+
+                    <ListBox Grid.Row="1"
+                             ItemsSource="{Binding Groups}"
+                             SelectedItem="{Binding SelectedGroup}"
+                             BorderThickness="1"
+                             BorderBrush="#E0E0E0"
+                             Background="White">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource SelectableListBoxItemStyle}"/>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding DisplayName}"
+                                               FontSize="13"
+                                               Padding="0,2"/>
+                                    <TextBlock FontSize="11"
+                                               Foreground="#888888">
+                                        <Run Text="{Binding StudentCount, Mode=OneWay}"/>
+                                        <Run Text=" étudiant(s)"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <StackPanel Grid.Row="2"
+                                Orientation="Horizontal"
+                                Margin="0,12,0,0">
+                        <Button Content="&#xE710;"
+                                Command="{Binding AddGroupCommand}"
+                                Style="{StaticResource IconButton}"
+                                Margin="0,0,4,0"
+                                ToolTip="{DynamicResource RosterEditor_Tooltip_AddGroup}"/>
+                        <Button Content="&#xE74D;"
+                                Command="{Binding DeleteGroupCommand}"
+                                Style="{StaticResource DangerIconButton}"
+                                ToolTip="{DynamicResource RosterEditor_Tooltip_DeleteGroup}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Panneau droit - Étudiants -->
+            <Border Grid.Column="2"
+                    Background="White"
+                    CornerRadius="8"
+                    BorderBrush="#E8E8E8"
+                    BorderThickness="1"
+                    Padding="16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"
+                                   Text="{DynamicResource RosterEditor_StudentsTitle}"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="#333333"
+                                   VerticalAlignment="Center"/>
+
+                        <TextBlock Grid.Column="1"
+                                   FontSize="13"
+                                   Foreground="#666666"
+                                   VerticalAlignment="Center">
+                            <Run Text="{Binding Students.Count, Mode=OneWay}"/>
+                            <Run Text=" étudiant(s)"/>
+                        </TextBlock>
+                    </Grid>
+
+                    <!-- Message si aucun groupe sélectionné -->
+                    <TextBlock Grid.Row="1"
+                               Text="{DynamicResource RosterEditor_NoGroupSelected}"
+                               FontSize="14"
+                               Foreground="#999999"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedGroup}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <!-- DataGrid des étudiants -->
+                    <DataGrid Grid.Row="1"
+                              ItemsSource="{Binding Students}"
+                              SelectedItem="{Binding SelectedStudent}"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              CanUserSortColumns="True"
+                              SelectionMode="Single"
+                              BorderThickness="1"
+                              BorderBrush="#E0E0E0"
+                              GridLinesVisibility="Horizontal"
+                              HeadersVisibility="Column"
+                              RowHeaderWidth="0"
+                              FontSize="13"
+                              Background="White"
+                              AlternatingRowBackground="#FAFAFA">
+                        <DataGrid.Style>
+                            <Style TargetType="DataGrid">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedGroup, Converter={StaticResource NullToBoolConverter}}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.Style>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource RosterEditor_ColDA}"
+                                               Binding="{Binding Da, UpdateSourceTrigger=PropertyChanged}"
+                                               Width="120"/>
+                            <DataGridTextColumn Header="{DynamicResource RosterEditor_ColFirstName}"
+                                               Binding="{Binding FirstName, UpdateSourceTrigger=PropertyChanged}"
+                                               Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource RosterEditor_ColLastName}"
+                                               Binding="{Binding LastName, UpdateSourceTrigger=PropertyChanged}"
+                                               Width="*"/>
+                            <DataGridTextColumn Header="{DynamicResource RosterEditor_ColTeam}"
+                                               Binding="{Binding Team, UpdateSourceTrigger=PropertyChanged}"
+                                               Width="80"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Boutons étudiants -->
+                    <StackPanel Grid.Row="2"
+                                Orientation="Horizontal"
+                                Margin="0,12,0,0">
+                        <Button Content="&#xE710;"
+                                Command="{Binding AddStudentCommand}"
+                                Style="{StaticResource IconButton}"
+                                Margin="0,0,4,0"
+                                IsEnabled="{Binding SelectedGroup, Converter={StaticResource NullToBoolConverter}}"
+                                ToolTip="{DynamicResource RosterEditor_Tooltip_AddStudent}"/>
+                        <Button Content="&#xE74D;"
+                                Command="{Binding DeleteStudentCommand}"
+                                Style="{StaticResource DangerIconButton}"
+                                ToolTip="{DynamicResource RosterEditor_Tooltip_DeleteStudent}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

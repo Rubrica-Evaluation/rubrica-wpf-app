@@ -23,6 +23,7 @@ public partial class NavigationService : ObservableObject, INavigationService
         
         var viewModel = _viewModelFactory.Invoke(typeof(TViewModel));
         CurrentView = viewModel;
+        (CurrentView as IActivatable)?.OnActivated();
     }
 
     public void NavigateBack()
@@ -32,6 +33,7 @@ public partial class NavigationService : ObservableObject, INavigationService
         {
             CurrentView = _previousView;
             _previousView = null;
+            (CurrentView as IActivatable)?.OnActivated();
         }
     }
 }

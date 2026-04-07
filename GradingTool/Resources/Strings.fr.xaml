@@ -18,7 +18,7 @@
     <system:String x:Key="Workspace_Sessions">Sessions</system:String>
     <system:String x:Key="Workspace_Courses">Cours</system:String>
     <system:String x:Key="Workspace_Evaluations">Évaluations</system:String>
-    <system:String x:Key="Workspace_RubricSection">Rubrique (rubric.json)</system:String>
+    <system:String x:Key="Workspace_RubricSection">Grille de l'évaluation</system:String>
     <system:String x:Key="Workspace_StudentsSection">Étudiants</system:String>
     <system:String x:Key="Workspace_GenerationMode">Mode de génération des grilles</system:String>
     <system:String x:Key="Workspace_GenerationModeIndividual">Une grille par étudiant</system:String>
@@ -26,14 +26,14 @@
     <system:String x:Key="Workspace_BtnRubricDesigner">Concepteur de grille</system:String>
     <system:String x:Key="Workspace_BtnLoadGroups">Charger des groupes</system:String>
     <system:String x:Key="Workspace_BtnDownloadTemplate">Télécharger modèle CSV</system:String>
-    <system:String x:Key="Workspace_BtnGenerateGrids">Générer tout le groupe</system:String>
+    <system:String x:Key="Workspace_BtnGenerateGrids">Générer les grilles</system:String>
     <system:String x:Key="Workspace_BtnOpenGradingFolder">Ouvrir dossier des grilles</system:String>
     <system:String x:Key="Workspace_BtnOpenEditor">Ouvrir l'éditeur</system:String>
     <system:String x:Key="Workspace_SelectFolder">Sélectionner dossier racine</system:String>
     <system:String x:Key="Workspace_ChangeFolder">Modifier dossier racine</system:String>
-    <system:String x:Key="Workspace_RubricNotFound">Aucune rubrique trouvée</system:String>
-    <system:String x:Key="Workspace_RubricValid">✓ Rubrique valide trouvée</system:String>
-    <system:String x:Key="Workspace_RubricInvalid">✗ Rubrique invalide: {0}</system:String>
+    <system:String x:Key="Workspace_RubricNotFound">Aucune grille trouvée</system:String>
+    <system:String x:Key="Workspace_RubricValid">✓ Grille valide trouvée</system:String>
+    <system:String x:Key="Workspace_RubricInvalid">✗ Grille invalide: {0}</system:String>
     <system:String x:Key="Workspace_RosterNotFound">Aucune liste d'étudiants trouvée</system:String>
     <system:String x:Key="Workspace_RosterValid">✓ Liste d'étudiants valide trouvée</system:String>
     <system:String x:Key="Workspace_RosterNoGroups">✓ Liste d'étudiants trouvée (aucun groupe détecté)</system:String>
@@ -51,8 +51,8 @@
     <system:String x:Key="Workspace_Tooltip_CreateWork">Créer une nouvelle évaluation</system:String>
     <system:String x:Key="Workspace_Tooltip_RenameWork">Renommer l'évaluation sélectionnée</system:String>
     <system:String x:Key="Workspace_Tooltip_DeleteWork">Supprimer l'évaluation sélectionnée</system:String>
-    <system:String x:Key="Workspace_Tooltip_RubricStatus">Indique si une rubrique est déjà disponible pour cette évaluation.</system:String>
-    <system:String x:Key="Workspace_Tooltip_RubricDesigner">Créer ou modifier la rubrique du travail, incluant les critères, niveaux qualitatifs et pénalités.</system:String>
+    <system:String x:Key="Workspace_Tooltip_RubricStatus">Indique si une grille est déjà disponible pour cette évaluation.</system:String>
+    <system:String x:Key="Workspace_Tooltip_RubricDesigner">Créer ou modifier la grille de l'évaluation, incluant les critères, niveaux qualitatifs et pénalités.</system:String>
     <system:String x:Key="Workspace_Tooltip_RosterStatus">Indique si une liste d'étudiants ou d'équipes a été chargée pour cette évaluation.</system:String>
     <system:String x:Key="Workspace_Tooltip_DeleteRoster">Supprimer cette liste d'étudiants</system:String>
     <system:String x:Key="Workspace_Tooltip_ModeIndividual">Créer une grille distincte pour chaque étudiant du roster.</system:String>
@@ -77,6 +77,7 @@
     <system:String x:Key="GridEditor_BtnExportSummary">Produire sommaire</system:String>
     <system:String x:Key="GridEditor_BtnExportSinglePdf">PDF étudiant</system:String>
     <system:String x:Key="GridEditor_BtnExportPdf">PDF groupe</system:String>
+    <system:String x:Key="GridEditor_BtnOpenGradingFolder">Ouvrir dossier</system:String>
     <system:String x:Key="GridEditor_BtnBank">Banque</system:String>
 
     <!-- Tooltips GridEditor -->
@@ -84,6 +85,7 @@
     <system:String x:Key="GridEditor_Tooltip_ExportSummary">Générer un fichier csv des résultats de tous les étudiants du groupe (pour importation Léa)</system:String>
     <system:String x:Key="GridEditor_Tooltip_ExportSinglePdf">Exporter le PDF de l'étudiant ou équipe actuellement affiché</system:String>
     <system:String x:Key="GridEditor_Tooltip_ExportPdf">Exporter toutes les grilles du groupe en PDF (et travaux.zip)</system:String>
+    <system:String x:Key="GridEditor_Tooltip_OpenGradingFolder">Ouvrir le dossier de correction du groupe dans l'explorateur</system:String>
     <system:String x:Key="GridEditor_Tooltip_AddComment">Ajouter un commentaire</system:String>
     <system:String x:Key="GridEditor_Tooltip_EditComment">Modifier le commentaire sélectionné</system:String>
     <system:String x:Key="GridEditor_Tooltip_DeleteComment">Supprimer le commentaire sélectionné</system:String>
@@ -91,16 +93,16 @@
 
     <!-- RubricDesigner -->
     <system:String x:Key="RubricDesigner_NavLabel">Concepteur de grille</system:String>
-    <system:String x:Key="RubricDesigner_Subtitle">Concevez la rubrique du travail: critères, niveaux qualitatifs et pénalités.</system:String>
-    <system:String x:Key="RubricDesigner_BtnLoadRubric">Charger une rubrique</system:String>
-    <system:String x:Key="RubricDesigner_BtnNewRubric">Nouvelle rubrique</system:String>
+    <system:String x:Key="RubricDesigner_Subtitle">Concevez la grille du travail: critères, niveaux qualitatifs et pénalités.</system:String>
+    <system:String x:Key="RubricDesigner_BtnLoadRubric">Charger une grille</system:String>
+    <system:String x:Key="RubricDesigner_BtnNewRubric">Nouvelle grille</system:String>
     <system:String x:Key="RubricDesigner_Settings">Paramètres</system:String>
     <system:String x:Key="RubricDesigner_WorkName">Nom du travail</system:String>
     <system:String x:Key="RubricDesigner_Summary">Résumé</system:String>
     <system:String x:Key="RubricDesigner_CriteriaCountFmt">Critères: {0}</system:String>
     <system:String x:Key="RubricDesigner_PenaltiesCountFmt">Pénalités: {0}</system:String>
     <system:String x:Key="RubricDesigner_TotalWeightFmt">Poids total: {0} %</system:String>
-    <system:String x:Key="RubricDesigner_InfoNote">La rubrique enregistrée remplacera rubric.json pour ce travail.</system:String>
+    <system:String x:Key="RubricDesigner_InfoNote">La grille enregistrée remplacera rubric.json pour ce travail.</system:String>
     <system:String x:Key="RubricDesigner_Tips">Conseils</system:String>
     <system:String x:Key="RubricDesigner_Tip1">1. Ajoutez un critère par dimension évaluée.</system:String>
     <system:String x:Key="RubricDesigner_Tip2">2. Définissez les niveaux qualitatifs avec leur pourcentage.</system:String>
@@ -123,14 +125,37 @@
     <!-- Tooltips RubricDesigner -->
     <system:String x:Key="RubricDesigner_Tooltip_Back">Retourner à la page d'accueil</system:String>
     <system:String x:Key="RubricDesigner_Tooltip_LoadRubric">Importer un fichier rubric.json existant dans le concepteur pour le consulter ou le modifier</system:String>
-    <system:String x:Key="RubricDesigner_Tooltip_NewRubric">Réinitialiser le concepteur avec une rubrique vide</system:String>
-    <system:String x:Key="RubricDesigner_Tooltip_Save">Valider et enregistrer la rubrique dans un fichier rubric.json pour ce travail</system:String>
+    <system:String x:Key="RubricDesigner_Tooltip_NewRubric">Réinitialiser le concepteur avec une grille vide</system:String>
+    <system:String x:Key="RubricDesigner_Tooltip_Save">Valider et enregistrer la grille dans un fichier rubric.json pour ce travail</system:String>
     <system:String x:Key="RubricDesigner_Tooltip_AddCriterion">Ajoute un nouveau critère avec un libellé, un poids et des niveaux qualitatifs.</system:String>
     <system:String x:Key="RubricDesigner_Tooltip_DeleteCriterion">Supprime ce critère ainsi que ses niveaux qualitatifs.</system:String>
     <system:String x:Key="RubricDesigner_Tooltip_AddScaleItem">Ajoute un niveau qualitatif supplémentaire à ce critère.</system:String>
     <system:String x:Key="RubricDesigner_Tooltip_DeleteScale">Supprimer ce niveau</system:String>
     <system:String x:Key="RubricDesigner_Tooltip_AddPenalty">Ajoute une nouvelle pénalité avec son nom, son facteur et son minimum.</system:String>
-    <system:String x:Key="RubricDesigner_Tooltip_DeletePenalty">Supprime cette pénalité de la rubrique.</system:String>
+    <system:String x:Key="RubricDesigner_Tooltip_DeletePenalty">Supprime cette pénalité de la grille.</system:String>
+
+    <!-- RosterEditor -->
+    <system:String x:Key="RosterEditor_NavLabel">Éditeur de liste d'étudiants</system:String>
+    <system:String x:Key="RosterEditor_GroupsTitle">Groupes</system:String>
+    <system:String x:Key="RosterEditor_StudentsTitle">Étudiants</system:String>
+    <system:String x:Key="RosterEditor_ColDA">DA</system:String>
+    <system:String x:Key="RosterEditor_ColFirstName">Prénom</system:String>
+    <system:String x:Key="RosterEditor_ColLastName">Nom</system:String>
+    <system:String x:Key="RosterEditor_ColTeam">Équipe</system:String>
+    <system:String x:Key="RosterEditor_BtnImportCsv">Importer CSV</system:String>
+    <system:String x:Key="RosterEditor_NoGroupSelected">Sélectionnez un groupe pour voir ses étudiants.</system:String>
+    <system:String x:Key="RosterEditor_SavedSuccess">Liste d'étudiants enregistrée avec succès</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_ImportCsv">Importer un ou plusieurs fichiers CSV dans le dossier roster</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_Save">Enregistrer toutes les modifications dans les fichiers CSV</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_Back">Retourner à l'espace de travail</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_AddGroup">Ajouter un nouveau groupe vide</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_DeleteGroup">Supprimer le groupe sélectionné et son fichier CSV</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_AddStudent">Ajouter un étudiant au groupe sélectionné</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_DeleteStudent">Supprimer l'étudiant sélectionné</system:String>
+
+    <!-- Workspace - bouton roster -->
+    <system:String x:Key="Workspace_BtnEditRoster">Modifier les étudiants</system:String>
+    <system:String x:Key="Workspace_Tooltip_EditRoster">Ouvrir l'éditeur de liste d'étudiants pour ce travail</system:String>
 
     <!-- Configuration -->
     <system:String x:Key="Config_Title">Configuration</system:String>

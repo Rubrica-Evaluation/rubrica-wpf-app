@@ -5,20 +5,25 @@ namespace GradingTool.Services;
 public interface IRosterService
 {
     /// <summary>
-    /// Checks if a roster CSV file exists in the specified evaluation's roster folder
+    /// Checks if roster.json exists for the specified evaluation
     /// </summary>
     bool RosterExists(string sessionName, string courseName, string workName);
 
     /// <summary>
-    /// Gets the path to the roster CSV file for the specified evaluation
+    /// Loads and deserializes roster.json
     /// </summary>
-    string GetRosterPath(string sessionName, string courseName, string workName);
+    RosterModel? LoadRoster(string sessionName, string courseName, string workName, out string errorMessage);
 
     /// <summary>
-    /// Loads and parses the roster CSV file
+    /// Serializes and overwrites roster.json with the given groups
     /// </summary>
-    /// <returns>The loaded roster or null if parsing fails</returns>
-    RosterModel? LoadRoster(string sessionName, string courseName, string workName, out string errorMessage);
+    void SaveRoster(string sessionName, string courseName, string workName, List<GroupModel> groups);
+
+    /// <summary>
+    /// Parses a CSV file and merges its students into roster.json.
+    /// The group code is detected from the filename (gr00001 pattern), or the next available code is used.
+    /// </summary>
+    void ImportCsv(string sessionName, string courseName, string workName, string csvFilePath);
 
     /// <summary>
     /// Validates that the CSV file has the expected format
@@ -26,27 +31,12 @@ public interface IRosterService
     bool ValidateCsvFormat(string filePath, out string errorMessage);
 
     /// <summary>
-    /// Imports a CSV file to the roster folder
-    /// </summary>
-    void ImportRoster(string sessionName, string courseName, string workName, string sourceFilePath);
-
-    /// <summary>
-    /// Checks if a file with the given name already exists in the roster folder
-    /// </summary>
-    bool FileExistsInRosterFolder(string sessionName, string courseName, string workName, string fileName);
-
-    /// <summary>
-    /// Creates and saves a template CSV file to the specified location
+    /// Creates and saves a CSV template file to the specified location
     /// </summary>
     void SaveRosterTemplate(string destinationFilePath);
 
     /// <summary>
-    /// Detects groups from roster file names (gr0000X pattern)
+    /// Copies roster.json from a source evaluation to a destination evaluation
     /// </summary>
-    List<GroupModel> DetectGroups(string sessionName, string courseName, string workName);
-
-    /// <summary>
-    /// Deletes a specific roster file by file path
-    /// </summary>
-    void DeleteRosterFile(string filePath);
+    void CopyRoster(string sessionName, string courseName, string sourceWorkName, string destWorkName);
 }

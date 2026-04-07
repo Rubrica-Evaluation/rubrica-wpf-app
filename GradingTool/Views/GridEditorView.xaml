@@ -101,6 +101,12 @@
                             Margin="0,0,8,0"
                             Style="{StaticResource DangerButton}"
                             ToolTip="{DynamicResource GridEditor_Tooltip_ExportPdf}"/>
+                    <Button Content="{DynamicResource GridEditor_BtnOpenGradingFolder}"
+                            Command="{Binding OpenGradingFolderCommand}"
+                            Padding="16,8"
+                            Margin="0,0,8,0"
+                            Style="{StaticResource GhostButton}"
+                            ToolTip="{DynamicResource GridEditor_Tooltip_OpenGradingFolder}"/>
                     <Button Content="{DynamicResource Common_Back}"
                             Command="{Binding GoBackCommand}"
                             Padding="16,8"
