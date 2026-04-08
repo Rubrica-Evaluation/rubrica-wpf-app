@@ -11,19 +11,33 @@ public static class FileHelper
 {
     public static async Task WriteAllTextAtomicAsync(string filePath, string content, Encoding? encoding = null)
     {
-        var directory = Path.GetDirectoryName(filePath)!;
-        var tempPath = Path.Combine(directory, Path.GetRandomFileName());
+        var tempPath = filePath + ".tmp";
 
         await File.WriteAllTextAsync(tempPath, content, encoding ?? Encoding.UTF8);
-        File.Move(tempPath, filePath, overwrite: true);
+        try
+        {
+            File.Move(tempPath, filePath, overwrite: true);
+        }
+        catch
+        {
+            try { File.Delete(tempPath); } catch { }
+            throw;
+        }
     }
 
     public static void WriteAllTextAtomic(string filePath, string content, Encoding? encoding = null)
     {
-        var directory = Path.GetDirectoryName(filePath)!;
-        var tempPath = Path.Combine(directory, Path.GetRandomFileName());
+        var tempPath = filePath + ".tmp";
 
         File.WriteAllText(tempPath, content, encoding ?? Encoding.UTF8);
-        File.Move(tempPath, filePath, overwrite: true);
+        try
+        {
+            File.Move(tempPath, filePath, overwrite: true);
+        }
+        catch
+        {
+            try { File.Delete(tempPath); } catch { }
+            throw;
+        }
     }
 }

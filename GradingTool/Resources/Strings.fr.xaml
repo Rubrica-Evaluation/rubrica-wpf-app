@@ -36,7 +36,7 @@
     <system:String x:Key="Workspace_RubricInvalid">✗ Grille invalide: {0}</system:String>
     <system:String x:Key="Workspace_RosterNotFound">Aucune liste d'étudiants trouvée</system:String>
     <system:String x:Key="Workspace_RosterValid">✓ Liste d'étudiants valide trouvée</system:String>
-    <system:String x:Key="Workspace_RosterNoGroups">✓ Liste d'étudiants trouvée (aucun groupe détecté)</system:String>
+    <system:String x:Key="Workspace_RosterNoGroups">⚠ Aucun groupe importé</system:String>
     <system:String x:Key="Workspace_RosterInvalid">✗ Liste d'étudiants invalide: {0}</system:String>
     <system:String x:Key="Workspace_RosterEmpty">Aucun roster trouvé</system:String>
 
@@ -139,7 +139,7 @@
     <system:String x:Key="RosterEditor_NavLabel">Éditeur de liste d'étudiants</system:String>
     <system:String x:Key="RosterEditor_GroupsTitle">Groupes</system:String>
     <system:String x:Key="RosterEditor_StudentsTitle">Étudiants</system:String>
-    <system:String x:Key="RosterEditor_ColDA">DA</system:String>
+    <system:String x:Key="RosterEditor_ColDA">Code</system:String>
     <system:String x:Key="RosterEditor_ColFirstName">Prénom</system:String>
     <system:String x:Key="RosterEditor_ColLastName">Nom</system:String>
     <system:String x:Key="RosterEditor_ColTeam">Équipe</system:String>
@@ -155,7 +155,7 @@
     <system:String x:Key="RosterEditor_Tooltip_DeleteStudent">Supprimer l'étudiant sélectionné</system:String>
 
     <!-- Workspace - bouton roster -->
-    <system:String x:Key="Workspace_BtnEditRoster">Modifier les étudiants</system:String>
+    <system:String x:Key="Workspace_BtnEditRoster">Gérer les groupes</system:String>
     <system:String x:Key="Workspace_Tooltip_EditRoster">Ouvrir l'éditeur de liste d'étudiants pour ce travail</system:String>
 
     <!-- Configuration -->

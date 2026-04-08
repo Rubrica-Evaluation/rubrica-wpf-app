@@ -43,6 +43,16 @@ public partial class MainWindow : Window
             }
         }
 
+        // Vérifier les modifications non enregistrées dans l'éditeur de groupes
+        if (currentView is RosterEditorViewModel rosterEditor)
+        {
+            if (!rosterEditor.CanProceedWithUnsavedChanges())
+            {
+                e.Cancel = true;
+                return;
+            }
+        }
+
         // Sauvegarder automatiquement la grille actuelle si on est dans l'éditeur
         if (currentView is GridEditorViewModel gridEditorViewModel)
         {

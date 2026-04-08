@@ -59,7 +59,7 @@ public class RosterService : IRosterService
             var roster = JsonSerializer.Deserialize<RosterModel>(json, JsonOptions);
             if (roster == null)
             {
-                errorMessage = "Le fichier roster.json ne peut pas etre deserialis�.";
+                errorMessage = "Le fichier roster.json ne peut pas etre deserialisé.";
                 return null;
             }            RehydrateGroupInfo(roster);            return roster;
         }
@@ -91,23 +91,37 @@ public class RosterService : IRosterService
         }
     }
 
-    public void ImportCsv(string sessionName, string courseName, string workName, string csvFilePath)
+    public void ImportCsv(string sessionName, string courseName, string workName, string csvFilePath, string? targetGroupCode = null)
     {
         if (!File.Exists(csvFilePath))
-            throw new FileNotFoundException("Le fichier source n'\''existe pas.", csvFilePath);
+            throw new FileNotFoundException("Le fichier source n'existe pas.", csvFilePath);
 
         var students = ParseCsvFile(csvFilePath, out string errorMessage);
         if (students == null)
             throw new InvalidOperationException($"Format CSV invalide: {errorMessage}");
 
-        var groupCode = ExtractGroupCodeFromFileName(Path.GetFileName(csvFilePath));
-
         var roster = RosterExists(sessionName, courseName, workName)
             ? (LoadRoster(sessionName, courseName, workName, out _) ?? new RosterModel())
             : new RosterModel();
 
-        if (string.IsNullOrEmpty(groupCode))
+        string groupCode;
+        if (targetGroupCode == null)
+        {
+            // Comportement automatique : détecter depuis le nom de fichier
+            groupCode = ExtractGroupCodeFromFileName(Path.GetFileName(csvFilePath));
+            if (string.IsNullOrEmpty(groupCode))
+                groupCode = GenerateNextGroupCode(roster.Groups);
+        }
+        else if (targetGroupCode == string.Empty)
+        {
+            // Forcer la création d'un nouveau groupe
             groupCode = GenerateNextGroupCode(roster.Groups);
+        }
+        else
+        {
+            // Utiliser le groupe existant spécifié
+            groupCode = targetGroupCode;
+        }
 
         var displayName = BuildDisplayName(groupCode);
 
@@ -136,12 +150,6 @@ public class RosterService : IRosterService
         return ParseCsvFile(filePath, out errorMessage) != null;
     }
 
-    public void SaveRosterTemplate(string destinationFilePath)
-    {
-        var template = "DA,Pr�nom,Nom,�quipe\n123456789,Jean,Dupont,1\n987654321,Marie,Martin,1\n456789123,Paul,Dubois,2\n";
-        File.WriteAllText(destinationFilePath, template, Encoding.UTF8);
-    }
-
     public void CopyRoster(string sessionName, string courseName, string sourceWorkName, string destWorkName)
     {
         var sourcePath = GetRosterFilePath(sessionName, courseName, sourceWorkName);
@@ -159,29 +167,38 @@ public class RosterService : IRosterService
         errorMessage = string.Empty;
         if (!File.Exists(filePath))
         {
-            errorMessage = "Le fichier CSV n'\''existe pas.";
+            errorMessage = "Le fichier CSV n'existe pas.";
             return null;
         }
 
-        var encodings = new[] { Encoding.UTF8, Encoding.GetEncoding(1252) };
-        Exception? lastException = null;
-
-        foreach (var encoding in encodings)
+        try
         {
-            try
-            {
-                var result = TryParseCsv(filePath, encoding, out errorMessage);
-                if (result != null)
-                    return result;
-            }
-            catch (Exception ex)
-            {
-                lastException = ex;
-            }
+            var encoding = DetectCsvEncoding(filePath);
+            return TryParseCsv(filePath, encoding, out errorMessage);
         }
+        catch (Exception ex)
+        {
+            errorMessage = ex.Message;
+            return null;
+        }
+    }
 
-        errorMessage = lastException?.Message ?? errorMessage;
-        return null;
+    private static Encoding DetectCsvEncoding(string filePath)
+    {
+        var bytes = File.ReadAllBytes(filePath);
+
+        if (bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+            return new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
+
+        try
+        {
+            new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true).GetString(bytes);
+            return Encoding.UTF8;
+        }
+        catch (DecoderFallbackException)
+        {
+            return Encoding.GetEncoding(1252);
+        }
     }
 
     private List<StudentModel>? TryParseCsv(string filePath, Encoding encoding, out string errorMessage)
@@ -201,7 +218,7 @@ public class RosterService : IRosterService
         var headers = parser.ReadFields();
         if (headers == null || headers.Length < 3)
         {
-            errorMessage = "Le fichier CSV doit contenir au moins 3 colonnes: DA, Pr�nom, Nom.";
+            errorMessage = "Le fichier CSV doit contenir au moins 3 colonnes: DA, Prénom, Nom.";
             return null;
         }
 
@@ -210,9 +227,9 @@ public class RosterService : IRosterService
         {
             var h = headers[i].ToLowerInvariant();
             if (h.Contains("da") && daIndex == -1) daIndex = i;
-            if ((h.Contains("pr�nom") || h.Contains("prenom") || h.Contains("firstname")) && firstNameIndex == -1) firstNameIndex = i;
-            if (h.Contains("nom") && !h.Contains("pr�nom") && !h.Contains("prenom") && lastNameIndex == -1) lastNameIndex = i;
-            if ((h.Contains("�quipe") || h.Contains("equipe") || h.Contains("team")) && teamIndex == -1) teamIndex = i;
+            if ((h.Contains("prénom") || h.Contains("prenom") || h.Contains("firstname")) && firstNameIndex == -1) firstNameIndex = i;
+            if (h.Contains("nom") && !h.Contains("prénom") && !h.Contains("prenom") && lastNameIndex == -1) lastNameIndex = i;
+            if ((h.Contains("Équipe") || h.Contains("equipe") || h.Contains("team")) && teamIndex == -1) teamIndex = i;
         }
         if (daIndex == -1) daIndex = 0;
         if (firstNameIndex == -1) firstNameIndex = 2;
@@ -245,6 +262,10 @@ public class RosterService : IRosterService
         if (input.StartsWith('"') && input.EndsWith('"')) return input[1..^1];
         return input;
     }
+
+    public string DetectGroupCodeInFileName(string fileName) => ExtractGroupCodeFromFileName(fileName);
+
+    public string BuildGroupDisplayName(string groupCode) => BuildDisplayName(groupCode);
 
     private static string ExtractGroupCodeFromFileName(string fileName)
     {

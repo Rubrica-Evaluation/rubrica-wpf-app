@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Collections.ObjectModel;
 using GradingTool.Models;
 using GradingTool.Helpers;
+using Microsoft.VisualBasic.FileIO;
 
 namespace GradingTool.Services;
 
@@ -56,6 +57,20 @@ public class GridService : IGridService
             var json = JsonSerializer.Serialize(grid, _jsonOptions);
             await FileHelper.WriteAllTextAtomicAsync(filePath, json);
 
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> UpdateGridAsync(GridModel grid, string filePath)
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(grid, _jsonOptions);
+            await FileHelper.WriteAllTextAtomicAsync(filePath, json);
             return true;
         }
         catch
@@ -366,7 +381,18 @@ public class GridService : IGridService
         drop = Math.Min(drop, maxDrop);
         return scaleList[drop].Qualitative;
     }
+    public bool GradingFolderHasFiles(string gradingBasePath, string groupCode)
+    {
+        var path = Path.Combine(gradingBasePath, groupCode);
+        return Directory.Exists(path) && Directory.GetFiles(path, "*.json").Length > 0;
+    }
 
+    public void DeleteGradingFolder(string gradingBasePath, string groupCode)
+    {
+        var path = Path.Combine(gradingBasePath, groupCode);
+        if (Directory.Exists(path))
+            FileSystem.DeleteDirectory(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+    }
     public List<string> FindCommentUsages(string gradingPath, CommentEntry comment)
     {
         var usages = new List<string>();

@@ -22,6 +22,15 @@ public interface IGridService
     Task<bool> SaveGridAsync(GridModel grid, string basePath);
 
     /// <summary>
+    /// Met à jour une grille existante en écrivant directement sur son chemin de fichier.
+    /// Utiliser lors de l'édition d'une grille déjà créée, pour éviter de recalculer le nom de fichier.
+    /// </summary>
+    /// <param name="grid">La grille à sauvegarder</param>
+    /// <param name="filePath">Le chemin absolu du fichier JSON existant</param>
+    /// <returns>True si sauvegardé avec succès</returns>
+    Task<bool> UpdateGridAsync(GridModel grid, string filePath);
+
+    /// <summary>
     /// Vérifie si une grille existe déjà pour un étudiant
     /// </summary>
     /// <param name="student">L'étudiant</param>
@@ -86,4 +95,18 @@ public interface IGridService
     /// Cherche toutes les grilles du dossier grading qui contiennent un commentaire identique (texte + sévérité).
     /// </summary>
     List<string> FindCommentUsages(string gradingPath, CommentEntry comment);
+
+    /// <summary>
+    /// Vérifie si le sous-dossier de grilles d'un groupe contient des fichiers JSON.
+    /// </summary>
+    /// <param name="gradingBasePath">Le dossier grading du travail (ex: .../TP1/grading)</param>
+    /// <param name="groupCode">Le code du groupe (ex: gr00001)</param>
+    bool GradingFolderHasFiles(string gradingBasePath, string groupCode);
+
+    /// <summary>
+    /// Envoie à la corbeille le dossier de grilles d'un groupe.
+    /// </summary>
+    /// <param name="gradingBasePath">Le dossier grading du travail (ex: .../TP1/grading)</param>
+    /// <param name="groupCode">Le code du groupe (ex: gr00001)</param>
+    void DeleteGradingFolder(string gradingBasePath, string groupCode);
 }

@@ -1,0 +1,51 @@
+<Window x:Class="GradingTool.Views.GroupSelectionDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Destination de l'importation"
+        Width="460"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="White"
+        FontFamily="Segoe UI">
+    <Grid Margin="28,24,28,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="16"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Message -->
+        <TextBlock x:Name="MessageText"
+                   Grid.Row="0"
+                   FontSize="13"
+                   Foreground="#333333"
+                   TextWrapping="Wrap"
+                   LineHeight="20"/>
+
+        <!-- ComboBox -->
+        <ComboBox x:Name="GroupComboBox"
+                  Grid.Row="2"
+                  FontSize="13"
+                  Padding="8,6"
+                  SelectionChanged="GroupComboBox_SelectionChanged"/>
+
+        <!-- Boutons -->
+        <StackPanel Grid.Row="4"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button x:Name="CancelButton"
+                    Content="Annuler"
+                    Style="{StaticResource GhostButton}"
+                    Click="CancelButton_Click"/>
+            <Button x:Name="OkButton"
+                    Content="Importer"
+                    Style="{StaticResource RoundedButton}"
+                    Margin="8,0,0,0"
+                    IsDefault="True"
+                    Click="OkButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

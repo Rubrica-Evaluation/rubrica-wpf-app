@@ -36,7 +36,7 @@
     <system:String x:Key="Workspace_RubricInvalid">✗ Invalid rubric: {0}</system:String>
     <system:String x:Key="Workspace_RosterNotFound">No student list found</system:String>
     <system:String x:Key="Workspace_RosterValid">✓ Valid student list found</system:String>
-    <system:String x:Key="Workspace_RosterNoGroups">✓ Student list found (no group detected)</system:String>
+    <system:String x:Key="Workspace_RosterNoGroups">⚠ No groups imported</system:String>
     <system:String x:Key="Workspace_RosterInvalid">✗ Invalid student list: {0}</system:String>
     <system:String x:Key="Workspace_RosterEmpty">No roster found</system:String>
 
@@ -155,7 +155,7 @@
     <system:String x:Key="RosterEditor_Tooltip_DeleteStudent">Delete the selected student</system:String>
 
     <!-- Workspace - roster button -->
-    <system:String x:Key="Workspace_BtnEditRoster">Edit Students</system:String>
+    <system:String x:Key="Workspace_BtnEditRoster">Manage Groups</system:String>
     <system:String x:Key="Workspace_Tooltip_EditRoster">Open the student list editor for this assignment</system:String>
 
     <!-- Configuration -->

@@ -1,3 +1,4 @@
+using GradingTool.Models;
 using System.Windows;
 
 namespace GradingTool.Services;
@@ -26,5 +27,12 @@ public interface IDialogService
     bool ShowConfirmation(string message, string title);
     OverwriteChoice ShowOverwriteConfirmation(int existingCount, int totalCount);
     UnsavedChangesChoice ShowUnsavedChangesConfirmation(string context);
+
+    /// <summary>
+    /// Affiche un dialog pour choisir le groupe cible d'un import CSV.
+    /// </summary>
+    /// <returns>null = annulé, "" = nouveau groupe, groupCode = groupe existant ou groupe à créer</returns>
+    string? ShowGroupImportTargetDialog(string fileName, List<GroupModel> existingGroups, string? suggestedGroupCode = null, string? suggestedDisplayName = null);
+
     void ShowToast(string message, int durationMs = 3000);
 }

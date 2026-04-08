@@ -179,9 +179,8 @@ public partial class GridEditorViewModel : ObservableObject
             // Recalculer les points avant la sauvegarde
             RecalculateAll();
 
-            // Le basePath doit être le répertoire du travail (ex: TP1), pas le répertoire grading
+            await _gridService.UpdateGridAsync(CurrentGrid, SelectedGridFile.FilePath);
             var basePath = Path.GetDirectoryName(Path.GetDirectoryName(SelectedGridFile.FilePath))!;
-            await _gridService.SaveGridAsync(CurrentGrid, basePath);
             await _commentService.SaveCommentsAsync(basePath);
             _ = ShowSavedFeedbackAsync();
         }
@@ -325,9 +324,7 @@ public partial class GridEditorViewModel : ObservableObject
             // Recalculer les points avant la sauvegarde
             RecalculateAll();
 
-            // Le basePath doit être le répertoire du travail (ex: TP1), pas le répertoire grading
-            var basePath = Path.GetDirectoryName(Path.GetDirectoryName(SelectedGridFile.FilePath))!;
-            var success = await _gridService.SaveGridAsync(CurrentGrid, basePath);
+            var success = await _gridService.UpdateGridAsync(CurrentGrid, SelectedGridFile.FilePath);
             
             if (success)
             {

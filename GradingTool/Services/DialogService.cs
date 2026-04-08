@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
 using GradingTool.Controls;
+using GradingTool.Models;
 using GradingTool.Views;
 
 namespace GradingTool.Services;
@@ -106,6 +107,12 @@ public class DialogService : IDialogService
             1 => UnsavedChangesChoice.Discard,
             _ => UnsavedChangesChoice.Cancel
         };
+    }
+
+    public string? ShowGroupImportTargetDialog(string fileName, List<GroupModel> existingGroups, string? suggestedGroupCode = null, string? suggestedDisplayName = null)
+    {
+        var dialog = new GroupSelectionDialog(fileName, existingGroups, suggestedGroupCode, suggestedDisplayName);
+        return dialog.ShowDialog() == true ? dialog.SelectedGroupCode : null;
     }
 
     public void ShowToast(string message, int durationMs = 3000)
