@@ -5,6 +5,7 @@
     <!-- Commun -->
     <system:String x:Key="Common_AppTitle">Outil d'évaluation</system:String>
     <system:String x:Key="Common_Back">Retour</system:String>
+    <system:String x:Key="Common_StudentCount"> étudiant(s)</system:String>
     <system:String x:Key="Common_Save">Enregistrer</system:String>
     <system:String x:Key="Common_Delete">Supprimer</system:String>
     <system:String x:Key="Common_Error">Erreur</system:String>
@@ -147,7 +148,7 @@
     <system:String x:Key="RosterEditor_NoGroupSelected">Sélectionnez un groupe pour voir ses étudiants.</system:String>
     <system:String x:Key="RosterEditor_SavedSuccess">Liste d'étudiants enregistrée avec succès</system:String>
     <system:String x:Key="RosterEditor_Tooltip_ImportCsv">Importer un ou plusieurs fichiers CSV dans le dossier roster</system:String>
-    <system:String x:Key="RosterEditor_Tooltip_Save">Enregistrer toutes les modifications dans les fichiers CSV</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_Save">Enregistrer toutes les modifications</system:String>
     <system:String x:Key="RosterEditor_Tooltip_Back">Retourner à l'espace de travail</system:String>
     <system:String x:Key="RosterEditor_Tooltip_AddGroup">Ajouter un nouveau groupe vide</system:String>
     <system:String x:Key="RosterEditor_Tooltip_DeleteGroup">Supprimer le groupe sélectionné et son fichier CSV</system:String>

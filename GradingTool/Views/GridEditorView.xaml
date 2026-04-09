@@ -384,7 +384,7 @@
                                                         </ComboBox>
 
                                                         <!-- Recommendation basée sur les commentaires -->
-                                                        <Button Margin="0,4,0,0"
+                                                        <Button Margin="0,8,0,0"
                                                                 Padding="0"
                                                                 BorderThickness="0"
                                                                 Background="Transparent"
@@ -421,6 +421,45 @@
                                                                             <Binding Path="RecommendedResult" StringFormat="Suggestion : {0}"/>
                                                                         </TextBlock.Text>
                                                                     </TextBlock>
+                                                                </StackPanel>
+                                                            </Border>
+                                                        </Button>
+
+                                                        <!-- Appliquer aux coéquipiers -->
+                                                        <Button Margin="0,8,0,0"
+                                                                Padding="0"
+                                                                BorderThickness="0"
+                                                                Background="Transparent"
+                                                                HorizontalAlignment="Left"
+                                                                Cursor="Hand"
+                                                                ToolTip="Appliquer le résultat et les commentaires aux autres coéquipiers"
+                                                                Visibility="{Binding DataContext.HasTeammates, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                                Command="{Binding DataContext.ApplyCriterionToTeammatesCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding}">
+                                                            <Border Background="#F0FFF0"
+                                                                    BorderBrush="#A8D5A8"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="3"
+                                                                    Padding="6,4">
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=IsMouseOver}" Value="True">
+                                                                                <Setter Property="Background" Value="#C8F0C8"/>
+                                                                                <Setter Property="BorderBrush" Value="#45A045"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </Border.Style>
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <TextBlock Text="👥"
+                                                                               FontSize="11"
+                                                                               VerticalAlignment="Center"
+                                                                               Margin="0,0,4,0"/>
+                                                                    <TextBlock Text="Appliquer aux coéquipiers"
+                                                                               FontSize="11"
+                                                                               Foreground="#1A5226"
+                                                                               VerticalAlignment="Center"/>
                                                                 </StackPanel>
                                                             </Border>
                                                         </Button>

@@ -109,4 +109,9 @@ public interface IGridService
     /// <param name="gradingBasePath">Le dossier grading du travail (ex: .../TP1/grading)</param>
     /// <param name="groupCode">Le code du groupe (ex: gr00001)</param>
     void DeleteGradingFolder(string gradingBasePath, string groupCode);
+
+    /// <summary>
+    /// Applique le résultat et les commentaires d'un critère à toutes les grilles coéquipières indiquées.
+    /// </summary>
+    Task ApplyCriterionToTeammatesAsync(string criterionLabel, string result, IEnumerable<CommentEntry> feedback, IEnumerable<string> teammateFilePaths);
 }

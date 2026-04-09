@@ -99,7 +99,7 @@
                                     <TextBlock FontSize="11"
                                                Foreground="#888888">
                                         <Run Text="{Binding StudentCount, Mode=OneWay}"/>
-                                        <Run Text=" étudiant(s)"/>
+                                        <Run Text="{DynamicResource Common_StudentCount}"/>
                                     </TextBlock>
                                 </StackPanel>
                             </DataTemplate>
@@ -154,7 +154,7 @@
                                    Foreground="#666666"
                                    VerticalAlignment="Center">
                             <Run Text="{Binding Students.Count, Mode=OneWay}"/>
-                            <Run Text=" étudiant(s)"/>
+                            <Run Text="{DynamicResource Common_StudentCount}"/>
                         </TextBlock>
                     </Grid>
 

@@ -5,6 +5,7 @@
     <!-- Common -->
     <system:String x:Key="Common_AppTitle">Grading Tool</system:String>
     <system:String x:Key="Common_Back">Back</system:String>
+    <system:String x:Key="Common_StudentCount"> student(s)</system:String>
     <system:String x:Key="Common_Save">Save</system:String>
     <system:String x:Key="Common_Delete">Delete</system:String>
     <system:String x:Key="Common_Error">Error</system:String>
@@ -147,7 +148,7 @@
     <system:String x:Key="RosterEditor_NoGroupSelected">Select a group to view its students.</system:String>
     <system:String x:Key="RosterEditor_SavedSuccess">Student list saved successfully</system:String>
     <system:String x:Key="RosterEditor_Tooltip_ImportCsv">Import one or more CSV files into the roster folder</system:String>
-    <system:String x:Key="RosterEditor_Tooltip_Save">Save all changes to the CSV files</system:String>
+    <system:String x:Key="RosterEditor_Tooltip_Save">Save all changes</system:String>
     <system:String x:Key="RosterEditor_Tooltip_Back">Return to workspace</system:String>
     <system:String x:Key="RosterEditor_Tooltip_AddGroup">Add a new empty group</system:String>
     <system:String x:Key="RosterEditor_Tooltip_DeleteGroup">Delete the selected group and its CSV file</system:String>

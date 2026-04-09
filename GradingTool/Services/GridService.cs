@@ -393,6 +393,28 @@ public class GridService : IGridService
         if (Directory.Exists(path))
             FileSystem.DeleteDirectory(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
     }
+
+    public async Task ApplyCriterionToTeammatesAsync(string criterionLabel, string result, IEnumerable<CommentEntry> feedback, IEnumerable<string> teammateFilePaths)
+    {
+        var feedbackSnapshot = feedback.ToList();
+        foreach (var filePath in teammateFilePaths)
+        {
+            var grid = await LoadGridAsync(filePath);
+            if (grid == null) continue;
+
+            var criterion = grid.Criteria.FirstOrDefault(c => c.Label == criterionLabel);
+            if (criterion == null) continue;
+
+            criterion.Result = result;
+            criterion.Feedback = new ObservableCollection<CommentEntry>(feedbackSnapshot);
+
+            grid.Computed.Total = grid.Criteria.Sum(c => c.Points ?? 0)
+                + grid.Penalties.Sum(p => p.ComputedPenalty);
+
+            var json = JsonSerializer.Serialize(grid, _jsonOptions);
+            await FileHelper.WriteAllTextAtomicAsync(filePath, json);
+        }
+    }
     public List<string> FindCommentUsages(string gradingPath, CommentEntry comment)
     {
         var usages = new List<string>();

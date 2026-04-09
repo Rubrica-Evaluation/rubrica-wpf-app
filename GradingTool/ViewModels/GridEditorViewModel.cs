@@ -21,6 +21,7 @@ public partial class GridEditorViewModel : ObservableObject
 
     private string _gradingRootPath = string.Empty;
     private string _groupGradingPath = string.Empty;
+    private string? _loadedGridFilePath;
 
     [ObservableProperty]
     private string _groupName = string.Empty;
@@ -57,6 +58,9 @@ public partial class GridEditorViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _justSaved;
+
+    [ObservableProperty]
+    private bool _hasTeammates;
 
     public string NavigationPath => $"{SessionName} / {CourseName} / {WorkName} / {GroupName}";
     
@@ -117,7 +121,10 @@ public partial class GridEditorViewModel : ObservableObject
         CurrentGrid = null;
         TotalPoints = null;
         TotalPenalties = null;
-        
+        HasTeammates = value != null
+            && value.TeamNumber > 0
+            && GridFiles.Any(f => f.FilePath != value.FilePath && f.TeamNumber == value.TeamNumber);
+
         if (value != null)
         {
             _ = LoadCurrentGridAsync(value.FilePath);
@@ -126,6 +133,7 @@ public partial class GridEditorViewModel : ObservableObject
 
     private async Task LoadCurrentGridAsync(string filePath)
     {
+        _loadedGridFilePath = filePath;
         CurrentGrid = await _gridService.LoadGridAsync(filePath);
         
         // Charger les commentaires réutilisables depuis le répertoire grading
@@ -174,16 +182,13 @@ public partial class GridEditorViewModel : ObservableObject
 
     public async Task SaveCurrentGridAsync()
     {
-        if (CurrentGrid != null && SelectedGridFile != null)
-        {
-            // Recalculer les points avant la sauvegarde
-            RecalculateAll();
+        if (CurrentGrid == null || _loadedGridFilePath == null) return;
 
-            await _gridService.UpdateGridAsync(CurrentGrid, SelectedGridFile.FilePath);
-            var basePath = Path.GetDirectoryName(Path.GetDirectoryName(SelectedGridFile.FilePath))!;
-            await _commentService.SaveCommentsAsync(basePath);
-            _ = ShowSavedFeedbackAsync();
-        }
+        RecalculateAll();
+        await _gridService.UpdateGridAsync(CurrentGrid, _loadedGridFilePath);
+        var basePath = Path.GetDirectoryName(Path.GetDirectoryName(_loadedGridFilePath))!;
+        await _commentService.SaveCommentsAsync(basePath);
+        _ = ShowSavedFeedbackAsync();
     }
 
     private async Task ShowSavedFeedbackAsync()
@@ -257,6 +262,27 @@ public partial class GridEditorViewModel : ObservableObject
     {
         if (criterion == null || string.IsNullOrEmpty(criterion.RecommendedResult)) return;
         criterion.Result = criterion.RecommendedResult;
+    }
+
+    [RelayCommand]
+    private async Task ApplyCriterionToTeammatesAsync(CriterionModel? criterion)
+    {
+        if (criterion == null || SelectedGridFile == null) return;
+
+        // Sauvegarder la grille courante avant d'appliquer
+        await SaveCurrentGridAsync();
+
+        var teammates = GridFiles
+            .Where(f => f.TeamNumber == SelectedGridFile.TeamNumber && f.FilePath != SelectedGridFile.FilePath)
+            .Select(f => f.FilePath)
+            .ToList();
+
+        if (teammates.Count == 0) return;
+
+        await _gridService.ApplyCriterionToTeammatesAsync(
+            criterion.Label, criterion.Result, criterion.Feedback, teammates);
+
+        _dialogService.ShowToast($"Appliqué à {teammates.Count} coéquipier(s)");
     }
 
     [RelayCommand]
