@@ -184,10 +184,19 @@ public partial class GridEditorViewModel : ObservableObject
     {
         if (CurrentGrid == null || _loadedGridFilePath == null) return;
 
+        // Capturer avant le premier yield : OnSelectedGridFileChanged nullifie CurrentGrid
+        // et LoadCurrentGridAsync réassigne _loadedGridFilePath de façon synchrone.
+        var gridToSave = CurrentGrid;
+        var filePathToSave = _loadedGridFilePath;
+        var basePath = Path.GetDirectoryName(Path.GetDirectoryName(filePathToSave))!;
+
         RecalculateAll();
-        await _gridService.UpdateGridAsync(CurrentGrid, _loadedGridFilePath);
-        var basePath = Path.GetDirectoryName(Path.GetDirectoryName(_loadedGridFilePath))!;
+
+        // SaveCommentsAsync doit être appelé AVANT UpdateGridAsync : la sérialisation du
+        // dictionnaire est synchrone (avant le premier yield interne), ce qui garantit que
+        // le snapshot est pris avant que LoadCommentsAsync puisse vider _commentsByCriteria.
         await _commentService.SaveCommentsAsync(basePath);
+        await _gridService.UpdateGridAsync(gridToSave, filePathToSave);
         _ = ShowSavedFeedbackAsync();
     }
 
