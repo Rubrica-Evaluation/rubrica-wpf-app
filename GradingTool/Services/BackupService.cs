@@ -136,7 +136,7 @@ public class BackupService : IBackupService
 
     private void CreateZip(string sourceFolderPath, string destinationZipPath)
     {
-        // RootPath is the parent so entries include the folder name, e.g. Evaluation-App/sessions/...
+        // RootPath is the parent so entries include the folder name, e.g. Rubrica/sessions/...
         var rootPath = Path.GetDirectoryName(sourceFolderPath)!;
         using var zipStream = new FileStream(destinationZipPath, FileMode.Create, FileAccess.Write);
         using var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, leaveOpen: false);
