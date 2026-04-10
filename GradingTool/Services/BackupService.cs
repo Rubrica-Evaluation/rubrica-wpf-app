@@ -14,13 +14,22 @@ public class BackupService : IBackupService
     private readonly System.Timers.Timer _periodicTimer;
     private volatile bool _suppressNextBackup;
 
+    private const int DefaultIntervalMinutes = 30;
+    private static readonly int[] ValidIntervalMinutes = [5, 10, 15, 30];
+
+    private static double ToValidIntervalMs(int minutes)
+    {
+        var clamped = ValidIntervalMinutes.Contains(minutes) ? minutes : DefaultIntervalMinutes;
+        return TimeSpan.FromMinutes(clamped).TotalMilliseconds;
+    }
+
     public BackupService(ISessionsRootService sessionsRootService, IConfigurationService configurationService)
     {
         _sessionsRootService = sessionsRootService;
         _configurationService = configurationService;
 
         var intervalMinutes = _configurationService.LoadBackupIntervalMinutes();
-        _periodicTimer = new System.Timers.Timer(TimeSpan.FromMinutes(intervalMinutes).TotalMilliseconds);
+        _periodicTimer = new System.Timers.Timer(ToValidIntervalMs(intervalMinutes));
         _periodicTimer.Elapsed += async (_, _) => await CreateBackupAsync();
         _periodicTimer.AutoReset = true;
         _periodicTimer.Start();
@@ -35,7 +44,7 @@ public class BackupService : IBackupService
     public void UpdateTimerInterval(int minutes)
     {
         _periodicTimer.Stop();
-        _periodicTimer.Interval = TimeSpan.FromMinutes(minutes).TotalMilliseconds;
+        _periodicTimer.Interval = ToValidIntervalMs(minutes);
         _periodicTimer.Start();
     }
 
