@@ -171,8 +171,10 @@
 
     <!-- Configuration - Sauvegardes -->
     <system:String x:Key="Config_Backup">Copies de sauvegardes</system:String>
-    <system:String x:Key="Config_BackupDescription">Une copie de sauvegarde est créée automatiquement à la fermeture de l'application (max. 5). Les dossiers submissions et pdf_docs sont exclus.</system:String>
+    <system:String x:Key="Config_BackupDescription">Une copie de sauvegarde est créée automatiquement à intervalle régulier et à la fermeture de l'application. Les dossiers submissions et pdf_docs sont exclus.</system:String>
     <system:String x:Key="Config_BackupEnabled">Activer les sauvegardes automatiques</system:String>
+    <system:String x:Key="Config_BackupInterval">Intervalle (minutes) :</system:String>
+    <system:String x:Key="Config_BackupMaxCount">Nombre max. de sauvegardes :</system:String>
     <system:String x:Key="Config_BackupAvailable">Sauvegardes disponibles :</system:String>
     <system:String x:Key="Config_BackupRestore">Restaurer cette sauvegarde</system:String>
 

@@ -6,21 +6,49 @@ namespace GradingTool.Services;
 
 public class BackupService : IBackupService
 {
-    private const int MaxBackupCount = 5;
     private static readonly HashSet<string> ExcludedFolderNames =
         new(StringComparer.OrdinalIgnoreCase) { "submissions", "pdf_docs" };
 
     private readonly ISessionsRootService _sessionsRootService;
     private readonly IConfigurationService _configurationService;
+    private readonly System.Timers.Timer _periodicTimer;
+    private volatile bool _suppressNextBackup;
 
     public BackupService(ISessionsRootService sessionsRootService, IConfigurationService configurationService)
     {
         _sessionsRootService = sessionsRootService;
         _configurationService = configurationService;
+
+        var intervalMinutes = _configurationService.LoadBackupIntervalMinutes();
+        _periodicTimer = new System.Timers.Timer(TimeSpan.FromMinutes(intervalMinutes).TotalMilliseconds);
+        _periodicTimer.Elapsed += async (_, _) => await CreateBackupAsync();
+        _periodicTimer.AutoReset = true;
+        _periodicTimer.Start();
     }
+
+    public void Dispose()
+    {
+        _periodicTimer.Stop();
+        _periodicTimer.Dispose();
+    }
+
+    public void UpdateTimerInterval(int minutes)
+    {
+        _periodicTimer.Stop();
+        _periodicTimer.Interval = TimeSpan.FromMinutes(minutes).TotalMilliseconds;
+        _periodicTimer.Start();
+    }
+
+    public void SuppressNextBackup() => _suppressNextBackup = true;
 
     public async Task CreateBackupAsync()
     {
+        if (_suppressNextBackup)
+        {
+            _suppressNextBackup = false;
+            return;
+        }
+
         if (!_configurationService.LoadBackupEnabled())
             return;
 
@@ -73,7 +101,10 @@ public class BackupService : IBackupService
                 var parentPath = Path.GetDirectoryName(evaluationAppPath)!;
 
                 if (Directory.Exists(evaluationAppPath))
+                {
+                    RemoveReadOnlyAttributes(evaluationAppPath);
                     Directory.Delete(evaluationAppPath, recursive: true);
+                }
 
                 ZipFile.ExtractToDirectory(zipPath, parentPath);
             }).ConfigureAwait(false);
@@ -89,8 +120,18 @@ public class BackupService : IBackupService
         if (sessionsRoot == null)
             return null;
 
-        // sessionsRoot = .../Evaluation-App/sessions  →  parent = .../Evaluation-App
+        // sessionsRoot = .../Rubrica/sessions  →  parent = .../Rubrica
         return Path.GetDirectoryName(sessionsRoot);
+    }
+
+    private static void RemoveReadOnlyAttributes(string path)
+    {
+        foreach (var entry in Directory.EnumerateFileSystemEntries(path, "*", SearchOption.AllDirectories).Prepend(path))
+        {
+            var attributes = File.GetAttributes(entry);
+            if ((attributes & FileAttributes.ReadOnly) != 0)
+                File.SetAttributes(entry, attributes & ~FileAttributes.ReadOnly);
+        }
     }
 
     private void CreateZip(string sourceFolderPath, string destinationZipPath)
@@ -120,12 +161,13 @@ public class BackupService : IBackupService
         }
     }
 
-    private static void PurgeOldBackups(string backupFolder)
+    private void PurgeOldBackups(string backupFolder)
     {
+        var maxCount = _configurationService.LoadBackupMaxCount();
         var oldBackups = Directory.GetFiles(backupFolder, "backup_*.zip")
             .Select(f => new FileInfo(f))
             .OrderByDescending(f => f.LastWriteTime)
-            .Skip(MaxBackupCount);
+            .Skip(maxCount);
 
         foreach (var backup in oldBackups)
             backup.Delete();

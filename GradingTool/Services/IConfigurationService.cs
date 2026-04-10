@@ -14,4 +14,8 @@ public interface IConfigurationService
     void SaveLanguage(string language);
     bool LoadBackupEnabled();
     void SaveBackupEnabled(bool enabled);
+    int LoadBackupIntervalMinutes();
+    void SaveBackupIntervalMinutes(int minutes);
+    int LoadBackupMaxCount();
+    void SaveBackupMaxCount(int count);
 }

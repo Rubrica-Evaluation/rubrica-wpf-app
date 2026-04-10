@@ -33,6 +33,9 @@ public partial class App : Application
 
         _serviceProvider.GetRequiredService<MainViewModel>().NavigateToInitialView();
 
+        // Instancier le service de sauvegarde pour démarrer le timer périodique
+        _serviceProvider.GetRequiredService<IBackupService>();
+
         var sessionsRootService = _serviceProvider.GetRequiredService<ISessionsRootService>();
         var rootPath = sessionsRootService.GetSessionsRootPath();
 

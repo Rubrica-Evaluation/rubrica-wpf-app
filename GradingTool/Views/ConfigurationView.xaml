@@ -85,6 +85,32 @@
                               Margin="0,0,0,12"/>
 
                     <StackPanel Visibility="{Binding IsBackupEnabled, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="32"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="16"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{DynamicResource Config_BackupInterval}"
+                                       FontSize="13" Foreground="#444444" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="2"
+                                      ItemsSource="{Binding BackupIntervalOptions}"
+                                      SelectedItem="{Binding SelectedBackupIntervalMinutes}"
+                                      Style="{StaticResource ModernComboBox}"
+                                      MinWidth="70" FontSize="13"/>
+                            <TextBlock Grid.Column="4" Text="{DynamicResource Config_BackupMaxCount}"
+                                       FontSize="13" Foreground="#444444" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="6"
+                                      ItemsSource="{Binding BackupMaxCountOptions}"
+                                      SelectedItem="{Binding SelectedBackupMaxCount}"
+                                      Style="{StaticResource ModernComboBox}"
+                                      MinWidth="55" FontSize="13"/>
+                        </Grid>
+
                         <TextBlock Text="{DynamicResource Config_BackupAvailable}"
                                    FontSize="12" Foreground="#666666" Margin="0,0,0,6"/>
 

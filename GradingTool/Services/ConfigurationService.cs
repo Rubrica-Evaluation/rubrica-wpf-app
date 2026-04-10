@@ -147,6 +147,40 @@ public class ConfigurationService : IConfigurationService
         catch { }
     }
 
+    public int LoadBackupIntervalMinutes()
+    {
+        try { return LoadConfig()?.BackupIntervalMinutes ?? 30; }
+        catch { return 30; }
+    }
+
+    public void SaveBackupIntervalMinutes(int minutes)
+    {
+        try
+        {
+            var config = LoadConfig() ?? new AppConfig();
+            config.BackupIntervalMinutes = minutes;
+            SaveConfig(config);
+        }
+        catch { }
+    }
+
+    public int LoadBackupMaxCount()
+    {
+        try { return LoadConfig()?.BackupMaxCount ?? 10; }
+        catch { return 10; }
+    }
+
+    public void SaveBackupMaxCount(int count)
+    {
+        try
+        {
+            var config = LoadConfig() ?? new AppConfig();
+            config.BackupMaxCount = count;
+            SaveConfig(config);
+        }
+        catch { }
+    }
+
     private class AppConfig
     {
         public string? SessionsRootPath { get; set; }
@@ -155,5 +189,7 @@ public class ConfigurationService : IConfigurationService
         public string? SelectedWork { get; set; }
         public string? Language { get; set; }
         public bool BackupEnabled { get; set; } = true;
+        public int BackupIntervalMinutes { get; set; } = 30;
+        public int BackupMaxCount { get; set; } = 10;
     }
 }

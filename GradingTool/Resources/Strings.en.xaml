@@ -171,8 +171,10 @@
 
     <!-- Configuration - Backups -->
     <system:String x:Key="Config_Backup">Backup Copies</system:String>
-    <system:String x:Key="Config_BackupDescription">A backup copy is automatically created when closing the application (max. 5). The submissions and pdf_docs folders are excluded.</system:String>
+    <system:String x:Key="Config_BackupDescription">A backup copy is automatically created at regular intervals and when closing the application. The submissions and pdf_docs folders are excluded.</system:String>
     <system:String x:Key="Config_BackupEnabled">Enable automatic backups</system:String>
+    <system:String x:Key="Config_BackupInterval">Interval (minutes):</system:String>
+    <system:String x:Key="Config_BackupMaxCount">Max. backup count:</system:String>
     <system:String x:Key="Config_BackupAvailable">Available backups:</system:String>
     <system:String x:Key="Config_BackupRestore">Restore this backup</system:String>
 

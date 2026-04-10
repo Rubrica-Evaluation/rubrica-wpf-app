@@ -35,6 +35,15 @@ public partial class ConfigurationViewModel : ObservableObject
     private bool _suppressBackupToggleDialog;
 
     [ObservableProperty]
+    private int _selectedBackupIntervalMinutes;
+
+    [ObservableProperty]
+    private int _selectedBackupMaxCount;
+
+    public static IReadOnlyList<int> BackupIntervalOptions { get; } = [5, 10, 15, 30];
+    public static IReadOnlyList<int> BackupMaxCountOptions { get; } = [5, 10];
+
+    [ObservableProperty]
     private ObservableCollection<BackupInfo> _availableBackups = [];
 
     [ObservableProperty]
@@ -159,6 +168,17 @@ public partial class ConfigurationViewModel : ObservableObject
         _configurationService.SaveBackupEnabled(value);
     }
 
+    partial void OnSelectedBackupIntervalMinutesChanged(int value)
+    {
+        _configurationService.SaveBackupIntervalMinutes(value);
+        _backupService.UpdateTimerInterval(value);
+    }
+
+    partial void OnSelectedBackupMaxCountChanged(int value)
+    {
+        _configurationService.SaveBackupMaxCount(value);
+    }
+
     [RelayCommand(CanExecute = nameof(CanRestoreBackup))]
     private async Task RestoreBackup()
     {
@@ -183,6 +203,7 @@ public partial class ConfigurationViewModel : ObservableObject
 
         if (success)
         {
+            _backupService.SuppressNextBackup();
             var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
             if (exePath != null)
                 System.Diagnostics.Process.Start(exePath);
@@ -204,6 +225,9 @@ public partial class ConfigurationViewModel : ObservableObject
         _suppressBackupToggleDialog = true;
         IsBackupEnabled = _configurationService.LoadBackupEnabled();
         _suppressBackupToggleDialog = false;
+
+        SelectedBackupIntervalMinutes = _configurationService.LoadBackupIntervalMinutes();
+        SelectedBackupMaxCount = _configurationService.LoadBackupMaxCount();
 
         var backups = _backupService.GetAvailableBackups();
         AvailableBackups = new ObservableCollection<BackupInfo>(backups);
