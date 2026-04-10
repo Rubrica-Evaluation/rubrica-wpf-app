@@ -2,6 +2,7 @@ using System.IO;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using GradingTool.Helpers;
 
 namespace GradingTool.Services;
 
@@ -9,7 +10,7 @@ public class ConfigurationService : IConfigurationService
 {
     private static readonly string AppDataFolder = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "Evaluation-App");
+        AppIdentity.AppFolderName);
     
     private static readonly string ConfigFilePath = Path.Combine(
         AppDataFolder,
@@ -126,6 +127,57 @@ public class ConfigurationService : IConfigurationService
         catch { }
     }
 
+    public bool LoadBackupEnabled()
+    {
+        try { return LoadConfig()?.BackupEnabled ?? true; }
+        catch { return true; }
+    }
+
+    public void SaveBackupEnabled(bool enabled)
+    {
+        try
+        {
+            var config = LoadConfig() ?? new AppConfig();
+            config.BackupEnabled = enabled;
+            SaveConfig(config);
+        }
+        catch { }
+    }
+
+    public int LoadBackupIntervalMinutes()
+    {
+        try { return LoadConfig()?.BackupIntervalMinutes ?? 30; }
+        catch { return 30; }
+    }
+
+    public void SaveBackupIntervalMinutes(int minutes)
+    {
+        try
+        {
+            var config = LoadConfig() ?? new AppConfig();
+            config.BackupIntervalMinutes = minutes;
+            SaveConfig(config);
+        }
+        catch { }
+    }
+
+    public int LoadBackupMaxCount()
+    {
+        try { return LoadConfig()?.BackupMaxCount ?? 10; }
+        catch { return 10; }
+    }
+
+    public void SaveBackupMaxCount(int count)
+    {
+        try
+        {
+            var config = LoadConfig() ?? new AppConfig();
+            config.BackupMaxCount = count;
+            SaveConfig(config);
+        }
+        catch { }
+    }
+
     private class AppConfig
     {
         public string? SessionsRootPath { get; set; }
@@ -133,5 +185,8 @@ public class ConfigurationService : IConfigurationService
         public string? SelectedCourse { get; set; }
         public string? SelectedWork { get; set; }
         public string? Language { get; set; }
+        public bool BackupEnabled { get; set; } = true;
+        public int BackupIntervalMinutes { get; set; } = 30;
+        public int BackupMaxCount { get; set; } = 10;
     }
 }

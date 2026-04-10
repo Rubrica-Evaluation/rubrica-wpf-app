@@ -50,10 +50,15 @@
         
         <!-- En-tête -->
         <Border Grid.Row="0" Background="White" BorderBrush="#E8E8E8" BorderThickness="0,0,0,1" Padding="20,14">
-            <TextBlock Text="{DynamicResource Common_AppTitle}"
-                       FontSize="20"
-                       FontWeight="SemiBold"
-                       Foreground="#1A1A1A"/>
+            <StackPanel>
+                <TextBlock Text="{DynamicResource Common_AppTitle}"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           Foreground="#1A1A1A"/>
+                <TextBlock Text="{DynamicResource Common_AppSubtitle}"
+                           FontSize="12"
+                           Foreground="#888888"/>
+            </StackPanel>
         </Border>
         
         <!-- Contenu - Affiche CurrentView -->

@@ -31,6 +31,11 @@ public partial class App : Application
         var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.Show();
 
+        _serviceProvider.GetRequiredService<MainViewModel>().NavigateToInitialView();
+
+        // Instancier le service de sauvegarde pour démarrer le timer périodique
+        _serviceProvider.GetRequiredService<IBackupService>();
+
         var sessionsRootService = _serviceProvider.GetRequiredService<ISessionsRootService>();
         var rootPath = sessionsRootService.GetSessionsRootPath();
 
@@ -70,6 +75,7 @@ public partial class App : Application
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IPdfService, PdfService>();
         services.AddSingleton<ICommentService, CommentService>();
+        services.AddSingleton<IBackupService, BackupService>();
 
         // ViewModel Factory pour le NavigationService
         services.AddSingleton<Func<Type, object>>(serviceProvider =>
@@ -95,6 +101,9 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        var backupService = _serviceProvider?.GetService<IBackupService>();
+        backupService?.CreateBackupAsync().GetAwaiter().GetResult();
+
         _serviceProvider?.Dispose();
         base.OnExit(e);
     }

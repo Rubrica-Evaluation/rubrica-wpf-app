@@ -1,6 +1,9 @@
+using System.Collections.ObjectModel;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GradingTool.Helpers;
+using GradingTool.Models;
 using GradingTool.Services;
 
 namespace GradingTool.ViewModels;
@@ -11,6 +14,8 @@ public partial class ConfigurationViewModel : ObservableObject
     private readonly ISessionsRootService _sessionsRootService;
     private readonly INavigationService _navigationService;
     private readonly ILocalizationService _localizationService;
+    private readonly IConfigurationService _configurationService;
+    private readonly IBackupService _backupService;
 
     [ObservableProperty]
     private string? _sessionsRootPath;
@@ -24,21 +29,47 @@ public partial class ConfigurationViewModel : ObservableObject
     [ObservableProperty]
     private string _selectedLanguage = "fr";
 
+    [ObservableProperty]
+    private bool _isBackupEnabled;
+
+    private bool _suppressBackupToggleDialog;
+
+    [ObservableProperty]
+    private int _selectedBackupIntervalMinutes;
+
+    [ObservableProperty]
+    private int _selectedBackupMaxCount;
+
+    public static IReadOnlyList<int> BackupIntervalOptions { get; } = [5, 10, 15, 30];
+    public static IReadOnlyList<int> BackupMaxCountOptions { get; } = [5, 10];
+
+    [ObservableProperty]
+    private ObservableCollection<BackupInfo> _availableBackups = [];
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RestoreBackupCommand))]
+    private BackupInfo? _selectedBackup;
+
     public ConfigurationViewModel(
         IDialogService dialogService,
         ISessionsRootService sessionsRootService,
         INavigationService navigationService,
-        ILocalizationService localizationService)
+        ILocalizationService localizationService,
+        IConfigurationService configurationService,
+        IBackupService backupService)
     {
         _dialogService = dialogService;
         _sessionsRootService = sessionsRootService;
         _navigationService = navigationService;
         _localizationService = localizationService;
+        _configurationService = configurationService;
+        _backupService = backupService;
 
         _selectedLanguage = _localizationService.CurrentLanguage;
         _localizationService.LanguageChanged += OnLanguageChanged;
 
         LoadSessionsRootPath();
+        LoadBackupSettings();
     }
 
     partial void OnSelectedLanguageChanged(string value)
@@ -77,17 +108,17 @@ public partial class ConfigurationViewModel : ObservableObject
     [RelayCommand]
     private void SelectSessionsRoot()
     {
-        var selectedPath = _dialogService.SelectFolder("Sélectionner le dossier 'Evaluation-App'");
+        var selectedPath = _dialogService.SelectFolder($"Sélectionner le dossier '{ISessionsRootService.EvaluationAppFolderName}'");
         if (selectedPath == null)
             return;
 
-        var needsEvaluationAppFolder = !selectedPath.EndsWith("Evaluation-App", StringComparison.OrdinalIgnoreCase);
+        var needsEvaluationAppFolder = !selectedPath.EndsWith(ISessionsRootService.EvaluationAppFolderName, StringComparison.OrdinalIgnoreCase);
 
         if (needsEvaluationAppFolder)
         {
             if (!_dialogService.ShowConfirmation(
-                "Voulez-vous créer un dossier 'Evaluation-App' dans le répertoire sélectionné?",
-                "Créer dossier Evaluation-App"))
+                $"Voulez-vous créer un dossier '{ISessionsRootService.EvaluationAppFolderName}' dans le répertoire sélectionné?",
+                $"Créer dossier {ISessionsRootService.EvaluationAppFolderName}"))
             {
                 return;
             }
@@ -112,6 +143,94 @@ public partial class ConfigurationViewModel : ObservableObject
                 "Erreur",
                 System.Windows.MessageBoxImage.Error);
         }
+    }
+
+    partial void OnIsBackupEnabledChanged(bool value)
+    {
+        if (_suppressBackupToggleDialog)
+            return;
+
+        if (!value)
+        {
+            var confirmed = _dialogService.ShowConfirmation(
+                "Désactiver les sauvegardes automatiques réduit votre protection contre la perte de données.\n\nÊtes-vous sûr de vouloir désactiver cette fonctionnalité ?",
+                "Désactiver les sauvegardes");
+
+            if (!confirmed)
+            {
+                _suppressBackupToggleDialog = true;
+                IsBackupEnabled = true;
+                _suppressBackupToggleDialog = false;
+                return;
+            }
+        }
+
+        _configurationService.SaveBackupEnabled(value);
+    }
+
+    partial void OnSelectedBackupIntervalMinutesChanged(int value)
+    {
+        _configurationService.SaveBackupIntervalMinutes(value);
+        _backupService.UpdateTimerInterval(value);
+    }
+
+    partial void OnSelectedBackupMaxCountChanged(int value)
+    {
+        _configurationService.SaveBackupMaxCount(value);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRestoreBackup))]
+    private async Task RestoreBackup()
+    {
+        if (SelectedBackup == null)
+            return;
+
+        var firstConfirmed = _dialogService.ShowConfirmation(
+            "Attention : cette opération va écraser et remplacer définitivement tout le contenu actuel de votre dossier Rubrica.\n\nL'état actuel ne sera pas récupérable.\n\nVoulez-vous continuer ?",
+            "Restaurer une sauvegarde");
+
+        if (!firstConfirmed)
+            return;
+
+        var secondConfirmed = _dialogService.ShowConfirmation(
+            "DERNIÈRE CONFIRMATION : toutes vos données actuelles seront perdues de façon irréversible et remplacées par la sauvegarde sélectionnée.\n\nL'application redémarrera automatiquement.\n\nConfirmez-vous la restauration ?",
+            "Confirmer la restauration");
+
+        if (!secondConfirmed)
+            return;
+
+        var success = await _backupService.RestoreBackupAsync(SelectedBackup.FilePath);
+
+        if (success)
+        {
+            _backupService.SuppressNextBackup();
+            var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+            if (exePath != null)
+                System.Diagnostics.Process.Start(exePath);
+            Application.Current.Shutdown();
+        }
+        else
+        {
+            _dialogService.ShowMessage(
+                "Une erreur est survenue lors de la restauration. Vos données n'ont pas été modifiées.",
+                "Erreur de restauration",
+                MessageBoxImage.Error);
+        }
+    }
+
+    private bool CanRestoreBackup() => SelectedBackup != null;
+
+    private void LoadBackupSettings()
+    {
+        _suppressBackupToggleDialog = true;
+        IsBackupEnabled = _configurationService.LoadBackupEnabled();
+        _suppressBackupToggleDialog = false;
+
+        SelectedBackupIntervalMinutes = _configurationService.LoadBackupIntervalMinutes();
+        SelectedBackupMaxCount = _configurationService.LoadBackupMaxCount();
+
+        var backups = _backupService.GetAvailableBackups();
+        AvailableBackups = new ObservableCollection<BackupInfo>(backups);
     }
 
     [RelayCommand]
