@@ -1,12 +1,10 @@
+using GradingTool.Helpers;
+
 namespace GradingTool.Services;
 
 public interface ISessionsRootService
 {
-#if DEBUG
-    static readonly string EvaluationAppFolderName = "Rubrica-dev";
-#else
-    static readonly string EvaluationAppFolderName = "Rubrica";
-#endif
+    static readonly string EvaluationAppFolderName = AppIdentity.AppFolderName;
 
     string? GetSessionsRootPath();
     bool IsConfigured();

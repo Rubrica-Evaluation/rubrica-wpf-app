@@ -2,6 +2,7 @@ using System.IO;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using GradingTool.Helpers;
 
 namespace GradingTool.Services;
 
@@ -9,11 +10,7 @@ public class ConfigurationService : IConfigurationService
 {
     private static readonly string AppDataFolder = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-#if DEBUG
-        "Rubrica-dev");
-#else
-        "Rubrica");
-#endif
+        AppIdentity.AppFolderName);
     
     private static readonly string ConfigFilePath = Path.Combine(
         AppDataFolder,
