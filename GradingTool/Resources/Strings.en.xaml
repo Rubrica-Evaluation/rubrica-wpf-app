@@ -3,7 +3,8 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <!-- Common -->
-    <system:String x:Key="Common_AppTitle">Grading Tool</system:String>
+    <system:String x:Key="Common_AppTitle">Rubrica</system:String>
+    <system:String x:Key="Common_AppSubtitle">Grading and rubric management</system:String>
     <system:String x:Key="Common_Back">Back</system:String>
     <system:String x:Key="Common_StudentCount"> student(s)</system:String>
     <system:String x:Key="Common_Save">Save</system:String>
@@ -167,5 +168,12 @@
     <system:String x:Key="Config_LanguageDescription">Choose the interface language</system:String>
     <system:String x:Key="Config_SelectFolder">Select Folder</system:String>
     <system:String x:Key="Config_ChangeFolder">Change Folder</system:String>
+
+    <!-- Configuration - Backups -->
+    <system:String x:Key="Config_Backup">Backup Copies</system:String>
+    <system:String x:Key="Config_BackupDescription">A backup copy is automatically created when closing the application (max. 5). The submissions and pdf_docs folders are excluded.</system:String>
+    <system:String x:Key="Config_BackupEnabled">Enable automatic backups</system:String>
+    <system:String x:Key="Config_BackupAvailable">Available backups:</system:String>
+    <system:String x:Key="Config_BackupRestore">Restore this backup</system:String>
 
 </ResourceDictionary>

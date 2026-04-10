@@ -21,7 +21,11 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = viewModel;
-        
+
+#if DEBUG
+        Title += " [DEV]";
+#endif
+
         // Gérer la fermeture de l'application pour sauvegarder automatiquement
         Closing += MainWindow_Closing;
     }

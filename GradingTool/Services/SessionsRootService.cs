@@ -29,7 +29,7 @@ public class SessionsRootService : ISessionsRootService
         // Créer le dossier Evaluation-App si nécessaire
         if (createEvaluationAppFolder)
         {
-            targetPath = Path.Combine(basePath, "Evaluation-App");
+            targetPath = Path.Combine(basePath, ISessionsRootService.EvaluationAppFolderName);
             if (!Directory.Exists(targetPath))
             {
                 Directory.CreateDirectory(targetPath);

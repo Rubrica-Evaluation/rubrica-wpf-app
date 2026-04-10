@@ -9,7 +9,11 @@ public class ConfigurationService : IConfigurationService
 {
     private static readonly string AppDataFolder = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "Evaluation-App");
+#if DEBUG
+        "Rubrica-dev");
+#else
+        "Rubrica");
+#endif
     
     private static readonly string ConfigFilePath = Path.Combine(
         AppDataFolder,
@@ -126,6 +130,23 @@ public class ConfigurationService : IConfigurationService
         catch { }
     }
 
+    public bool LoadBackupEnabled()
+    {
+        try { return LoadConfig()?.BackupEnabled ?? true; }
+        catch { return true; }
+    }
+
+    public void SaveBackupEnabled(bool enabled)
+    {
+        try
+        {
+            var config = LoadConfig() ?? new AppConfig();
+            config.BackupEnabled = enabled;
+            SaveConfig(config);
+        }
+        catch { }
+    }
+
     private class AppConfig
     {
         public string? SessionsRootPath { get; set; }
@@ -133,5 +154,6 @@ public class ConfigurationService : IConfigurationService
         public string? SelectedCourse { get; set; }
         public string? SelectedWork { get; set; }
         public string? Language { get; set; }
+        public bool BackupEnabled { get; set; } = true;
     }
 }

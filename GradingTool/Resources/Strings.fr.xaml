@@ -3,7 +3,8 @@
                     xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <!-- Commun -->
-    <system:String x:Key="Common_AppTitle">Outil d'évaluation</system:String>
+    <system:String x:Key="Common_AppTitle">Rubrica</system:String>
+    <system:String x:Key="Common_AppSubtitle">Évaluations et grilles simplifiées</system:String>
     <system:String x:Key="Common_Back">Retour</system:String>
     <system:String x:Key="Common_StudentCount"> étudiant(s)</system:String>
     <system:String x:Key="Common_Save">Enregistrer</system:String>
@@ -167,5 +168,12 @@
     <system:String x:Key="Config_LanguageDescription">Choisissez la langue de l'interface</system:String>
     <system:String x:Key="Config_SelectFolder">Sélectionner dossier</system:String>
     <system:String x:Key="Config_ChangeFolder">Modifier dossier</system:String>
+
+    <!-- Configuration - Sauvegardes -->
+    <system:String x:Key="Config_Backup">Copies de sauvegardes</system:String>
+    <system:String x:Key="Config_BackupDescription">Une copie de sauvegarde est créée automatiquement à la fermeture de l'application (max. 5). Les dossiers submissions et pdf_docs sont exclus.</system:String>
+    <system:String x:Key="Config_BackupEnabled">Activer les sauvegardes automatiques</system:String>
+    <system:String x:Key="Config_BackupAvailable">Sauvegardes disponibles :</system:String>
+    <system:String x:Key="Config_BackupRestore">Restaurer cette sauvegarde</system:String>
 
 </ResourceDictionary>

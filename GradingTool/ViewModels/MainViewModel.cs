@@ -12,7 +12,10 @@ public partial class MainViewModel : ObservableObject
     public MainViewModel(INavigationService navigationService)
     {
         _navigationService = navigationService;
-        // Au démarrage, naviguer vers le workspace
+    }
+
+    public void NavigateToInitialView()
+    {
         _navigationService.NavigateTo<WorkspaceViewModel>();
     }
 }

@@ -122,6 +122,20 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
     {
         UpdateRubricStatus();
         UpdateRosterStatus();
+        PromptIfSessionsRootMissing();
+    }
+
+    private void PromptIfSessionsRootMissing()
+    {
+        if (IsSessionsRootConfigured)
+            return;
+
+        var wantsToConfigureNow = _dialogService.ShowConfirmation(
+            "Aucun dossier de données n'est configuré.\n\nVoulez-vous en sélectionner un maintenant ?",
+            "Dossier racine manquant");
+
+        if (wantsToConfigureNow)
+            SelectSessionsRoot();
     }
 
     private void RefreshLocalizedTexts()
@@ -144,44 +158,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
         }
         else
         {
-            // Essayer de détecter automatiquement le dossier sessions
-            TryAutoDetectSessionsRoot();
-
-            if (!IsSessionsRootConfigured)
-            {
-                IsSessionsRootConfigured = false;
-                SelectFolderButtonText = _localizationService["Workspace_SelectFolder"];
-            }
-        }
-    }
-
-    private void TryAutoDetectSessionsRoot()
-    {
-        try
-        {
-            // Chercher dans le répertoire parent de l'application
-            var appDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            var projectRoot = Directory.GetParent(appDirectory)?.Parent?.Parent?.Parent?.FullName;
-            
-            if (projectRoot != null)
-            {
-                var sessionsPath = Path.Combine(projectRoot, "sessions");
-                if (Directory.Exists(sessionsPath))
-                {
-                    // Configurer automatiquement
-                    _sessionsRootService.SetupSessionsRoot(sessionsPath, false);
-                    SessionsRootPath = sessionsPath;
-                    IsSessionsRootConfigured = true;
-                    SelectFolderButtonText = _localizationService["Workspace_ChangeFolder"];
-                    LoadSessions();
-                    _dialogService.ShowToast("Dossier racine détecté automatiquement");
-                    return;
-                }
-            }
-        }
-        catch
-        {
-            // Ignorer les erreurs de détection automatique
+            IsSessionsRootConfigured = false;
+            SelectFolderButtonText = _localizationService["Workspace_SelectFolder"];
         }
     }
 
@@ -401,18 +379,17 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
     [RelayCommand]
     private void SelectSessionsRoot()
     {
-        var selectedPath = _dialogService.SelectFolder("Sélectionner le dossier 'Evaluation-App'");
+        var selectedPath = _dialogService.SelectFolder($"Sélectionner le dossier '{ISessionsRootService.EvaluationAppFolderName}'");
         if (selectedPath == null)
             return;
 
-        // Vérifier si l'utilisateur a sélectionné un dossier nommé "Evaluation-App"
-        var needsEvaluationAppFolder = !selectedPath.EndsWith("Evaluation-App", StringComparison.OrdinalIgnoreCase);
-        
+        var needsEvaluationAppFolder = !selectedPath.EndsWith(ISessionsRootService.EvaluationAppFolderName, StringComparison.OrdinalIgnoreCase);
+
         if (needsEvaluationAppFolder)
         {
             if (!_dialogService.ShowConfirmation(
-                "Voulez-vous créer un dossier 'Evaluation-App' dans le répertoire sélectionné?",
-                "Créer dossier Evaluation-App"))
+                $"Voulez-vous créer un dossier '{ISessionsRootService.EvaluationAppFolderName}' dans le répertoire sélectionné?",
+                $"Créer dossier {ISessionsRootService.EvaluationAppFolderName}"))
             {
                 return;
             }

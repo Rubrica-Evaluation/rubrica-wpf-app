@@ -52,7 +52,7 @@
             </Border>
 
             <!-- Langue -->
-            <Border Background="White" CornerRadius="8" BorderBrush="#E8E8E8" BorderThickness="1" Padding="16">
+            <Border Background="White" CornerRadius="8" BorderBrush="#E8E8E8" BorderThickness="1" Padding="16" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="{DynamicResource Config_Language}" FontSize="16" FontWeight="SemiBold" Foreground="#333333" Margin="0,0,0,10"/>
                     <TextBlock Text="{DynamicResource Config_LanguageDescription}"
@@ -68,6 +68,43 @@
                                      IsChecked="{Binding SelectedLanguage, Converter={StaticResource GenerationModeConverter}, ConverterParameter=en}"
                                      GroupName="Language"
                                      FontSize="14"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Copies de sauvegardes -->
+            <Border Background="White" CornerRadius="8" BorderBrush="#E8E8E8" BorderThickness="1" Padding="16">
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource Config_Backup}" FontSize="16" FontWeight="SemiBold" Foreground="#333333" Margin="0,0,0,10"/>
+                    <TextBlock Text="{DynamicResource Config_BackupDescription}"
+                               FontSize="12" Foreground="#666666" Margin="0,0,0,12" TextWrapping="Wrap"/>
+
+                    <CheckBox Content="{DynamicResource Config_BackupEnabled}"
+                              IsChecked="{Binding IsBackupEnabled}"
+                              FontSize="14"
+                              Margin="0,0,0,12"/>
+
+                    <StackPanel Visibility="{Binding IsBackupEnabled, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <TextBlock Text="{DynamicResource Config_BackupAvailable}"
+                                   FontSize="12" Foreground="#666666" Margin="0,0,0,6"/>
+
+                        <ListBox ItemsSource="{Binding AvailableBackups}"
+                                 SelectedItem="{Binding SelectedBackup}"
+                                 MaxHeight="150"
+                                 BorderBrush="#E8E8E8"
+                                 BorderThickness="1"
+                                 Margin="0,0,0,10">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayName}" FontSize="12" Padding="4,2"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <Button Content="{DynamicResource Config_BackupRestore}"
+                                Command="{Binding RestoreBackupCommand}"
+                                Style="{StaticResource RoundedButton}"
+                                HorizontalAlignment="Left"/>
                     </StackPanel>
                 </StackPanel>
             </Border>

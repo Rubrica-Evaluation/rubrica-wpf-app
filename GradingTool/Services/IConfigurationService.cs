@@ -12,4 +12,6 @@ public interface IConfigurationService
     void SaveSelectedWork(string? workName);
     string? LoadLanguage();
     void SaveLanguage(string language);
+    bool LoadBackupEnabled();
+    void SaveBackupEnabled(bool enabled);
 }
