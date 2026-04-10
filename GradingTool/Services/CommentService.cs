@@ -1,7 +1,6 @@
 namespace GradingTool.Services;
 
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.Encodings.Web;
 using System.IO;
 using GradingTool.Models;
@@ -15,8 +14,8 @@ public class CommentService : ICommentService
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         WriteIndented = true,
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        Converters = { new JsonStringEnumConverter() }
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
     public CommentService()
@@ -99,12 +98,13 @@ public class CommentService : ICommentService
 
             string jsonContent = await File.ReadAllTextAsync(filePath);
             var loaded = JsonSerializer.Deserialize<Dictionary<string, List<CommentEntry>>>(jsonContent, _jsonOptions);
-            if (loaded == null) return;
 
             // Vider le cache seulement après un chargement réussi
             _commentsByCriteria.Clear();
             _currentGradingPath = gradingPath;
-            MergeIntoCache(loaded);
+
+            if (loaded != null)
+                PopulateCache(loaded);
         }
         catch (Exception ex)
         {
@@ -114,21 +114,9 @@ public class CommentService : ICommentService
         }
     }
 
-    private void MergeIntoCache(Dictionary<string, List<CommentEntry>> loaded)
+    private void PopulateCache(Dictionary<string, List<CommentEntry>> source)
     {
-        foreach (var (criterionLabel, entries) in loaded)
-        {
-            if (!_commentsByCriteria.TryGetValue(criterionLabel, out var list))
-            {
-                list = new List<CommentEntry>();
-                _commentsByCriteria[criterionLabel] = list;
-            }
-
-            foreach (var entry in entries)
-            {
-                if (!list.Any(e => string.Equals(e.Text, entry.Text, StringComparison.OrdinalIgnoreCase)))
-                    list.Add(entry);
-            }
-        }
+        foreach (var (criterionLabel, entries) in source)
+            _commentsByCriteria[criterionLabel] = new List<CommentEntry>(entries);
     }
 }
