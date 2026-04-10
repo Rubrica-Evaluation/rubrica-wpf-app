@@ -69,7 +69,7 @@ public class CommentService : ICommentService
         {
             if (string.IsNullOrWhiteSpace(gradingPath) || !Directory.Exists(gradingPath)) return;
             // Ne pas écraser le fichier si le chargement a échoué pour ce chemin
-            if (_currentGradingPath != gradingPath) return;
+            if (!string.Equals(_currentGradingPath, gradingPath, StringComparison.OrdinalIgnoreCase)) return;
 
             string filePath = Path.Combine(gradingPath, CommentsFileName);
             string jsonContent = JsonSerializer.Serialize(_commentsByCriteria, _jsonOptions);

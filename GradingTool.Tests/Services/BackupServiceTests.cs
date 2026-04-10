@@ -26,6 +26,8 @@ public class BackupServiceTests : IDisposable
 
         _configurationService = Substitute.For<IConfigurationService>();
         _configurationService.LoadBackupEnabled().Returns(true);
+        _configurationService.LoadBackupIntervalMinutes().Returns(30);
+        _configurationService.LoadBackupMaxCount().Returns(10);
 
         _sut = new BackupService(_sessionsRootService, _configurationService);
     }
@@ -112,6 +114,7 @@ public class BackupServiceTests : IDisposable
     [Fact]
     public async Task CreateBackupAsync_MoreThanFiveBackups_PurgesOldest()
     {
+        _configurationService.LoadBackupMaxCount().Returns(5);
         var backupFolder = _evaluationAppPath + "_backups";
         Directory.CreateDirectory(backupFolder);
 
