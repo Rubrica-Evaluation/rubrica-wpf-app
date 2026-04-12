@@ -67,8 +67,7 @@
 
                 <!-- Section Sessions -->
                 <Grid Grid.Row="3"
-                      Margin="0,0,0,10"
-                      Visibility="{Binding IsSessionsRootConfigured, Converter={StaticResource BoolToVisibilityConverter}}">
+                      Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>

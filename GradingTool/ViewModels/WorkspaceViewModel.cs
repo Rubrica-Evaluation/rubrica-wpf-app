@@ -53,6 +53,7 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(EditSessionCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteSessionCommand))]
+    [NotifyPropertyChangedFor(nameof(IsSessionSelected))]
     private string? _selectedSession;
 
     [ObservableProperty]
@@ -88,6 +89,7 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
     [ObservableProperty]
     private string _generationMode = "individual";
 
+    public bool IsSessionSelected => !string.IsNullOrEmpty(SelectedSession);
     public bool IsCourseSelected => !string.IsNullOrEmpty(SelectedCourse);
 
     public WorkspaceViewModel(
@@ -434,6 +436,12 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
     [RelayCommand]
     private void CreateNewSession()
     {
+        if (!IsSessionsRootConfigured)
+        {
+            PromptIfSessionsRootMissing();
+            return;
+        }
+
         var sessionName = Views.InputDialog.Show(
             "Entrez le nom de la nouvelle session (ex: Hiver 2026):",
             "Nouvelle session");

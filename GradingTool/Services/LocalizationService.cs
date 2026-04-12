@@ -58,7 +58,7 @@ public class LocalizationService : ILocalizationService
             dicts.Remove(existing);
 
         var uri = new Uri(
-            $"pack://application:,,,/GradingTool;component/Resources/Strings.{language}.xaml",
+            $"pack://application:,,,/Rubrica;component/Resources/Strings.{language}.xaml",
             UriKind.Absolute);
 
         dicts.Add(new ResourceDictionary { Source = uri });

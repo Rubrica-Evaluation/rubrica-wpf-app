@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/GradingTool/bin/Debug/net8.0-windows/GradingTool.exe",
+            "program": "${workspaceFolder}/GradingTool/bin/Debug/net10.0-windows/Rubrica.exe",
             "args": [],
             "cwd": "${workspaceFolder}/GradingTool",
             "console": "integratedTerminal",
