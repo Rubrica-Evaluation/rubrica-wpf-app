@@ -133,8 +133,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             return;
 
         var wantsToConfigureNow = _dialogService.ShowConfirmation(
-            "Aucun dossier de données n'est configuré.\n\nVoulez-vous en sélectionner un maintenant ?",
-            "Dossier racine manquant");
+            _localizationService["Workspace_Dialog_NoRootBody"],
+            _localizationService["Workspace_Dialog_NoRootTitle"]);
 
         if (wantsToConfigureNow)
             SelectSessionsRoot();
@@ -258,20 +258,18 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
         if (missingDirectories.Count > 0)
         {
             var directoriesList = string.Join(", ", missingDirectories);
-            var message = $"L'évaluation '{value}' ne contient pas tous les sous-dossiers requis.\n\n" +
-                         $"Dossiers manquants: {directoriesList}\n\n" +
-                         $"Voulez-vous créer les dossiers manquants?";
-            
-            if (_dialogService.ShowConfirmation(message, "Structure incomplète"))
+            var message = string.Format(_localizationService["Workspace_Dialog_MissingDirsBody"], value, directoriesList);
+
+            if (_dialogService.ShowConfirmation(message, _localizationService["Workspace_Dialog_MissingDirsTitle"]))
             {
                 try
                 {
                     _workService.EnsureStructure(SelectedSession, SelectedCourse, value);
-                    _dialogService.ShowToast($"Structure créée avec succès pour '{value}'");
+                    _dialogService.ShowToast(string.Format(_localizationService["Workspace_Toast_StructureCreated"], value));
                 }
                 catch (Exception ex)
                 {
-                    _dialogService.ShowMessage($"Erreur lors de la création de la structure: {ex.Message}", "Erreur", System.Windows.MessageBoxImage.Error);
+                    _dialogService.ShowMessage(string.Format(_localizationService["Workspace_Error_StructureBody"], ex.Message), _localizationService["Common_Error"], System.Windows.MessageBoxImage.Error);
                 }
             }
         }
@@ -381,7 +379,7 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
     [RelayCommand]
     private void SelectSessionsRoot()
     {
-        var selectedPath = _dialogService.SelectFolder($"Sélectionner le dossier '{ISessionsRootService.EvaluationAppFolderName}'");
+        var selectedPath = _dialogService.SelectFolder(string.Format(_localizationService["Workspace_Dialog_SelectFolderPrompt"], ISessionsRootService.EvaluationAppFolderName));
         if (selectedPath == null)
             return;
 
@@ -390,8 +388,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
         if (needsEvaluationAppFolder)
         {
             if (!_dialogService.ShowConfirmation(
-                $"Voulez-vous créer un dossier '{ISessionsRootService.EvaluationAppFolderName}' dans le répertoire sélectionné?",
-                $"Créer dossier {ISessionsRootService.EvaluationAppFolderName}"))
+                string.Format(_localizationService["Workspace_Dialog_CreateAppFolderBody"], ISessionsRootService.EvaluationAppFolderName),
+                string.Format(_localizationService["Workspace_Dialog_CreateAppFolderTitle"], ISessionsRootService.EvaluationAppFolderName)))
             {
                 return;
             }
@@ -409,13 +407,13 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
 
             LoadSessions();
 
-            _dialogService.ShowToast("Dossier racine configuré avec succès");
+            _dialogService.ShowToast(_localizationService["Workspace_Toast_RootConfigured"]);
         }
         catch (Exception ex)
         {
             _dialogService.ShowMessage(
                 ex.Message,
-                "Erreur",
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
         }
     }
@@ -426,10 +424,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             return;
 
         _dialogService.ShowMessage(
-            "Le dossier sélectionné se trouve dans OneDrive, mais OneDrive n'est pas démarré.\n\n"
-            + "Cela pourrait entraîner une perte de données ou des conflits de synchronisation.\n\n"
-            + "Conseil : démarrez OneDrive avant de continuer à travailler.",
-            "Avertissement — OneDrive inactif",
+            _localizationService["Workspace_Warning_OneDriveBody"],
+            _localizationService["Workspace_Warning_OneDriveTitle"],
             System.Windows.MessageBoxImage.Warning);
     }
 
@@ -443,8 +439,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
         }
 
         var sessionName = Views.InputDialog.Show(
-            "Entrez le nom de la nouvelle session (ex: Hiver 2026):",
-            "Nouvelle session");
+            _localizationService["Workspace_Dialog_CreateSessionPrompt"],
+            _localizationService["Workspace_Dialog_CreateSessionTitle"]);
 
         if (string.IsNullOrWhiteSpace(sessionName))
             return;
@@ -455,13 +451,13 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             LoadSessions();
             SelectedSession = sessionName;
             
-            _dialogService.ShowToast($"Session '{sessionName}' créée avec succès");
+            _dialogService.ShowToast(string.Format(_localizationService["Workspace_Toast_SessionCreated"], sessionName));
         }
         catch (Exception ex)
         {
             _dialogService.ShowMessage(
                 ex.Message,
-                "Erreur",
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
         }
     }
@@ -473,8 +469,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             return;
 
         var newName = Views.InputDialog.Show(
-            $"Modifier le nom de la session:",
-            "Modifier session",
+            _localizationService["Workspace_Dialog_EditSessionPrompt"],
+            _localizationService["Workspace_Dialog_EditSessionTitle"],
             SelectedSession);
 
         if (string.IsNullOrWhiteSpace(newName) || newName == SelectedSession)
@@ -487,13 +483,13 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             LoadSessions();
             SelectedSession = newName;
 
-            _dialogService.ShowToast($"Session renommée avec succès");
+            _dialogService.ShowToast(_localizationService["Workspace_Toast_SessionRenamed"]);
         }
         catch (Exception ex)
         {
             _dialogService.ShowMessage(
                 ex.Message,
-                "Erreur",
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
         }
     }
@@ -507,10 +503,10 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
         // Vérifier si la session contient des sous-dossiers
         var hasSubdirectories = _sessionService.HasSubdirectories(SelectedSession);
         var message = hasSubdirectories
-            ? $"La session '{SelectedSession}' contient des sous-dossiers.\n\nÊtes-vous sûr de vouloir la supprimer?"
-            : $"Êtes-vous sûr de vouloir supprimer la session '{SelectedSession}'?";
+            ? string.Format(_localizationService["Workspace_Dialog_DeleteSessionWithSubsBody"], SelectedSession)
+            : string.Format(_localizationService["Workspace_Dialog_DeleteSessionBody"], SelectedSession);
 
-        if (!_dialogService.ShowConfirmation(message, "Supprimer session"))
+        if (!_dialogService.ShowConfirmation(message, _localizationService["Workspace_Dialog_DeleteSessionTitle"]))
             return;
 
         try
@@ -519,13 +515,13 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             SelectedSession = null;
             LoadSessions();
 
-            _dialogService.ShowToast("Session supprimée avec succès");
+            _dialogService.ShowToast(_localizationService["Workspace_Toast_SessionDeleted"]);
         }
         catch (Exception ex)
         {
             _dialogService.ShowMessage(
                 ex.Message,
-                "Erreur",
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
         }
     }
@@ -539,8 +535,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             return;
 
         var courseName = Views.InputDialog.Show(
-            "Entrez le nom du nouveau cours (ex: BD1):",
-            "Nouveau cours");
+            _localizationService["Workspace_Dialog_CreateCoursePrompt"],
+            _localizationService["Workspace_Dialog_CreateCourseTitle"]);
 
         if (string.IsNullOrWhiteSpace(courseName))
             return;
@@ -551,13 +547,13 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             LoadCourses();
             SelectedCourse = courseName;
 
-            _dialogService.ShowToast($"Cours '{courseName}' créé avec succès");
+            _dialogService.ShowToast(string.Format(_localizationService["Workspace_Toast_CourseCreated"], courseName));
         }
         catch (Exception ex)
         {
             _dialogService.ShowMessage(
                 ex.Message,
-                "Erreur",
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
         }
     }
@@ -569,8 +565,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             return;
 
         var newName = Views.InputDialog.Show(
-            $"Modifier le nom du cours:",
-            "Modifier cours",
+            _localizationService["Workspace_Dialog_EditCoursePrompt"],
+            _localizationService["Workspace_Dialog_EditCourseTitle"],
             SelectedCourse);
 
         if (string.IsNullOrWhiteSpace(newName) || newName == SelectedCourse)
@@ -583,13 +579,13 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             LoadCourses();
             SelectedCourse = newName;
 
-            _dialogService.ShowToast($"Cours renommé avec succès");
+            _dialogService.ShowToast(_localizationService["Workspace_Toast_CourseRenamed"]);
         }
         catch (Exception ex)
         {
             _dialogService.ShowMessage(
                 ex.Message,
-                "Erreur",
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
         }
     }
@@ -602,10 +598,10 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
 
         var hasSubdirectories = _courseService.HasSubdirectories(SelectedSession, SelectedCourse);
         var message = hasSubdirectories
-            ? $"Le cours '{SelectedCourse}' contient des sous-dossiers.\n\nÊtes-vous sûr de vouloir le supprimer?"
-            : $"Êtes-vous sûr de vouloir supprimer le cours '{SelectedCourse}'?";
+            ? string.Format(_localizationService["Workspace_Dialog_DeleteCourseWithSubsBody"], SelectedCourse)
+            : string.Format(_localizationService["Workspace_Dialog_DeleteCourseBody"], SelectedCourse);
 
-        if (!_dialogService.ShowConfirmation(message, "Supprimer cours"))
+        if (!_dialogService.ShowConfirmation(message, _localizationService["Workspace_Dialog_DeleteCourseTitle"]))
             return;
 
         try
@@ -614,13 +610,13 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             SelectedCourse = null;
             LoadCourses();
 
-            _dialogService.ShowToast("Cours supprimé avec succès");
+            _dialogService.ShowToast(_localizationService["Workspace_Toast_CourseDeleted"]);
         }
         catch (Exception ex)
         {
             _dialogService.ShowMessage(
                 ex.Message,
-                "Erreur",
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
         }
     }
@@ -634,8 +630,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             return;
 
         var workName = Views.InputDialog.Show(
-            "Entrez le nom de la nouvelle évaluation (ex: TP1):",
-            "Nouvelle évaluation");
+            _localizationService["Workspace_Dialog_CreateWorkPrompt"],
+            _localizationService["Workspace_Dialog_CreateWorkTitle"]);
 
         if (string.IsNullOrWhiteSpace(workName))
             return;
@@ -648,8 +644,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             var rosterCopied = TryCopyRosterFromExistingWork(workName);
             SelectedWork = workName;
             var toastMessage = rosterCopied
-                ? $"Évaluation '{workName}' créée avec succès — liste d'étudiants copiée"
-                : $"Évaluation '{workName}' créée avec succès (rubric, roster, submissions, grading, pdf_docs)";
+                ? string.Format(_localizationService["Workspace_Toast_WorkCreatedWithRoster"], workName)
+                : string.Format(_localizationService["Workspace_Toast_WorkCreated"], workName);
 
             _dialogService.ShowToast(toastMessage);
         }
@@ -657,7 +653,7 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
         {
             _dialogService.ShowMessage(
                 ex.Message,
-                "Erreur",
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
         }
     }
@@ -673,8 +669,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
 
         var sourceWork = worksWithRoster[^1];
         var confirmed = _dialogService.ShowConfirmation(
-            $"Copier la liste d'étudiants depuis '{sourceWork}' vers '{newWorkName}' ?",
-            "Copier le roster");
+            string.Format(_localizationService["Workspace_Dialog_CopyRosterBody"], sourceWork, newWorkName),
+            _localizationService["Workspace_Dialog_CopyRosterTitle"]);
 
         if (!confirmed)
             return false;
@@ -690,8 +686,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             return;
 
         var newName = Views.InputDialog.Show(
-            $"Modifier le nom de l'évaluation:",
-            "Modifier évaluation",
+            _localizationService["Workspace_Dialog_EditWorkPrompt"],
+            _localizationService["Workspace_Dialog_EditWorkTitle"],
             SelectedWork);
 
         if (string.IsNullOrWhiteSpace(newName) || newName == SelectedWork)
@@ -704,13 +700,13 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             LoadWorks();
             SelectedWork = newName;
 
-            _dialogService.ShowToast($"Évaluation renommée avec succès");
+            _dialogService.ShowToast(_localizationService["Workspace_Toast_WorkRenamed"]);
         }
         catch (Exception ex)
         {
             _dialogService.ShowMessage(
                 ex.Message,
-                "Erreur",
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
         }
     }
@@ -721,9 +717,9 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
         if (string.IsNullOrEmpty(SelectedSession) || string.IsNullOrEmpty(SelectedCourse) || string.IsNullOrEmpty(SelectedWork))
             return;
 
-        var message = $"Êtes-vous sûr de vouloir supprimer l'évaluation '{SelectedWork}'?";
+        var message = string.Format(_localizationService["Workspace_Dialog_DeleteWorkBody"], SelectedWork);
 
-        if (!_dialogService.ShowConfirmation(message, "Supprimer évaluation"))
+        if (!_dialogService.ShowConfirmation(message, _localizationService["Workspace_Dialog_DeleteWorkTitle"]))
             return;
 
         try
@@ -732,13 +728,13 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             SelectedWork = null;
             LoadWorks();
 
-            _dialogService.ShowToast("Évaluation supprimée avec succès");
+            _dialogService.ShowToast(_localizationService["Workspace_Toast_WorkDeleted"]);
         }
         catch (Exception ex)
         {
             _dialogService.ShowMessage(
                 ex.Message,
-                "Erreur",
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
         }
     }
@@ -822,8 +818,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             if (rubric == null)
             {
                 _dialogService.ShowMessage(
-                    $"Impossible de charger la rubrique: {rubricError}",
-                    "Erreur de rubrique",
+                    string.Format(_localizationService["Workspace_Error_LoadRubricBody"], rubricError),
+                    _localizationService["Workspace_Error_LoadRubricTitle"],
                     System.Windows.MessageBoxImage.Error);
                 return;
             }
@@ -833,8 +829,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             if (string.IsNullOrEmpty(rootPath))
             {
                 _dialogService.ShowMessage(
-                    "Le dossier racine des sessions n'est pas configuré.",
-                    "Erreur de configuration",
+                    _localizationService["Workspace_Error_RootNotConfiguredBody"],
+                    _localizationService["Workspace_Error_RootNotConfiguredTitle"],
                     System.Windows.MessageBoxImage.Error);
                 return;
             }
@@ -853,8 +849,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
         catch (Exception ex)
         {
             _dialogService.ShowMessage(
-                $"Erreur lors de la génération des grilles:\n\n{ex.Message}",
-                "Erreur",
+                string.Format(_localizationService["Workspace_Error_GenerateGridsBody"], ex.Message),
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
         }
     }
@@ -920,8 +916,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             else
             {
                 _dialogService.ShowMessage(
-                    $"Erreur lors de la sauvegarde de la grille pour {student.FirstName} {student.LastName}.",
-                    "Erreur de sauvegarde",
+                    string.Format(_localizationService["Workspace_Error_SaveGridBody"], student.FirstName, student.LastName),
+                    _localizationService["Workspace_Error_SaveGridTitle"],
                     System.Windows.MessageBoxImage.Error);
                 return; // Stop on first error
             }
@@ -929,22 +925,22 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
 
         if (generatedCount > 0)
         {
-            _dialogService.ShowToast($"{generatedCount} grille(s) générée(s) pour le groupe {group.DisplayName} dans grading/{group.GroupCode}/");
+            _dialogService.ShowToast(string.Format(_localizationService["Workspace_Toast_GridsGenerated"], generatedCount, group.DisplayName, group.GroupCode));
         }
-        
+
         if (skippedCount > 0)
         {
             _dialogService.ShowMessage(
-                $"{skippedCount} grille(s) existaient déjà et ont été ignorées.",
-                "Grilles ignorées",
+                string.Format(_localizationService["Workspace_Dialog_GridsSkippedBody"], skippedCount),
+                _localizationService["Workspace_Dialog_GridsSkippedTitle"],
                 System.Windows.MessageBoxImage.Information);
         }
 
         if (generatedCount == 0 && skippedCount == 0)
         {
             _dialogService.ShowMessage(
-                "Aucune grille n'a été générée.",
-                "Information",
+                _localizationService["Workspace_Dialog_NoGridsBody"],
+                _localizationService["Common_Information"],
                 System.Windows.MessageBoxImage.Information);
         }
     }
@@ -961,8 +957,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
         if (teams.Count == 0)
         {
             _dialogService.ShowMessage(
-                "Aucune équipe détectée. Tous les étudiants ont un numéro d'équipe à 0 ou vide.",
-                "Pas d'équipes",
+                _localizationService["Workspace_Dialog_NoTeamsBody"],
+                _localizationService["Workspace_Dialog_NoTeamsTitle"],
                 System.Windows.MessageBoxImage.Warning);
             return;
         }
@@ -1036,8 +1032,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             else
             {
                 _dialogService.ShowMessage(
-                    $"Erreur lors de la sauvegarde de la grille pour l'équipe {teamNumber}.",
-                    "Erreur de sauvegarde",
+                    string.Format(_localizationService["Workspace_Error_SaveTeamGridBody"], teamNumber),
+                    _localizationService["Workspace_Error_SaveGridTitle"],
                     System.Windows.MessageBoxImage.Error);
                 return; // Stop on first error
             }
@@ -1069,8 +1065,8 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
             else
             {
                 _dialogService.ShowMessage(
-                    $"Erreur lors de la sauvegarde de la grille pour {student.FirstName} {student.LastName}.",
-                    "Erreur de sauvegarde",
+                    string.Format(_localizationService["Workspace_Error_SaveGridBody"], student.FirstName, student.LastName),
+                    _localizationService["Workspace_Error_SaveGridTitle"],
                     System.Windows.MessageBoxImage.Error);
                 return; // Stop on first error
             }
@@ -1078,31 +1074,30 @@ public partial class WorkspaceViewModel : ObservableObject, IActivatable
 
         if (generatedCount > 0)
         {
-            var message = $"{generatedCount} grille(s) générée(s)";
-            if (teams.Count > 0)
-                message += $" ({teams.Count} d'équipe";
-            if (studentsWithoutTeam.Count > 0)
-                message += $"{(teams.Count > 0 ? ", " : "")} {studentsWithoutTeam.Count} individuelle(s)";
-            if (teams.Count > 0)
-                message += ")";
-            message += $" pour le groupe {group.DisplayName} dans grading/{group.GroupCode}/";
-            
-            _dialogService.ShowToast(message);
+            string toastMessage;
+            if (studentsWithoutTeam.Count == 0)
+                toastMessage = string.Format(_localizationService["Workspace_Toast_TeamGridsGenerated"], generatedCount, group.DisplayName, group.GroupCode);
+            else if (teams.Count == 0)
+                toastMessage = string.Format(_localizationService["Workspace_Toast_GridsGenerated"], generatedCount, group.DisplayName, group.GroupCode);
+            else
+                toastMessage = string.Format(_localizationService["Workspace_Toast_MixedGridsGenerated"], generatedCount, teams.Count, studentsWithoutTeam.Count, group.DisplayName, group.GroupCode);
+
+            _dialogService.ShowToast(toastMessage);
         }
-        
+
         if (skippedCount > 0)
         {
             _dialogService.ShowMessage(
-                $"{skippedCount} grille(s) existaient déjà et ont été ignorées.",
-                "Grilles ignorées",
+                string.Format(_localizationService["Workspace_Dialog_GridsSkippedBody"], skippedCount),
+                _localizationService["Workspace_Dialog_GridsSkippedTitle"],
                 System.Windows.MessageBoxImage.Information);
         }
 
         if (generatedCount == 0 && skippedCount == 0)
         {
             _dialogService.ShowMessage(
-                "Aucune grille n'a été générée.",
-                "Information",
+                _localizationService["Workspace_Dialog_NoGridsBody"],
+                _localizationService["Common_Information"],
                 System.Windows.MessageBoxImage.Information);
         }
     }

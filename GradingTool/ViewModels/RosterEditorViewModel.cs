@@ -173,12 +173,12 @@ public partial class RosterEditorViewModel : ObservableObject
             && _gridService.GradingFolderHasFiles(gradingBasePath, groupToDelete.GroupCode);
 
         var warning = hasGradingFiles
-            ? $"\n\n\u26a0\ufe0f Des grilles de correction existent pour ce groupe (grading/{groupToDelete.GroupCode}/). Elles seront inaccessibles si le groupe est supprimé."
+            ? string.Format(_localizationService["RosterEditor_Dialog_DeleteGroupWarning"], groupToDelete.GroupCode)
             : string.Empty;
 
         var confirmed = _dialogService.ShowConfirmation(
-            $"Voulez-vous vraiment supprimer le groupe '{groupToDelete.DisplayName}' et ses {groupToDelete.Students.Count} étudiant(s) ?{warning}",
-            "Confirmer la suppression");
+            string.Format(_localizationService["RosterEditor_Dialog_DeleteGroupBody"], groupToDelete.DisplayName, groupToDelete.Students.Count, warning),
+            _localizationService["RosterEditor_Dialog_DeleteGroupTitle"]);
 
         if (!confirmed)
             return;
@@ -187,8 +187,8 @@ public partial class RosterEditorViewModel : ObservableObject
         if (hasGradingFiles && gradingBasePath != null)
         {
             deleteGradingFiles = _dialogService.ShowConfirmation(
-                $"Voulez-vous aussi supprimer les fichiers de grilles (grading/{groupToDelete.GroupCode}/) ?\n\nIls seront envoyés à la corbeille.",
-                "Supprimer les grilles ?");
+                string.Format(_localizationService["RosterEditor_Dialog_DeleteGradingBody"], groupToDelete.GroupCode),
+                _localizationService["RosterEditor_Dialog_DeleteGradingTitle"]);
         }
 
         var index = Groups.IndexOf(groupToDelete);
@@ -241,8 +241,8 @@ public partial class RosterEditorViewModel : ObservableObject
         if (duplicates.Count > 0)
         {
             _dialogService.ShowMessage(
-                $"Codes en double détectés :\n\n{string.Join("\n", duplicates)}\n\nCorrigez avant de sauvegarder.",
-                "Codes en double",
+                string.Format(_localizationService["RosterEditor_Dialog_DuplicateBody"], string.Join("\n", duplicates)),
+                _localizationService["RosterEditor_Dialog_DuplicateTitle"],
                 System.Windows.MessageBoxImage.Warning);
             return false;
         }
@@ -256,8 +256,8 @@ public partial class RosterEditorViewModel : ObservableObject
         catch (Exception ex)
         {
             _dialogService.ShowMessage(
-                $"Erreur lors de la sauvegarde:\n\n{ex.Message}",
-                "Erreur",
+                string.Format(_localizationService["RosterEditor_Error_SaveBody"], ex.Message),
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
             return false;
         }
@@ -277,7 +277,7 @@ public partial class RosterEditorViewModel : ObservableObject
     {
         if (!_isDirty) return true;
 
-        var choice = _dialogService.ShowUnsavedChangesConfirmation("l'éditeur de groupes");
+        var choice = _dialogService.ShowUnsavedChangesConfirmation(_localizationService["RosterEditor_Context_UnsavedChanges"]);
 
         if (choice == UnsavedChangesChoice.Discard) return true;
         if (choice == UnsavedChangesChoice.Cancel) return false;
@@ -305,7 +305,7 @@ public partial class RosterEditorViewModel : ObservableObject
             return;
 
         var selectedFiles = _dialogService.SelectFiles(
-            "Sélectionner des fichiers CSV d'étudiants",
+            _localizationService["RosterEditor_Dialog_ImportCsvTitle"],
             "Fichiers CSV|*.csv|Tous les fichiers|*.*");
 
         if (selectedFiles == null || selectedFiles.Length == 0)
@@ -337,14 +337,14 @@ public partial class RosterEditorViewModel : ObservableObject
         if (errorMessages.Count > 0)
         {
             _dialogService.ShowMessage(
-                $"Erreurs:\n\n{string.Join("\n", errorMessages)}",
-                "Erreurs d'importation",
+                string.Format(_localizationService["RosterEditor_Dialog_ImportErrorBody"], string.Join("\n", errorMessages)),
+                _localizationService["RosterEditor_Dialog_ImportErrorTitle"],
                 System.Windows.MessageBoxImage.Warning);
         }
 
         if (successCount > 0)
         {
-            _dialogService.ShowToast($"{successCount} groupe(s) importé(s)");
+            _dialogService.ShowToast(string.Format(_localizationService["RosterEditor_Toast_ImportSuccess"], successCount));
             LoadGroups();
         }
     }

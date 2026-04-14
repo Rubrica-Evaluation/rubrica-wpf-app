@@ -98,8 +98,8 @@ public partial class RubricDesignerViewModel : ObservableObject
         {
             LoadRubricIntoDesigner(_rubricService.CreateEmptyRubric(WorkName));
             _dialogService.ShowMessage(
-                $"La rubrique actuelle n'a pas pu être chargée dans le concepteur.\n\n{errorMessage}",
-                "Rubrique invalide",
+                string.Format(_localizationService["RubricDesigner_Error_LoadBody"], errorMessage),
+                _localizationService["RubricDesigner_Error_LoadTitle"],
                 System.Windows.MessageBoxImage.Warning);
             return;
         }
@@ -270,28 +270,28 @@ public partial class RubricDesignerViewModel : ObservableObject
         };
     }
 
-    private static RubricCriterionEditorModel CreateDefaultCriterion(int criterionNumber)
+    private RubricCriterionEditorModel CreateDefaultCriterionLocalized(int criterionNumber)
     {
         return new RubricCriterionEditorModel
         {
-            Label = $"Critère {criterionNumber}",
+            Label = string.Format(_localizationService["RubricDesigner_Default_CriterionLabel"], criterionNumber),
             Weight = 0,
             Scale = new ObservableCollection<RubricScaleItemEditorModel>
             {
-                new() { Qualitative = "Excellent", Label = "[Descripteur du niveau: Excellent]", Points = 100 },
-                new() { Qualitative = "Très bien", Label = "[Descripteur du niveau: Très bien]", Points = 80 },
-                new() { Qualitative = "Suffisant", Label = "[Descripteur du niveau: Suffisant]", Points = 60 },
-                new() { Qualitative = "Insuffisant", Label = "[Descripteur du niveau: Insuffisant]", Points = 40 },
-                new() { Qualitative = "Invalide", Label = "[Descripteur du niveau: Invalide]", Points = 0 }
+                new() { Qualitative = _localizationService["RubricDesigner_Default_QualExcellent"], Label = _localizationService["RubricDesigner_Default_ScaleExcellent"], Points = 100 },
+                new() { Qualitative = _localizationService["RubricDesigner_Default_QualTresBien"], Label = _localizationService["RubricDesigner_Default_ScaleTresBien"], Points = 80 },
+                new() { Qualitative = _localizationService["RubricDesigner_Default_QualSuffisant"], Label = _localizationService["RubricDesigner_Default_ScaleSuffisant"], Points = 60 },
+                new() { Qualitative = _localizationService["RubricDesigner_Default_QualInsuffisant"], Label = _localizationService["RubricDesigner_Default_ScaleInsuffisant"], Points = 40 },
+                new() { Qualitative = _localizationService["RubricDesigner_Default_QualInvalide"], Label = _localizationService["RubricDesigner_Default_ScaleInvalide"], Points = 0 }
             }
         };
     }
 
-    private static RubricPenaltyEditorModel CreateDefaultPenalty(int penaltyNumber)
+    private RubricPenaltyEditorModel CreateDefaultPenaltyLocalized(int penaltyNumber)
     {
         return new RubricPenaltyEditorModel
         {
-            Label = $"Pénalité {penaltyNumber} (ex.: Nombre de jours de retard)",
+            Label = string.Format(_localizationService["RubricDesigner_Default_PenaltyLabel"], penaltyNumber),
             Factor = -10,
             Min = -30
         };
@@ -349,13 +349,13 @@ public partial class RubricDesignerViewModel : ObservableObject
 
         if (string.IsNullOrWhiteSpace(TpName))
         {
-            errorMessage = "Le nom du travail est requis.";
+            errorMessage = _localizationService["RubricDesigner_Validate_WorkNameRequired"];
             return false;
         }
 
         if (Criteria.Count == 0)
         {
-            errorMessage = "Ajoutez au moins un critère avant d'enregistrer la rubrique.";
+            errorMessage = _localizationService["RubricDesigner_Validate_NoCriteria"];
             return false;
         }
 
@@ -363,32 +363,32 @@ public partial class RubricDesignerViewModel : ObservableObject
         {
             if (string.IsNullOrWhiteSpace(criterion.Label))
             {
-                errorMessage = "Chaque critère doit avoir un libellé.";
+                errorMessage = _localizationService["RubricDesigner_Validate_CriterionNoLabel"];
                 return false;
             }
 
             if (criterion.Weight <= 0)
             {
-                errorMessage = $"Le critère '{criterion.Label}' doit avoir un poids supérieur à 0.";
+                errorMessage = string.Format(_localizationService["RubricDesigner_Validate_CriterionNoWeight"], criterion.Label);
                 return false;
             }
 
             if (criterion.Scale.Count == 0)
             {
-                errorMessage = $"Le critère '{criterion.Label}' doit contenir au moins un niveau qualitatif.";
+                errorMessage = string.Format(_localizationService["RubricDesigner_Validate_CriterionNoScale"], criterion.Label);
                 return false;
             }
 
             if (criterion.Scale.Any(scale => string.IsNullOrWhiteSpace(scale.Qualitative) || string.IsNullOrWhiteSpace(scale.Label)))
             {
-                errorMessage = $"Chaque niveau du critère '{criterion.Label}' doit avoir un code qualitatif et un libellé.";
+                errorMessage = string.Format(_localizationService["RubricDesigner_Validate_ScaleNoCode"], criterion.Label);
                 return false;
             }
         }
 
         if (Penalties.OfType<RubricPenaltyEditorModel>().Any(penalty => string.IsNullOrWhiteSpace(penalty.Label)))
         {
-            errorMessage = "Chaque pénalité doit avoir un libellé.";
+            errorMessage = _localizationService["RubricDesigner_Validate_PenaltyNoLabel"];
             return false;
         }
 
@@ -399,8 +399,8 @@ public partial class RubricDesignerViewModel : ObservableObject
     private void LoadRubricFromFile()
     {
         var filePath = _dialogService.SelectFile(
-            "Charger une rubrique",
-            "Fichiers JSON|*.json");
+            _localizationService["RubricDesigner_Dialog_LoadFileTitle"],
+            _localizationService["RubricDesigner_Dialog_LoadFileFilter"]);
 
         if (string.IsNullOrEmpty(filePath))
             return;
@@ -410,21 +410,21 @@ public partial class RubricDesignerViewModel : ObservableObject
         {
             _dialogService.ShowMessage(
                 errorMessage,
-                "Fichier invalide",
+                _localizationService["RubricDesigner_Error_FileTitle"],
                 System.Windows.MessageBoxImage.Warning);
             return;
         }
 
         if ((Criteria.Count > 0 || Penalties.Count > 0) &&
             !_dialogService.ShowConfirmation(
-                "Remplacer le contenu actuel du concepteur par la rubrique chargée ?",
-                "Charger une rubrique"))
+                _localizationService["RubricDesigner_Dialog_LoadConfirmBody"],
+                _localizationService["RubricDesigner_Dialog_LoadFileTitle"]))
         {
             return;
         }
 
         LoadRubricIntoDesigner(rubric);
-        _dialogService.ShowToast("Rubrique chargée dans le concepteur");
+        _dialogService.ShowToast(_localizationService["RubricDesigner_Toast_Loaded"]);
     }
 
     [RelayCommand]
@@ -432,8 +432,8 @@ public partial class RubricDesignerViewModel : ObservableObject
     {
         if ((Criteria.Count > 0 || Penalties.Count > 0) &&
             !_dialogService.ShowConfirmation(
-                "Réinitialiser le concepteur et repartir d'une rubrique vide ?",
-                "Nouvelle rubrique"))
+                _localizationService["RubricDesigner_Dialog_NewBody"],
+                _localizationService["RubricDesigner_Dialog_NewTitle"]))
         {
             return;
         }
@@ -444,7 +444,7 @@ public partial class RubricDesignerViewModel : ObservableObject
     [RelayCommand]
     private void AddCriterion()
     {
-        Criteria.Add(CreateDefaultCriterion(Criteria.Count + 1));
+        Criteria.Add(CreateDefaultCriterionLocalized(Criteria.Count + 1));
     }
 
     [RelayCommand]
@@ -485,7 +485,7 @@ public partial class RubricDesignerViewModel : ObservableObject
     [RelayCommand]
     private void AddPenalty()
     {
-        Penalties.Add(CreateDefaultPenalty(Penalties.Count + 1));
+        Penalties.Add(CreateDefaultPenaltyLocalized(Penalties.Count + 1));
     }
 
     [RelayCommand]
@@ -502,13 +502,13 @@ public partial class RubricDesignerViewModel : ObservableObject
     {
         if (!ValidateDesignerState(out var errorMessage))
         {
-            _dialogService.ShowMessage(errorMessage, "Rubrique incomplète", System.Windows.MessageBoxImage.Warning);
+            _dialogService.ShowMessage(errorMessage, _localizationService["RubricDesigner_Dialog_InvalidTitle"], System.Windows.MessageBoxImage.Warning);
             return;
         }
 
         if (TotalWeight != 100 && !_dialogService.ShowConfirmation(
-                $"Le total des poids est de {TotalWeight} %. Voulez-vous enregistrer quand même ?",
-                "Poids non équilibrés"))
+                string.Format(_localizationService["RubricDesigner_Dialog_UnbalancedWeightBody"], TotalWeight),
+                _localizationService["RubricDesigner_Dialog_UnbalancedWeightTitle"]))
         {
             return;
         }
@@ -517,15 +517,15 @@ public partial class RubricDesignerViewModel : ObservableObject
         if (!_rubricService.SaveRubric(SessionName, CourseName, WorkName, rubric, out var saveError))
         {
             _dialogService.ShowMessage(
-                $"La rubrique n'a pas pu être enregistrée.\n\n{saveError}",
-                "Erreur de sauvegarde",
+                string.Format(_localizationService["RubricDesigner_Error_SaveBody"], saveError),
+                _localizationService["RubricDesigner_Error_SaveTitle"],
                 System.Windows.MessageBoxImage.Error);
             return;
         }
 
         HasExistingRubric = true;
         _isDirty = false;
-        _dialogService.ShowToast("Rubrique enregistrée avec succès");
+        _dialogService.ShowToast(_localizationService["RubricDesigner_Toast_Saved"]);
     }
 
     /// <summary>
@@ -536,7 +536,7 @@ public partial class RubricDesignerViewModel : ObservableObject
     {
         if (!_isDirty) return true;
 
-        var choice = _dialogService.ShowUnsavedChangesConfirmation("le Concepteur de grille");
+        var choice = _dialogService.ShowUnsavedChangesConfirmation(_localizationService["RubricDesigner_Context_UnsavedChanges"]);
 
         if (choice == UnsavedChangesChoice.Discard) return true;
         if (choice == UnsavedChangesChoice.Cancel) return false;
@@ -544,13 +544,13 @@ public partial class RubricDesignerViewModel : ObservableObject
         // Save
         if (!ValidateDesignerState(out var errorMessage))
         {
-            _dialogService.ShowMessage(errorMessage, "Rubrique incomplète", System.Windows.MessageBoxImage.Warning);
+            _dialogService.ShowMessage(errorMessage, _localizationService["RubricDesigner_Dialog_InvalidTitle"], System.Windows.MessageBoxImage.Warning);
             return false;
         }
 
         if (TotalWeight != 100 && !_dialogService.ShowConfirmation(
-                $"Le total des poids est de {TotalWeight} %. Voulez-vous enregistrer quand même ?",
-                "Poids non équilibrés"))
+                string.Format(_localizationService["RubricDesigner_Dialog_UnbalancedWeightBody"], TotalWeight),
+                _localizationService["RubricDesigner_Dialog_UnbalancedWeightTitle"]))
         {
             return false;
         }
@@ -559,8 +559,8 @@ public partial class RubricDesignerViewModel : ObservableObject
         if (!_rubricService.SaveRubric(SessionName, CourseName, WorkName, rubric, out var saveError))
         {
             _dialogService.ShowMessage(
-                $"La rubrique n'a pas pu être enregistrée.\n\n{saveError}",
-                "Erreur de sauvegarde",
+                string.Format(_localizationService["RubricDesigner_Error_SaveBody"], saveError),
+                _localizationService["RubricDesigner_Error_SaveTitle"],
                 System.Windows.MessageBoxImage.Error);
             return false;
         }

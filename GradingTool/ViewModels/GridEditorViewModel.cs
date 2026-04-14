@@ -18,6 +18,7 @@ public partial class GridEditorViewModel : ObservableObject
     private readonly IDialogService _dialogService;
     private readonly IPdfService _pdfService;
     private readonly ICommentService _commentService;
+    private readonly ILocalizationService _localizationService;
 
     private string _gradingRootPath = string.Empty;
     private string _groupGradingPath = string.Empty;
@@ -64,13 +65,14 @@ public partial class GridEditorViewModel : ObservableObject
 
     public string NavigationPath => $"{SessionName} / {CourseName} / {WorkName} / {GroupName}";
     
-    public GridEditorViewModel(INavigationService navigationService, IGridService gridService, IDialogService dialogService, IPdfService pdfService, ICommentService commentService)
+    public GridEditorViewModel(INavigationService navigationService, IGridService gridService, IDialogService dialogService, IPdfService pdfService, ICommentService commentService, ILocalizationService localizationService)
     {
         _navigationService = navigationService;
         _gridService = gridService;
         _dialogService = dialogService;
         _pdfService = pdfService;
         _commentService = commentService;
+        _localizationService = localizationService;
     }
 
     public void Initialize(GroupModel group, string gradingPath, string session, string course, string work)
@@ -247,8 +249,8 @@ public partial class GridEditorViewModel : ObservableObject
     {
         if (string.IsNullOrEmpty(_gradingRootPath)) return string.Empty;
         var usages = _gridService.FindCommentUsages(_gradingRootPath, entry);
-        if (usages.Count == 0) return "Aucune grille ne contient ce commentaire.";
-        return "Utilisé dans :\n" + string.Join("\n", usages.Select(u => $"• {u}"));
+        if (usages.Count == 0) return _localizationService["GridEditor_Comment_NoUsage"];
+        return _localizationService["GridEditor_Comment_UsedIn"] + string.Join("\n", usages.Select(u => $"• {u}"));
     }
 
     [RelayCommand]
@@ -291,7 +293,7 @@ public partial class GridEditorViewModel : ObservableObject
         await _gridService.ApplyCriterionToTeammatesAsync(
             criterion.Label, criterion.Result, criterion.Feedback, teammates);
 
-        _dialogService.ShowToast($"Appliqué à {teammates.Count} coéquipier(s)");
+        _dialogService.ShowToast(string.Format(_localizationService["GridEditor_Toast_AppliedToTeammates"], teammates.Count));
     }
 
     [RelayCommand]
@@ -299,7 +301,7 @@ public partial class GridEditorViewModel : ObservableObject
     {
         if (criterion == null) return;
 
-        var (text, addToBank, severity) = Views.InputDialog.ShowWithBankOption("Nouveau commentaire :", "Ajouter un commentaire", multiline: true);
+        var (text, addToBank, severity) = Views.InputDialog.ShowWithBankOption(_localizationService["GridEditor_Dialog_AddFeedbackPrompt"], _localizationService["GridEditor_Dialog_AddFeedbackTitle"], multiline: true);
         if (string.IsNullOrWhiteSpace(text)) return;
 
         var entry = new CommentEntry { Text = text, Severity = severity };
@@ -316,7 +318,7 @@ public partial class GridEditorViewModel : ObservableObject
 
         int idx = criterion.Feedback.IndexOf(SelectedFeedbackItem);
         var originalEntry = SelectedFeedbackItem;
-        var (text, severity, updateBank) = Views.InputDialog.ShowWithSeverity("Modifier le commentaire :", "Modifier", originalEntry.Text, originalEntry.Severity);
+        var (text, severity, updateBank) = Views.InputDialog.ShowWithSeverity(_localizationService["GridEditor_Dialog_EditFeedbackPrompt"], _localizationService["GridEditor_Dialog_EditFeedbackTitle"], originalEntry.Text, originalEntry.Severity);
         if (text == null) return;
 
         var updatedEntry = new CommentEntry { Text = text, Severity = severity };
@@ -344,13 +346,13 @@ public partial class GridEditorViewModel : ObservableObject
     {
         if (CurrentGrid == null)
         {
-            _dialogService.ShowToast("Erreur: Aucune grille chargée");
+            _dialogService.ShowToast(_localizationService["GridEditor_Toast_NoGridLoaded"]);
             return;
         }
-        
+
         if (SelectedGridFile == null)
         {
-            _dialogService.ShowToast("Erreur: Aucun fichier sélectionné");
+            _dialogService.ShowToast(_localizationService["GridEditor_Toast_NoFileSelected"]);
             return;
         }
 
@@ -368,12 +370,12 @@ public partial class GridEditorViewModel : ObservableObject
                 var gradingPath = Path.GetDirectoryName(groupPath)!;  // Remonter au répertoire grading
                 await _commentService.SaveCommentsAsync(gradingPath);
                 
-                _dialogService.ShowToast("Sauvegarde réussie");
+                _dialogService.ShowToast(_localizationService["GridEditor_Toast_SaveSuccess"]);
                 _ = ShowSavedFeedbackAsync();
-                
+
                 // Stocker le chemin du fichier actuel avant de recharger
                 var currentFilePath = SelectedGridFile.FilePath;
-                
+
                 // Recharger la liste des fichiers pour mettre à jour les informations
                 var gridFileList = _gridService.LoadGridFiles(groupPath);
                 GridFiles.Clear();
@@ -383,20 +385,20 @@ public partial class GridEditorViewModel : ObservableObject
                 }
                 // Resélectionner le fichier actuel
                 SelectedGridFile = GridFiles.FirstOrDefault(g => g.FilePath == currentFilePath);
-                
+
                 if (SelectedGridFile == null)
                 {
-                    _dialogService.ShowToast("Sauvegarde réussie, mais fichier non trouvé après rechargement");
+                    _dialogService.ShowToast(_localizationService["GridEditor_Toast_SaveSuccessFileNotFound"]);
                 }
             }
             else
             {
-                _dialogService.ShowToast("Erreur lors de la sauvegarde");
+                _dialogService.ShowToast(_localizationService["GridEditor_Toast_SaveError"]);
             }
         }
         catch (Exception ex)
         {
-            _dialogService.ShowToast($"Erreur: {ex.Message}");
+            _dialogService.ShowToast(string.Format(_localizationService["GridEditor_Toast_SaveException"], ex.Message));
         }
     }
 
@@ -418,7 +420,7 @@ public partial class GridEditorViewModel : ObservableObject
     {
         if (SelectedGridFile == null)
         {
-            _dialogService.ShowToast("Erreur: Aucun groupe sélectionné");
+            _dialogService.ShowToast(_localizationService["GridEditor_Toast_NoGroupSelected"]);
             return;
         }
 
@@ -428,7 +430,7 @@ public partial class GridEditorViewModel : ObservableObject
             string groupDir = Path.GetDirectoryName(SelectedGridFile.FilePath)!;
             if (!Directory.Exists(groupDir))
             {
-                _dialogService.ShowToast("Erreur: Dossier du groupe introuvable");
+                _dialogService.ShowToast(_localizationService["GridEditor_Toast_GroupFolderNotFound"]);
                 return;
             }
 
@@ -436,7 +438,7 @@ public partial class GridEditorViewModel : ObservableObject
             var jsonFiles = Directory.GetFiles(groupDir, "*.json");
             if (jsonFiles.Length == 0)
             {
-                _dialogService.ShowToast("Aucune grille trouvée dans le groupe");
+                _dialogService.ShowToast(_localizationService["GridEditor_Toast_NoGridsInGroup"]);
                 return;
             }
 
@@ -460,7 +462,7 @@ public partial class GridEditorViewModel : ObservableObject
 
             if (summaries.Count == 0)
             {
-                _dialogService.ShowToast("Aucune grille valide trouvée");
+                _dialogService.ShowToast(_localizationService["GridEditor_Toast_NoValidGrids"]);
                 return;
             }
 
@@ -481,7 +483,7 @@ public partial class GridEditorViewModel : ObservableObject
 
             await File.WriteAllLinesAsync(csvPath, csvLines);
 
-            _dialogService.ShowToast($"Sommaire exporté: {csvPath}");
+            _dialogService.ShowToast(string.Format(_localizationService["GridEditor_Toast_SummaryExported"], csvPath));
 
             // Open the folder
             try
@@ -500,7 +502,7 @@ public partial class GridEditorViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _dialogService.ShowToast($"Erreur lors de l'export: {ex.Message}");
+            _dialogService.ShowToast(string.Format(_localizationService["GridEditor_Toast_ExportError"], ex.Message));
         }
     }
 
@@ -509,7 +511,7 @@ public partial class GridEditorViewModel : ObservableObject
     {
         if (CurrentGrid == null || SelectedGridFile == null)
         {
-            _dialogService.ShowToast("Aucune grille sélectionnée");
+            _dialogService.ShowToast(_localizationService["GridEditor_Toast_NoGridSelected"]);
             return;
         }
 
@@ -538,17 +540,17 @@ public partial class GridEditorViewModel : ObservableObject
             var success = await _pdfService.ExportPdfAsync(CurrentGrid, pdfPath);
             if (success)
             {
-                _dialogService.ShowToast("PDF exporté avec succès");
+                _dialogService.ShowToast(_localizationService["GridEditor_Toast_PdfSuccess"]);
                 Process.Start(new ProcessStartInfo { FileName = "explorer.exe", Arguments = pdfDocsDir, UseShellExecute = true });
             }
             else
             {
-                _dialogService.ShowToast("Erreur lors de l'exportation PDF");
+                _dialogService.ShowToast(_localizationService["GridEditor_Toast_PdfError"]);
             }
         }
         catch (Exception ex)
         {
-            _dialogService.ShowToast($"Erreur: {ex.Message}");
+            _dialogService.ShowToast(string.Format(_localizationService["GridEditor_Toast_SaveException"], ex.Message));
         }
     }
 
@@ -557,7 +559,7 @@ public partial class GridEditorViewModel : ObservableObject
     {
         if (SelectedGridFile == null)
         {
-            _dialogService.ShowToast("Erreur: Aucun groupe sélectionné");
+            _dialogService.ShowToast(_localizationService["GridEditor_Toast_NoGroupSelected"]);
             return;
         }
 
@@ -567,7 +569,7 @@ public partial class GridEditorViewModel : ObservableObject
             string groupDir = Path.GetDirectoryName(SelectedGridFile.FilePath)!;
             if (!Directory.Exists(groupDir))
             {
-                _dialogService.ShowToast("Erreur: Dossier du groupe introuvable");
+                _dialogService.ShowToast(_localizationService["GridEditor_Toast_GroupFolderNotFound"]);
                 return;
             }
 
@@ -593,16 +595,16 @@ public partial class GridEditorViewModel : ObservableObject
 
             if (success)
             {
-                _dialogService.ShowToast("Exportation PDF réussie");
+                _dialogService.ShowToast(_localizationService["GridEditor_Toast_PdfGroupSuccess"]);
             }
             else
             {
-                _dialogService.ShowToast("Erreur lors de l'exportation PDF");
+                _dialogService.ShowToast(_localizationService["GridEditor_Toast_PdfError"]);
             }
         }
         catch (Exception ex)
         {
-            _dialogService.ShowToast($"Erreur: {ex.Message}");
+            _dialogService.ShowToast(string.Format(_localizationService["GridEditor_Toast_SaveException"], ex.Message));
         }
     }
 
@@ -615,8 +617,8 @@ public partial class GridEditorViewModel : ObservableObject
             return;
 
         var confirmed = _dialogService.ShowConfirmation(
-            $"Voulez-vous vraiment supprimer la grille de {SelectedGridFile.DisplayName} ?\n\nCette action est irréversible.",
-            "Supprimer la grille");
+            string.Format(_localizationService["GridEditor_Dialog_DeleteGridBody"], SelectedGridFile.DisplayName),
+            _localizationService["GridEditor_Dialog_DeleteGridTitle"]);
 
         if (!confirmed)
             return;
@@ -629,7 +631,7 @@ public partial class GridEditorViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _dialogService.ShowToast($"Erreur lors de la suppression: {ex.Message}");
+            _dialogService.ShowToast(string.Format(_localizationService["GridEditor_Toast_DeleteGridError"], ex.Message));
         }
     }
 
@@ -650,7 +652,7 @@ public partial class GridEditorViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            _dialogService.ShowToast($"Impossible d'ouvrir le dossier: {ex.Message}");
+            _dialogService.ShowToast(string.Format(_localizationService["GridEditor_Toast_OpenFolderError"], ex.Message));
         }
     }
 

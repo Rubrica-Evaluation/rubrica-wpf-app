@@ -108,7 +108,7 @@ public partial class ConfigurationViewModel : ObservableObject
     [RelayCommand]
     private void SelectSessionsRoot()
     {
-        var selectedPath = _dialogService.SelectFolder($"Sélectionner le dossier '{ISessionsRootService.EvaluationAppFolderName}'");
+        var selectedPath = _dialogService.SelectFolder(string.Format(_localizationService["Workspace_Dialog_SelectFolderPrompt"], ISessionsRootService.EvaluationAppFolderName));
         if (selectedPath == null)
             return;
 
@@ -117,8 +117,8 @@ public partial class ConfigurationViewModel : ObservableObject
         if (needsEvaluationAppFolder)
         {
             if (!_dialogService.ShowConfirmation(
-                $"Voulez-vous créer un dossier '{ISessionsRootService.EvaluationAppFolderName}' dans le répertoire sélectionné?",
-                $"Créer dossier {ISessionsRootService.EvaluationAppFolderName}"))
+                string.Format(_localizationService["Workspace_Dialog_CreateAppFolderBody"], ISessionsRootService.EvaluationAppFolderName),
+                string.Format(_localizationService["Workspace_Dialog_CreateAppFolderTitle"], ISessionsRootService.EvaluationAppFolderName)))
             {
                 return;
             }
@@ -134,13 +134,13 @@ public partial class ConfigurationViewModel : ObservableObject
 
             WarnIfOneDriveInactive(SessionsRootPath);
 
-            _dialogService.ShowToast("Dossier racine configuré avec succès");
+            _dialogService.ShowToast(_localizationService["Workspace_Toast_RootConfigured"]);
         }
         catch (Exception ex)
         {
             _dialogService.ShowMessage(
                 ex.Message,
-                "Erreur",
+                _localizationService["Common_Error"],
                 System.Windows.MessageBoxImage.Error);
         }
     }
@@ -153,8 +153,8 @@ public partial class ConfigurationViewModel : ObservableObject
         if (!value)
         {
             var confirmed = _dialogService.ShowConfirmation(
-                "Désactiver les sauvegardes automatiques réduit votre protection contre la perte de données.\n\nÊtes-vous sûr de vouloir désactiver cette fonctionnalité ?",
-                "Désactiver les sauvegardes");
+                _localizationService["Config_Dialog_DisableBackupBody"],
+                _localizationService["Config_Dialog_DisableBackupTitle"]);
 
             if (!confirmed)
             {
@@ -186,15 +186,15 @@ public partial class ConfigurationViewModel : ObservableObject
             return;
 
         var firstConfirmed = _dialogService.ShowConfirmation(
-            "Attention : cette opération va écraser et remplacer définitivement tout le contenu actuel de votre dossier Rubrica.\n\nL'état actuel ne sera pas récupérable.\n\nVoulez-vous continuer ?",
-            "Restaurer une sauvegarde");
+            _localizationService["Config_Dialog_RestoreBackupBody"],
+            _localizationService["Config_Dialog_RestoreBackupTitle"]);
 
         if (!firstConfirmed)
             return;
 
         var secondConfirmed = _dialogService.ShowConfirmation(
-            "DERNIÈRE CONFIRMATION : toutes vos données actuelles seront perdues de façon irréversible et remplacées par la sauvegarde sélectionnée.\n\nL'application redémarrera automatiquement.\n\nConfirmez-vous la restauration ?",
-            "Confirmer la restauration");
+            _localizationService["Config_Dialog_ConfirmRestoreBody"],
+            _localizationService["Config_Dialog_ConfirmRestoreTitle"]);
 
         if (!secondConfirmed)
             return;
@@ -212,8 +212,8 @@ public partial class ConfigurationViewModel : ObservableObject
         else
         {
             _dialogService.ShowMessage(
-                "Une erreur est survenue lors de la restauration. Vos données n'ont pas été modifiées.",
-                "Erreur de restauration",
+                _localizationService["Config_Error_RestoreBody"],
+                _localizationService["Config_Error_RestoreTitle"],
                 MessageBoxImage.Error);
         }
     }
@@ -246,10 +246,8 @@ public partial class ConfigurationViewModel : ObservableObject
             return;
 
         _dialogService.ShowMessage(
-            "Le dossier sélectionné se trouve dans OneDrive, mais OneDrive n'est pas démarré.\n\n"
-            + "Cela pourrait entraîner une perte de données ou des conflits de synchronisation.\n\n"
-            + "Conseil : fermez l'application, démarrez OneDrive, puis relancez.",
-            "Avertissement — OneDrive inactif",
+            _localizationService["Config_Warning_OneDriveBody"],
+            _localizationService["Workspace_Warning_OneDriveTitle"],
             System.Windows.MessageBoxImage.Warning);
     }
 }

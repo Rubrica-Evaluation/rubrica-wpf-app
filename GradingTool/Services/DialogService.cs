@@ -9,6 +9,13 @@ namespace GradingTool.Services;
 
 public class DialogService : IDialogService
 {
+    private readonly ILocalizationService _localizationService;
+
+    public DialogService(ILocalizationService localizationService)
+    {
+        _localizationService = localizationService;
+    }
+
     public string? SelectFolder(string title)
     {
         var dialog = new OpenFolderDialog
@@ -69,27 +76,26 @@ public class DialogService : IDialogService
     public bool ShowConfirmation(string message, string title)
     {
         var dialog = new CustomDialog(title, message, CustomDialogIcon.Question,
-            ("Non", false), ("Oui", true));
+            (_localizationService["Common_No"], false), (_localizationService["Common_Yes"], true));
         dialog.ShowDialog();
         return dialog.ClickedButtonIndex == 1;
     }
 
     public OverwriteChoice ShowOverwriteConfirmation(int existingCount, int totalCount)
     {
-        string message = $"{existingCount} fichier(s) sur {totalCount} existe(nt) déjà.\n\n"
-                       + "Voulez-vous écraser les fichiers existants, les ignorer ou annuler l'opération ?";
-        var dialog = new CustomDialog("Fichiers existants", message, CustomDialogIcon.Question,
-            ("Annuler", false), ("Ignorer", false), ("Écraser", true));
+        string message = string.Format(_localizationService["Dialog_Overwrite_Body"], existingCount, totalCount);
+        var dialog = new CustomDialog(_localizationService["Dialog_Overwrite_Title"], message, CustomDialogIcon.Question,
+            (_localizationService["Common_Cancel"], false), (_localizationService["Common_Skip"], false), (_localizationService["Common_Overwrite"], true));
         dialog.ShowDialog();
 
         if (dialog.ClickedButtonIndex != 2)
             return dialog.ClickedButtonIndex == 1 ? OverwriteChoice.Skip : OverwriteChoice.Cancel;
 
         var confirm = new CustomDialog(
-            "Confirmation d'écrasement",
-            "Attention : toutes les données saisies dans les grilles existantes seront définitivement perdues.\n\nCette action est irréversible. Confirmer ?",
+            _localizationService["Dialog_ConfirmOverwrite_Title"],
+            _localizationService["Dialog_ConfirmOverwrite_Body"],
             CustomDialogIcon.Warning,
-            ("Annuler", false), ("Confirmer l'écrasement", true));
+            (_localizationService["Common_Cancel"], false), (_localizationService["Common_ConfirmOverwrite"], true));
         confirm.ShowDialog();
 
         return confirm.ClickedButtonIndex == 1 ? OverwriteChoice.Overwrite : OverwriteChoice.Cancel;
@@ -97,9 +103,9 @@ public class DialogService : IDialogService
 
     public UnsavedChangesChoice ShowUnsavedChangesConfirmation(string context)
     {
-        string message = $"Des modifications non enregistrées sont en cours dans {context}.\n\nVoulez-vous enregistrer avant de quitter ?";
-        var dialog = new CustomDialog("Modifications non enregistrées", message, CustomDialogIcon.Warning,
-            ("Annuler", false), ("Quitter sans enregistrer", false), ("Enregistrer", true));
+        string message = string.Format(_localizationService["Dialog_UnsavedChanges_Body"], context);
+        var dialog = new CustomDialog(_localizationService["Dialog_UnsavedChanges_Title"], message, CustomDialogIcon.Warning,
+            (_localizationService["Common_Cancel"], false), (_localizationService["Common_DiscardChanges"], false), (_localizationService["Common_Save"], true));
         dialog.ShowDialog();
         return dialog.ClickedButtonIndex switch
         {
