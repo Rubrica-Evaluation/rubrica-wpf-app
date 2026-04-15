@@ -74,7 +74,7 @@
             </Border>
 
             <!-- Copies de sauvegardes -->
-            <Border Background="White" CornerRadius="8" BorderBrush="#E8E8E8" BorderThickness="1" Padding="16">
+            <Border Background="White" CornerRadius="8" BorderBrush="#E8E8E8" BorderThickness="1" Padding="16" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="{DynamicResource Config_Backup}" FontSize="16" FontWeight="SemiBold" Foreground="#333333" Margin="0,0,0,10"/>
                     <TextBlock Text="{DynamicResource Config_BackupDescription}"
@@ -134,6 +134,40 @@
                                 HorizontalAlignment="Left"/>
                     </StackPanel>
                 </StackPanel>
+            </Border>
+
+            <!-- Version -->
+            <Border Background="#FAFAFA" CornerRadius="8" BorderBrush="#E8E8E8" BorderThickness="1" Padding="16">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource Config_Version}"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="#333333"
+                                   Margin="0,0,0,6"/>
+                        <TextBlock Text="{DynamicResource Config_VersionDescription}"
+                                   FontSize="12"
+                                   Foreground="#666666"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <Border Grid.Column="1"
+                            Background="#F1F3F5"
+                            CornerRadius="999"
+                            Padding="12,6"
+                            VerticalAlignment="Center"
+                            Margin="16,0,0,0">
+                        <TextBlock Text="{Binding AppVersion}"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="#333333"/>
+                    </Border>
+                </Grid>
             </Border>
         </StackPanel>
         </ScrollViewer>

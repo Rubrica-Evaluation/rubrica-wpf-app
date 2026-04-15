@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Collections.ObjectModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -49,6 +50,8 @@ public partial class ConfigurationViewModel : ObservableObject
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RestoreBackupCommand))]
     private BackupInfo? _selectedBackup;
+
+    public string AppVersion { get; } = ResolveAppVersion();
 
     public ConfigurationViewModel(
         IDialogService dialogService,
@@ -249,5 +252,24 @@ public partial class ConfigurationViewModel : ObservableObject
             _localizationService["Config_Warning_OneDriveBody"],
             _localizationService["Workspace_Warning_OneDriveTitle"],
             System.Windows.MessageBoxImage.Warning);
+    }
+
+    private static string ResolveAppVersion()
+    {
+        var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+
+        var informationalVersion = assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+            .InformationalVersion;
+
+        if (!string.IsNullOrWhiteSpace(informationalVersion))
+        {
+            var plusIndex = informationalVersion.IndexOf('+');
+            return plusIndex >= 0
+                ? informationalVersion[..plusIndex]
+                : informationalVersion;
+        }
+
+        return assembly.GetName().Version?.ToString(3) ?? "1.0.0";
     }
 }

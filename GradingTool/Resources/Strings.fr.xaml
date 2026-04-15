@@ -168,6 +168,8 @@
     <system:String x:Key="Config_LanguageDescription">Choisissez la langue de l'interface</system:String>
     <system:String x:Key="Config_SelectFolder">Sélectionner dossier</system:String>
     <system:String x:Key="Config_ChangeFolder">Modifier dossier</system:String>
+    <system:String x:Key="Config_Version">Version</system:String>
+    <system:String x:Key="Config_VersionDescription">Version actuellement installée de l'application</system:String>
 
     <!-- Configuration - Sauvegardes -->
     <system:String x:Key="Config_Backup">Copies de sauvegardes</system:String>
