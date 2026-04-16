@@ -1,6 +1,11 @@
 # Rubrica — Outil de gestion de grilles d'évaluation pour enseignants
 
 Application Windows gratuite pour organiser et corriger les évaluations. Conçue pour les enseignants du collégial, elle permet de gérer les sessions, cours et évaluations, de créer des rubriques de correction, de générer des grilles par étudiant ou par équipe, et d'exporter les résultats en PDF pour le partage aux étudiants.
+
+## Principe directeur
+
+Proposer une solution qui permet de gagner du temps à différents stades de l'évaluation afin de diminuer la fatigue cognitive. De plus, l'enseignant demeure propriétaire de ses données en tout temps.
+
 ## Fonctionnalités
 
 - **Gestion hiérarchique** : sessions → cours → évaluations
