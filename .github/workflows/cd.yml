@@ -6,6 +6,9 @@ on:
       - 'Rubrica-v*'
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   test:
     name: Validate before release
