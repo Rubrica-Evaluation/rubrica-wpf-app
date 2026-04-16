@@ -1,9 +1,6 @@
 # Rubrica — Outil de gestion de grilles d'évaluation pour enseignants
 
 Application Windows gratuite pour organiser et corriger les évaluations. Conçue pour les enseignants du collégial, elle permet de gérer les sessions, cours et évaluations, de créer des rubriques de correction, de générer des grilles par étudiant ou par équipe, et d'exporter les résultats en PDF pour le partage aux étudiants.
-
-> Projet open source — [pourboires bienvenus](https://ko-fi.com/oliviertremblay) si l'outil vous est utile dans votre quotidien
-
 ## Fonctionnalités
 
 - **Gestion hiérarchique** : sessions → cours → évaluations
@@ -16,7 +13,7 @@ Application Windows gratuite pour organiser et corriger les évaluations. Conçu
 
 ## Téléchargement
 
-Téléchargez la dernière version sur la page [Releases](../../releases) — aucune installation requise, lancez simplement `Rubrica.exe`.
+L'application est disponible sur la page [Releases](../../releases).
 
 **Prérequis :** Windows 10/11
 
@@ -64,9 +61,9 @@ dotnet test GradingTool.Tests
 
 Tâches VS Code disponibles : `build`, `publish`, `watch`.
 
-## Contribution
+## Contribution et retours
 
-Les issues et pull requests sont bienvenus. Consultez le code source — l'architecture suit le pattern MVVM strict avec injection de dépendances.
+Les issues, suggestions et pull requests sont bienvenus. Le projet suit une architecture MVVM avec injection de dépendances.
 
 ## Licence
 
